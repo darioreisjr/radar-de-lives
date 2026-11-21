@@ -1,4 +1,8 @@
 import "server-only";
+import { randomBytes } from "node:crypto";
+
+/** Chave aleatória por processo: usada só no modo memória, onde não precisa ser compartilhada. */
+const PROCESS_SECRET = randomBytes(32).toString("base64url");
 
 function int(name: string, fallback: number, min: number, max: number): number {
   const raw = process.env[name];
@@ -22,7 +26,7 @@ export function getServerEnv() {
     upstashUrl,
     upstashToken,
     /** Chave do HMAC que pseudonimiza o IP no rate limit (spec 005 D5). */
-    rateLimitSecret: process.env.RATE_LIMIT_SECRET?.trim() || upstashToken || "radar-de-lives-local-dev",
+    rateLimitSecret: process.env.RATE_LIMIT_SECRET?.trim() || upstashToken || PROCESS_SECRET,
     cacheTtlSeconds: int("LIVE_CACHE_TTL_SECONDS", 900, 30, 86_400),
     staleTtlSeconds: int("LIVE_STALE_TTL_SECONDS", 600, 0, 86_400),
     rateLimitSeconds: int("LIVE_RATE_LIMIT_SECONDS", 30, 5, 3_600),

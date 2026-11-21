@@ -38,7 +38,7 @@ class FakeRedis implements RedisLike {
 
 const failing: RedisLike = {
   get: async () => {
-    throw new Error("https://secret.upstash.io network down");
+    throw new Error("https://db-ficticio.example.invalid network down");
   },
   set: async () => {
     throw new Error("down");
@@ -83,7 +83,7 @@ describe("adaptadores Upstash (CA1, CA6)", () => {
   it("erro do provedor vira StoreError sem expor a mensagem original", async () => {
     const err = await new UpstashCache(failing, "x").get("k").catch((e) => e);
     expect(err).toBeInstanceOf(StoreError);
-    expect(String(err.message)).not.toContain("upstash.io");
+    expect(String(err.message)).not.toContain("example.invalid");
   });
 });
 

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { MemoryCache } from "@/lib/cache/memory-cache";
+import { MemoryCounter, MemoryLock } from "@/lib/store/memory";
 import type { TelemetryEvent, TelemetryFields } from "@/lib/telemetry";
 import { createYoutubeClient } from "@/lib/youtube/client";
 import { createLivesService, type PageData } from "@/lib/youtube/service";
@@ -24,6 +25,8 @@ describe("telemetria (CA6)", () => {
     const service = createLivesService({
       client: createYoutubeClient({ apiKey: KEY, regionCode: "BR", relevanceLanguage: "pt", fetchImpl, retryDelayMs: 0 }),
       cache: new MemoryCache<PageData>(50, now),
+      counter: new MemoryCounter(now),
+      lock: new MemoryLock(now),
       config: { query: "q", ttlMs: 900_000, staleMs: 600_000, minUpstreamIntervalMs: 30_000, dailySearchBudget: 90 },
       now,
       log: (evt, fields) => events.push({ evt, fields }),

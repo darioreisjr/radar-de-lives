@@ -1,4 +1,4 @@
-import type { CacheStore } from "@/lib/cache/types";
+import type { CacheStore, Counter } from "@/lib/store/types";
 import { logEvent, type Logger } from "@/lib/telemetry";
 import type { YoutubeClient } from "./client";
 import { createDailyBudget } from "./daily-budget";
@@ -29,6 +29,7 @@ export function videoStatusFrom(videoId: string, item: YtVideoItem | undefined):
 export interface VideoStatusDeps {
   client: YoutubeClient | null;
   cache: CacheStore<StatusData>;
+  counter: Counter;
   ttlMs: number;
   dailyBudget: number;
   now?: () => number;
@@ -38,37 +39,54 @@ export interface VideoStatusDeps {
 export function createVideoStatusService(deps: VideoStatusDeps) {
   const now = deps.now ?? Date.now;
   const log = deps.log ?? logEvent;
-  const budget = createDailyBudget(deps.dailyBudget, now);
+  const budget = createDailyBudget({ limit: deps.dailyBudget, counter: deps.counter, method: "videos.list", now });
   const inflight = new Map<string, Promise<VideoStatusPayload>>();
+
+  /** Falha do store fecha sem chamar o YouTube (spec 005 D6). */
+  async function store<T>(operation: string, fn: () => Promise<T>): Promise<T> {
+    try {
+      return await fn();
+    } catch {
+      log("store_error", { operation });
+      throw new LivesError("upstream_unavailable");
+    }
+  }
 
   async function getStatus(videoId: string): Promise<VideoStatusPayload> {
     const client = deps.client;
     if (!client) throw new LivesError("missing_api_key");
 
-    const hit = await deps.cache.get(videoId);
+    const hit = await store("cache.get", () => deps.cache.get(videoId));
     if (hit && now() - hit.storedAt < deps.ttlMs) {
       return { ...hit.value, checkedAt: new Date(hit.storedAt).toISOString(), cached: true };
     }
     const running = inflight.get(videoId);
     if (running) return running;
 
-    if (!budget.consume()) {
-      log("budget_exhausted", { method: "videos.list", budgetLimit: deps.dailyBudget });
-      throw new LivesError("quota_exceeded");
-    }
-
     const task = (async () => {
       try {
-        const res = await client.videoDetails([videoId]);
-        log("youtube_call", { method: "videos.list", ids: 1, budgetUsed: budget.used(), budgetLimit: deps.dailyBudget });
+        const b = await store("budget.consume", () => budget.consume());
+        if (!b.ok) {
+          log("budget_exhausted", { method: "videos.list", budgetLimit: deps.dailyBudget });
+          throw new LivesError("quota_exceeded");
+        }
+        let res;
+        try {
+          res = await client.videoDetails([videoId]);
+        } catch (e) {
+          const err = e instanceof LivesError ? e : new LivesError("upstream_unavailable");
+          log("youtube_error", { method: "videos.list", code: err.code });
+          throw err;
+        }
+        log("youtube_call", { method: "videos.list", ids: 1, budgetUsed: b.used, budgetLimit: deps.dailyBudget });
         const value = videoStatusFrom(videoId, res.items?.find((i) => i.id === videoId));
         const storedAt = now();
-        await deps.cache.set(videoId, { value, storedAt }, deps.ttlMs);
+        try {
+          await deps.cache.set(videoId, { value, storedAt }, deps.ttlMs);
+        } catch {
+          log("store_error", { operation: "cache.set" });
+        }
         return { ...value, checkedAt: new Date(storedAt).toISOString(), cached: false };
-      } catch (e) {
-        const err = e instanceof LivesError ? e : new LivesError("upstream_unavailable");
-        log("youtube_error", { method: "videos.list", code: err.code });
-        throw err;
       } finally {
         inflight.delete(videoId);
       }
@@ -77,7 +95,7 @@ export function createVideoStatusService(deps: VideoStatusDeps) {
     return task;
   }
 
-  return { getStatus, budgetUsed: budget.used };
+  return { getStatus };
 }
 
 export type VideoStatusService = ReturnType<typeof createVideoStatusService>;

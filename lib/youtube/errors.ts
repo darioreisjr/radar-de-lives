@@ -17,7 +17,7 @@ export const PUBLIC_MESSAGES: Record<LivesErrorCode, string> = {
   quota_exceeded:
     "O limite diário de consultas ao YouTube foi atingido. A quota é renovada à meia-noite no horário do Pacífico (EUA).",
   rate_limited: "Muitas solicitações em pouco tempo. Aguarde alguns segundos e tente novamente.",
-  upstream_unavailable: "O YouTube não respondeu a tempo. Tente novamente em instantes.",
+  upstream_unavailable: "A busca não respondeu a tempo. Tente novamente em instantes.",
   upstream_config:
     "O YouTube recusou a consulta. Verifique se a chave é válida e se a YouTube Data API v3 está ativada no projeto do Google Cloud.",
   invalid_params: "Parâmetros inválidos.",

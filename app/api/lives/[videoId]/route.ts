@@ -7,7 +7,7 @@ import { VIDEO_ID } from "@/lib/youtube/normalize";
 
 /** Revalida um vídeo antes de abrir o player (spec 002). */
 export async function GET(request: NextRequest, ctx: RouteContext<"/api/lives/[videoId]">) {
-  const limited = getRouteRateLimit().check(clientKey(request));
+  const limited = await getRouteRateLimit().check(clientKey(request));
   if (!limited.ok) return errorResponse("rate_limited", undefined, limited.retryAfterSeconds);
 
   const { videoId } = await ctx.params;

@@ -25,8 +25,8 @@ export default function PrivacyPage() {
         <p>
           O servidor do site consulta a YouTube Data API v3 para encontrar transmissões públicas ao vivo e exibe apenas
           metadados públicos retornados por ela: título, canal, miniatura, horário de início e, quando o canal permite,
-          número de espectadores. Esses dados ficam em cache na memória do servidor por alguns minutos e depois são
-          descartados ou atualizados.
+          número de espectadores. Esses dados ficam em cache por até cerca de 25 minutos e depois são descartados ou
+          atualizados. Em produção, o cache fica no Upstash Redis, um serviço de armazenamento usado pelo site.
         </p>
         <p>
           O uso do YouTube está sujeito aos <ExternalLink href={YOUTUBE_TERMS}>Termos de Serviço do YouTube</ExternalLink>,
@@ -38,13 +38,15 @@ export default function PrivacyPage() {
       <LegalSection title="Dados tratados pelo site">
         <ul className="list-disc space-y-2 pl-5">
           <li>
-            <strong>Endereço IP:</strong> usado apenas na memória do servidor, por até 60 segundos, para limitar
-            requisições em excesso. O site não grava o IP.
+            <strong>Endereço IP:</strong> usado para limitar requisições em excesso. O IP não é gravado: guardamos
+            apenas um código derivado dele por função de hash com chave secreta (HMAC-SHA256), que não permite
+            recuperar o endereço sem essa chave. Esse código fica no Upstash Redis por até 60 segundos e é apagado
+            automaticamente.
           </li>
           <li>
             <strong>Registros técnicos:</strong> o site registra eventos de funcionamento (por exemplo, consultas ao
             YouTube e falhas) sem IP nem dados pessoais. O provedor de hospedagem pode manter registros de acesso próprios,
-            conforme a política dele.
+            conforme a política dele. O site é hospedado na Vercel.
           </li>
           <li>
             <strong>Filtros e preferências:</strong> ficam só na página aberta e são perdidos ao recarregar. Nada é salvo no

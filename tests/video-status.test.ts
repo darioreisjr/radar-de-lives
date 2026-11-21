@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { MemoryCache } from "@/lib/cache/memory-cache";
+import { MemoryCounter } from "@/lib/store/memory";
 import { createYoutubeClient } from "@/lib/youtube/client";
 import { createVideoStatusService, videoStatusFrom } from "@/lib/youtube/video-status";
 
@@ -33,6 +34,7 @@ function setup(fetchImpl: typeof fetch, budget = 100) {
   const service = createVideoStatusService({
     client: createYoutubeClient({ apiKey: "K", regionCode: "BR", relevanceLanguage: "pt", fetchImpl, retryDelayMs: 0 }),
     cache: new MemoryCache(50, now),
+    counter: new MemoryCounter(now),
     ttlMs: 60_000,
     dailyBudget: budget,
     now,
@@ -71,7 +73,7 @@ describe("serviço de revalidação", () => {
   });
 
   it("sem chave: missing_api_key", async () => {
-    const service = createVideoStatusService({ client: null, cache: new MemoryCache(), ttlMs: 1, dailyBudget: 1 });
+    const service = createVideoStatusService({ client: null, cache: new MemoryCache(), counter: new MemoryCounter(), ttlMs: 1, dailyBudget: 1 });
     await expect(service.getStatus(ID)).rejects.toMatchObject({ code: "missing_api_key" });
   });
 });

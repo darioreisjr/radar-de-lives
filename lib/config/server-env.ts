@@ -14,8 +14,15 @@ function code(name: string, fallback: string, pattern: RegExp): string {
 /** Configuração somente do servidor. A chave nunca deve sair deste módulo para o cliente. */
 export function getServerEnv() {
   const apiKey = process.env.YOUTUBE_API_KEY?.trim() || null;
+  // Spec 005: aceita os nomes do Upstash e os antigos do Vercel KV (os mesmos lidos pelo SDK).
+  const upstashUrl = (process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL)?.trim() || null;
+  const upstashToken = (process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN)?.trim() || null;
   return {
     apiKey,
+    upstashUrl,
+    upstashToken,
+    /** Chave do HMAC que pseudonimiza o IP no rate limit (spec 005 D5). */
+    rateLimitSecret: process.env.RATE_LIMIT_SECRET?.trim() || upstashToken || "radar-de-lives-local-dev",
     cacheTtlSeconds: int("LIVE_CACHE_TTL_SECONDS", 900, 30, 86_400),
     staleTtlSeconds: int("LIVE_STALE_TTL_SECONDS", 600, 0, 86_400),
     rateLimitSeconds: int("LIVE_RATE_LIMIT_SECONDS", 30, 5, 3_600),

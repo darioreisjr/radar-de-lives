@@ -8,7 +8,7 @@ import { LivesError } from "@/lib/youtube/errors";
 import type { LivesPayload } from "@/lib/youtube/types";
 
 export async function GET(request: NextRequest) {
-  const limited = getRouteRateLimit().check(clientKey(request));
+  const limited = await getRouteRateLimit().check(clientKey(request));
   if (!limited.ok) return errorResponse("rate_limited", undefined, limited.retryAfterSeconds);
 
   const parsed = parseLivesQuery(request.nextUrl.searchParams);

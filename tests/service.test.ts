@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { MemoryCache } from "@/lib/cache/memory-cache";
-import { FixedWindowRateLimit } from "@/lib/rate-limit/memory-rate-limit";
+import { MemoryCounter, MemoryLock } from "@/lib/store/memory";
 import { createYoutubeClient } from "@/lib/youtube/client";
 import { LivesError } from "@/lib/youtube/errors";
 import { createLivesService, type PageData } from "@/lib/youtube/service";
@@ -32,6 +32,9 @@ function setup(opts: { fetchImpl: typeof fetch; budget?: number }) {
       retryDelayMs: 0,
     }),
     cache: new MemoryCache<PageData>(50, now),
+    counter: new MemoryCounter(now),
+    lock: new MemoryLock(now),
+    sleep: async () => {},
     config: {
       query: "q",
       ttlMs: 120_000,
@@ -158,21 +161,10 @@ describe("serviço de lives", () => {
     const service = createLivesService({
       client: null,
       cache: new MemoryCache<PageData>(),
+      counter: new MemoryCounter(),
+      lock: new MemoryLock(),
       config: { query: "q", ttlMs: 1, staleMs: 1, minUpstreamIntervalMs: 1, dailySearchBudget: 1 },
     });
     await expect(service.getLives()).rejects.toMatchObject({ code: "missing_api_key" });
-  });
-});
-
-describe("rate limit", () => {
-  it("bloqueia após o limite e informa retry-after", () => {
-    let t = 0;
-    const rl = new FixedWindowRateLimit(2, 60_000, () => t);
-    expect(rl.check("ip").ok).toBe(true);
-    expect(rl.check("ip").ok).toBe(true);
-    const r = rl.check("ip");
-    expect(r.ok).toBe(false);
-    t += 60_000;
-    expect(rl.check("ip").ok).toBe(true);
   });
 });

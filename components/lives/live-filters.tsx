@@ -4,7 +4,7 @@ import type { LangFilter, SortOption } from "@/lib/youtube/types";
 
 const field =
   "min-h-11 w-full rounded-lg bg-surface px-3 text-sm text-text-primary ring-1 ring-border-strong placeholder:text-text-secondary/80 transition-shadow duration-[140ms] hover:ring-accent-cyan/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan";
-const label = "mb-1.5 block text-xs font-medium uppercase tracking-[0.1em] text-text-secondary";
+const label = "mb-2 block text-sm text-text-secondary";
 
 export interface FilterValue {
   q: string;
@@ -48,7 +48,7 @@ export function LiveFilters({
       <div className="grid grid-cols-2 gap-3 sm:contents">
         <div>
           <label htmlFor="filter-lang" className={label}>
-            Idioma <span className="normal-case tracking-normal">(estimado)</span>
+            Idioma (estimado)
           </label>
           <select
             id="filter-lang"

@@ -2,9 +2,10 @@ import { HeroSection } from "@/components/hero/hero-section";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { LiveExplorer } from "@/components/lives/live-explorer";
+import { LivesProvider } from "@/components/lives/lives-provider";
 
 export default function Home() {
-  // Dados simulados só fora de produção (D15).
+  // Dados simulados só fora de produção (001 D15).
   const demoAllowed = process.env.NODE_ENV !== "production";
 
   return (
@@ -17,8 +18,11 @@ export default function Home() {
       </a>
       <SiteHeader />
       <main className="flex-1">
-        <HeroSection />
-        <LiveExplorer demoAllowed={demoAllowed} />
+        {/* Estado das lives compartilhado entre o painel do radar e a grade (spec 007 D4). */}
+        <LivesProvider demoAllowed={demoAllowed}>
+          <HeroSection />
+          <LiveExplorer />
+        </LivesProvider>
       </main>
       <SiteFooter />
     </>

@@ -8,9 +8,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5" aria-label={`${siteConfig.name} — início`}>
           <RadarMark className="size-8" />
-          <span className="font-display text-lg font-semibold uppercase tracking-[0.12em]">
-            Radar <span className="text-accent-pink">de</span> Lives
-          </span>
+          <span className="text-base font-semibold">Radar de Lives</span>
         </Link>
         <nav aria-label="Principal">
           <ul className="flex items-center gap-1 text-sm text-text-secondary">

@@ -14,11 +14,11 @@ function Panel({
   action?: ReactNode;
   role?: "alert" | "status";
 }) {
-  const accent = { neutral: "bg-accent-cyan", error: "bg-live-red", quota: "bg-accent-violet" }[tone];
+  const accent = { neutral: "bg-border-strong", error: "bg-live-red", quota: "bg-border-strong" }[tone];
   return (
     <div role={role} className="relative overflow-hidden rounded-xl bg-surface p-6 ring-1 ring-border sm:p-8">
       <span className={`absolute inset-y-0 left-0 w-1 ${accent}`} aria-hidden="true" />
-      <h3 className="font-display text-xl font-semibold uppercase tracking-wide">{title}</h3>
+      <h3 className="text-lg font-medium">{title}</h3>
       <div className="mt-2 max-w-prose text-sm leading-relaxed text-text-secondary">{children}</div>
       {action && <div className="mt-5">{action}</div>}
     </div>

@@ -18,14 +18,14 @@ export function LegalPage({ title, children }: { title: string; children: ReactN
           <Link href="/" className="text-sm text-accent-cyan underline underline-offset-2">
             ← Voltar para as lives
           </Link>
-          <h1 className="mt-6 font-display text-4xl font-bold uppercase tracking-tight sm:text-5xl">{title}</h1>
+          <h1 className="mt-6 font-display text-4xl font-medium tracking-[-0.02em] sm:text-5xl">{title}</h1>
           <p className="mt-3 font-mono text-xs text-text-secondary">
             Atualizado em <time dateTime={updatedAt}>{dateFmt.format(new Date(`${updatedAt}T00:00:00Z`))}</time>
           </p>
 
           {preliminary && (
-            <div role="note" className="mt-6 rounded-xl bg-accent-violet/10 p-4 text-sm ring-1 ring-accent-violet/50">
-              <p className="font-semibold text-[#D7C2FF]">Versão preliminar</p>
+            <div role="note" className="mt-6 rounded-xl bg-surface p-4 text-sm ring-1 ring-border">
+              <p className="font-medium text-text-primary">Versão preliminar</p>
               <p className="mt-1 text-text-secondary">
                 O responsável pelo site e o contato ainda não foram definidos. Este texto descreve o funcionamento atual do
                 site e precisa de revisão antes da publicação.
@@ -36,7 +36,7 @@ export function LegalPage({ title, children }: { title: string; children: ReactN
           <div className="legal-prose mt-8 space-y-8 text-[15px] leading-relaxed text-text-secondary">{children}</div>
 
           <section className="mt-10 border-t border-border pt-6 text-sm text-text-secondary">
-            <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-text-primary">Responsável e contato</h2>
+            <h2 className="text-lg font-medium text-text-primary">Responsável e contato</h2>
             <p className="mt-2">
               {controller ?? "Responsável: a definir."} {contact ? <>Contato: {contact}</> : "Contato: a definir."}
             </p>
@@ -51,7 +51,7 @@ export function LegalPage({ title, children }: { title: string; children: ReactN
 export function LegalSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="space-y-3">
-      <h2 className="font-display text-xl font-semibold uppercase tracking-wide text-text-primary">{title}</h2>
+      <h2 className="text-xl font-medium text-text-primary">{title}</h2>
       {children}
     </section>
   );

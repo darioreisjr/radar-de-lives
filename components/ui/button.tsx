@@ -10,7 +10,7 @@ export const buttonStyles: Record<Variant, string> = {
 };
 
 export const buttonBase =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors duration-[140ms] disabled:cursor-not-allowed";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium transition-colors duration-[140ms] disabled:cursor-not-allowed";
 
 export function Button({
   variant = "ghost",

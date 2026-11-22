@@ -95,7 +95,7 @@ export function LivePlayerDialog({
             {demo ? <Badge tone="demo">Simulado</Badge> : live ? <LiveBadge /> : <Badge>Encerrada</Badge>}
             {!demo && live && <span className="font-mono text-xs text-accent-cyan">{viewers.full}</span>}
           </div>
-          <h2 id={titleId} className="mt-2 line-clamp-2 text-lg font-semibold leading-snug">
+          <h2 id={titleId} className="mt-2 line-clamp-2 text-lg font-medium leading-snug">
             {item.title}
           </h2>
           <p className="mt-1 truncate text-sm text-text-secondary">{item.channelTitle}</p>
@@ -124,7 +124,7 @@ export function LivePlayerDialog({
               {view.kind === "checking" && <p className="text-sm text-text-secondary">Conferindo se a live continua…</p>}
               {message && (
                 <>
-                  <p className="font-display text-xl font-semibold uppercase tracking-wide">{message.title}</p>
+                  <p className="text-lg font-medium">{message.title}</p>
                   <p className="mt-2 text-sm leading-relaxed text-text-secondary">{message.body}</p>
                 </>
               )}

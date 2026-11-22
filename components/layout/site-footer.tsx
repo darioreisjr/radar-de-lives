@@ -9,7 +9,7 @@ export function SiteFooter() {
         <div>
           <div className="flex items-center gap-2.5">
             <RadarMark className="size-7" />
-            <p className="font-display text-base font-semibold uppercase tracking-[0.12em]">{siteConfig.name}</p>
+            <p className="text-base font-semibold">{siteConfig.name}</p>
           </div>
           <p className="mt-4 max-w-prose text-sm leading-relaxed text-text-secondary">{siteConfig.disclaimer}</p>
           <nav aria-label="Informações legais" className="mt-5">
@@ -28,7 +28,7 @@ export function SiteFooter() {
           </nav>
         </div>
         <div className="space-y-3 text-sm leading-relaxed text-text-secondary">
-          <h2 className="font-display text-sm font-semibold uppercase tracking-[0.14em] text-text-primary">
+          <h2 className="text-sm font-medium text-text-primary">
             Como funciona
           </h2>
           <p>{siteConfig.coverageNote}</p>

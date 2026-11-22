@@ -38,7 +38,7 @@ export function RefreshStatus({
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <p className="font-display text-2xl font-semibold uppercase tracking-wide" aria-live="polite" aria-atomic="true">
+        <p className="text-2xl font-medium tabular-nums" aria-live="polite" aria-atomic="true">
           {summary}
         </p>
         <p className="mt-1 font-mono text-xs text-text-secondary">

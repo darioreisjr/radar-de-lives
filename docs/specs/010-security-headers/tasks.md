@@ -24,5 +24,9 @@ Legenda: [x] concluído e verificado · [ ] pendente
   - console: nenhum erro de Permissions-Policy, Referrer ou bloqueio. Única mensagem: `[Vercel Web Analytics] Failed to load script` (esperado fora da Vercel);
   - `document.featurePolicy`: `camera`, `microphone`, `geolocation`, `payment`, `usb`, `browsing-topics` = bloqueados; `fullscreen`, `picture-in-picture`, `encrypted-media`, `autoplay` = liberados;
   - `allowsFeature("fullscreen", "https://www.youtube.com")` = `false` tanto aqui quanto na produção atual **sem** o cabeçalho → comportamento padrão do navegador (o iframe recebe a permissão pelo atributo `allow`), não regressão.
-- [ ] T7 Push autorizado → cabeçalhos no Preview (`vercel curl`) — aguarda autorização
+- [x] T7 Push → CI [45014700223](https://github.com/darioreisjr/radar-de-lives/actions/runs/45014700223) verde; Preview `radar-de-lives-q6b37gql7` conferido com `vercel curl`:
+  - `/`, `/privacy`, `/opengraph-image` (200) e `/api/lives` (503, Preview sem chave) com os 5 cabeçalhos e sem `x-powered-by`;
+  - `Strict-Transport-Security` da Vercel mantido;
+  - `/_vercel/insights/script.js` → 200 (Analytics carrega com os cabeçalhos novos) — CA4
+- [x] T7b PR aberto para `main`
 - [ ] T8 Depois do merge: cabeçalhos em produção e script do Analytics carregando — CA4 (parte Analytics)

@@ -1,6 +1,6 @@
 # 009 — CI no GitHub Actions
 
-Status: em andamento · Data: 2026-11-22
+Status: implementada e verificada · Data: 2026-11-22
 Fonte: [sprint.md — S-04](../../../sprint.md#s-04--ci-no-github-actions).
 
 ## 1. Contexto

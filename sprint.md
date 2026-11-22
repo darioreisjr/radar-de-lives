@@ -141,7 +141,7 @@ O projeto está finalizado quando:
 
 - [ ] S-01 concluída: textos legais revisados e publicados, sem pendência jurídica aberta.
 - [ ] S-02 concluída: política com os itens da LGPD.
-- [ ] S-03 concluída: chave restrita à YouTube Data API v3.
+- [x] S-03 concluída: chave restrita à YouTube Data API v3.
 - [ ] S-04 concluída: CI verde em `main`.
 - [ ] S-05 concluída: cabeçalhos de segurança em produção, com player, miniaturas e Analytics funcionando.
 - [ ] S-06 concluída: specs e README sem pendências falsas.
@@ -254,6 +254,11 @@ npm run dev   # abrir http://localhost:3000/privacy em 375 px e desktop
 
 **Pronto quando:** a chave está restrita só à YouTube Data API v3 e o site continua retornando lives.
 **Opcional:** mande um print do painel **sem a chave visível** para um agente conferir.
+
+**Resultado (2026-11-22):** concluída.
+- Projeto `radar-de-lives` tem uma única chave ("Chave de API 1"). Restrições de aplicativo: Nenhuma. Restrições de API: somente "YouTube Data API v3". Salva por volta de 10:27 UTC; a lista de credenciais passou a mostrar a restrição.
+- Cotas da YouTube Data API v3: "Search Queries per day" = **100** (uso no momento: 2); "Queries per day" = 10.000.
+- Site depois da restrição: a primeira busca nova em produção, `GET /api/lives` às 10:34:50 UTC, respondeu `cached: false`, `source: "youtube"`, com 50 itens e sem erro.
 
 ---
 

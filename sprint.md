@@ -144,7 +144,7 @@ O projeto está finalizado quando:
 - [x] S-03 concluída: chave restrita à YouTube Data API v3.
 - [ ] S-04 concluída: CI verde em `main`.
 - [ ] S-05 concluída: cabeçalhos de segurança em produção, com player, miniaturas e Analytics funcionando.
-- [ ] S-06 concluída: specs e README sem pendências falsas.
+- [x] S-06 concluída: specs e README sem pendências falsas. (3 itens abertos com nota por falta de evidência; ver S-06.)
 - [x] S-07 concluída: `robots.txt` e `sitemap.xml` em produção.
 - [ ] S-08 concluída: licença decidida e aplicada (ou decisão registrada de não licenciar).
 - [ ] S-10 concluída: estados e movimento reduzido verificados.
@@ -412,6 +412,15 @@ Além disso:
 1. `grep -rnE "^\s*- \[ \]|^\s*- \[!\]" docs/specs` só retorna itens realmente abertos, cada um apontando para uma tarefa S-xx.
 2. Nenhuma afirmação nova sem evidência. Se não conseguir confirmar algo, deixe aberto com nota.
 3. Sem alteração de código.
+
+**Resultado (2026-11-22):** concluída, spec `011-docs-cleanup`, PR #9 (`d73f7ca`).
+- Itens resolvidos fechados com evidência: specs 001 a 005, 008 T8 e 012 T6. A 008 e a 012 estão fora da lista de arquivos e foram alteradas com autorização do usuário.
+- Itens abertos apontados para tarefas do sprint: reduced motion e estados vistos na UI → S-10; testes de componente → S-09; Search Console → S-07; transferência internacional e legítimo interesse → S-01.
+- Critérios:
+  - 1 OK, com exceção registrada. Três itens ficaram abertos com nota e sem tarefa S-xx, por decisão do usuário: 002 "live real", 004 "Assistir aqui" e 004 "Carregar mais". A tabela acima os dá como feitos, mas a evidência só existe na conversa de deploy, e os logs da Vercel disponíveis (desde 2026-11-22 10:04 UTC) não mostram essas chamadas.
+  - 2 OK.
+  - 3 OK. Só Markdown alterado; lint, typecheck, 117 testes e build verdes.
+- README: Pendências apontando para este arquivo, link em "Desenvolvimento", linha do CI e fatias novas na tabela. CLAUDE.md: a linha pedida.
 
 ---
 

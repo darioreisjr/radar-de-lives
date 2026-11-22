@@ -14,4 +14,5 @@
 - Logs do servidor só via `lib/telemetry.ts` (`logEvent`); nunca IP, chave ou URL do YouTube.
 - Cores: `lib/config/design-tokens.ts` e `app/globals.css` precisam bater (teste `tests/contrast.test.ts`). Controles usam `border-strong`.
 - Textos de `/privacy` e `/terms` devem refletir o que o código faz; atualize-os ao mudar coleta de dados ou integrações.
+- Vercel CLI 59.x: `vercel env rm <nome> <ambiente>` apagou a variável de **todos** os ambientes (ocorrido em 2026-11-21). Para mudar ambientes de uma variável, use o painel. `vercel link` também baixa variáveis para `.env.local` e altera o `.gitignore`: confira com `git diff` depois.
 - Commits: Conventional Commits em pt-BR (ex.: `feat(cache): adiciona cache compartilhado no Upstash`), **sem** linha `Co-Authored-By`. Pedido do usuário em 2026-11-21.

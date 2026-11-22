@@ -9,17 +9,30 @@ Mostra **lives encontradas** pela busca da YouTube Data API v3. A busca **não g
 
 **Em produção:** https://radardelives.darioreis.dev — Vercel + Upstash Redis + Vercel Web Analytics.
 
-MVP do [PRD](docs/product/PRD_Radar_de_Lives_GTA6.md) concluído e verificado em produção (fatias 001–006). Pendências antes de divulgar: [ver abaixo](#pendências).
+MVP do [PRD](docs/product/PRD_Radar_de_Lives_GTA6.md) concluído e verificado em produção (fatias 001–007). Pendências antes de divulgar: [ver abaixo](#pendências).
 
 ## Funcionalidades
 
+- Painel do radar no topo da página: lives no ar, distribuição por idioma estimado e maior público informado, calculados da mesma consulta da grade (sem quota extra e sem números inventados).
 - Grade de lives com miniatura, título, canal, horário de início, idioma estimado e espectadores (ou "Não informado", nunca zero).
 - Busca por texto, filtro de idioma estimado (pt/en/es/outro), ordenação por relevância, espectadores ou mais recentes.
 - Botão "Atualizar" com cooldown de 30 s e "Carregar mais" por clique (sem rolagem infinita).
 - "Assistir no YouTube" (nova aba) e "Assistir aqui": diálogo que confere se a live continua, pede consentimento e só então carrega o player oficial, sem autoplay, sempre com "Abrir no YouTube" como alternativa.
 - Estados de carregamento, vazio, erro, quota esgotada, dados antigos (stale), live encerrada e incorporação desativada.
-- Páginas de [privacidade](https://radardelives.darioreis.dev/privacy) e [termos](https://radardelives.darioreis.dev/terms), imagem de compartilhamento (Open Graph) original.
+- Páginas de [privacidade](https://radardelives.darioreis.dev/privacy) e [termos](https://radardelives.darioreis.dev/terms) e imagem de compartilhamento (Open Graph) no mesmo visual da home.
 - Acessível por teclado, contraste WCAG verificado por teste, respeita `prefers-reduced-motion`.
+
+## Visual
+
+Interface noturna e discreta, polida com a skill [unslop](https://github.com/heydamir/unslop) (Damir Sokolovsky, CC BY 4.0) dentro dos tokens do PRD ([spec 007](docs/specs/007-unslop-home/)):
+
+- A cor fica no conteúdo: as miniaturas das lives e o painel do radar. Fundo, cards e controles usam neutros com contornos finos.
+- **Uma única ação rosa** por tela ("Ver lives encontradas"); as ações dos cards são neutras.
+- Ciano para dados (espectadores, barra principal do painel) e vermelho só no ponto "ao vivo", a assinatura do site.
+- Oswald 500 apenas nos títulos grandes (home e páginas legais); o resto em Geist, sem caixa alta e com números tabulares.
+- Sem texto em gradiente, manchas de cor, texturas ou sombras coloridas. Movimento curto: hover com contorno e 2 px de elevação, entrada única com escalonamento em até 6 cards.
+
+Cores e contraste ficam em `lib/config/design-tokens.ts` e são verificados por `tests/contrast.test.ts`.
 
 ## Limitações conhecidas
 
@@ -77,7 +90,7 @@ Modelo completo em [.env.example](.env.example).
 | `npm run dev` | Servidor de desenvolvimento |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Gera tipos de rota e roda `tsc --noEmit` |
-| `npm test` | Testes unitários (Vitest, 103 testes) |
+| `npm test` | Testes unitários (Vitest, 106 testes) |
 | `npm run build` / `npm start` | Build e servidor de produção |
 
 ## API
@@ -138,6 +151,7 @@ O projeto segue **Spec-Driven Development** ([skill](.claude/skills/sdd/SKILL.md
 | [004-real-key-validation](docs/specs/004-real-key-validation/) | Validação com dados reais, calibração do idioma | ✅ |
 | [005-shared-store](docs/specs/005-shared-store/) | Upstash Redis e deploy na Vercel | ✅ |
 | [006-web-analytics](docs/specs/006-web-analytics/) | Vercel Web Analytics | ✅ |
+| [007-unslop-home](docs/specs/007-unslop-home/) | Polimento visual, painel do radar, imagem Open Graph | ✅ |
 
 **Commits:** [Conventional Commits](https://www.conventionalcommits.org/pt-br/) em pt-BR, sem linha de coautor (ex.: `feat(store): ...`, `docs(specs): ...`).
 

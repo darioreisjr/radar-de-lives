@@ -17,6 +17,6 @@ export const siteConfig = {
   legal: {
     controller: "Radar de Lives, projeto independente de fãs" as string | null,
     contact: "dev.darioreis@gmail.com" as string | null,
-    updatedAt: "2026-11-21",
+    updatedAt: "2026-11-22",
   },
 } as const;

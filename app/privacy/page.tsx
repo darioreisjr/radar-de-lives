@@ -10,7 +10,11 @@ export const metadata: Metadata = {
 const GOOGLE_PRIVACY = "https://policies.google.com/privacy";
 const YOUTUBE_TERMS = "https://www.youtube.com/t/terms";
 
+const dateFmt = new Intl.DateTimeFormat("pt-BR", { dateStyle: "long", timeZone: "UTC" });
+
 export default function PrivacyPage() {
+  const { controller, contact } = siteConfig.legal;
+
   return (
     <LegalPage title="Política de privacidade">
       <LegalSection title="Resumo">
@@ -88,12 +92,133 @@ export default function PrivacyPage() {
         </ul>
       </LegalSection>
 
+      <LegalSection title="Controlador e contato">
+        <p>
+          O controlador dos dados tratados por este site é{" "}
+          <strong>{controller ?? "o responsável pelo site (a definir)"}</strong>. Para dúvidas, pedidos ou reclamações
+          sobre privacidade, escreva para{" "}
+          {contact ? (
+            <a href={`mailto:${contact}`} className="text-accent-cyan underline underline-offset-2">
+              {contact}
+            </a>
+          ) : (
+            "o contato do site (a definir)"
+          )}
+          . Esse e-mail é o canal de comunicação com os titulares; o projeto não tem um encarregado (DPO) nomeado
+          separadamente.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="Finalidades e bases legais">
+        <p>
+          Cada tratamento tem uma finalidade específica e uma base legal da Lei Geral de Proteção de Dados (LGPD, Lei
+          13.709/2018):
+        </p>
+        <ul className="list-disc space-y-2 pl-5">
+          <li>
+            <strong>Código derivado do IP no limite de requisições:</strong> segurança do site e prevenção de abuso, como
+            excesso de consultas que esgotaria a cota da API do YouTube. Base legal: legítimo interesse (art. 7º, IX).
+          </li>
+          <li>
+            <strong>Estatísticas de visitas (Vercel Web Analytics):</strong> saber, de forma agregada, quantas pessoas
+            usam o site e quais páginas são vistas, para manter e melhorar o serviço. Base legal: legítimo interesse (art.
+            7º, IX).
+          </li>
+          <li>
+            <strong>Miniaturas carregadas do YouTube:</strong> exibir as imagens das lives encontradas, que são parte do
+            próprio serviço. Base legal: legítimo interesse (art. 7º, IX).
+          </li>
+          <li>
+            <strong>Player incorporado do YouTube:</strong> assistir à live dentro do site. Só é carregado depois que você
+            clica em &ldquo;Carregar player&rdquo;. Base legal: consentimento (art. 7º, I), que você pode deixar de dar
+            simplesmente não carregando o player.
+          </li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection title="Compartilhamento e operadores">
+        <p>Não vendemos nem compartilhamos dados para publicidade. Usamos estes serviços para o site funcionar:</p>
+        <ul className="list-disc space-y-2 pl-5">
+          <li>
+            <strong>Vercel</strong> (operador): hospedagem do site, registros de acesso e estatísticas de visitas.
+          </li>
+          <li>
+            <strong>Upstash</strong> (operador): armazenamento temporário do cache de lives e do código derivado do IP
+            usado no limite de requisições.
+          </li>
+          <li>
+            <strong>Google/YouTube</strong>: fornece os dados públicos das lives pela API (o servidor do site não envia
+            dados de visitantes nessa consulta), as miniaturas e o player incorporado. Quando seu navegador carrega
+            miniaturas ou o player, o Google recebe dados diretamente de você e os trata como controlador, conforme a{" "}
+            <ExternalLink href={GOOGLE_PRIVACY}>Política de Privacidade do Google</ExternalLink>.
+          </li>
+        </ul>
+        <p>
+          Também podemos fornecer dados quando houver obrigação legal ou ordem de autoridade competente.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="Transferência internacional">
+        <p>
+          Os serviços acima são de empresas estrangeiras e podem processar dados fora do Brasil, por exemplo nos Estados
+          Unidos. Nesses casos, a transferência segue as garantias oferecidas por esses provedores em seus contratos e
+          políticas, conforme o art. 33 da LGPD.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="Por quanto tempo guardamos">
+        <ul className="list-disc space-y-2 pl-5">
+          <li>
+            <strong>Código derivado do IP:</strong> até 60 segundos, apagado automaticamente.
+          </li>
+          <li>
+            <strong>Cache de dados públicos do YouTube:</strong> até cerca de 25 minutos. Não contém dados de visitantes.
+          </li>
+          <li>
+            <strong>Estatísticas de visitas:</strong> conforme a Vercel. A identificação da visita é descartada após 24
+            horas, e os relatórios agregados ficam disponíveis pelo período do plano contratado.
+          </li>
+          <li>
+            <strong>Registros de acesso da hospedagem:</strong> conforme a política da Vercel.
+          </li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection title="Seus direitos">
+        <p>Pela LGPD (art. 18), você pode pedir:</p>
+        <ul className="list-disc space-y-2 pl-5">
+          <li>confirmação de que tratamos dados seus e acesso a eles;</li>
+          <li>correção de dados incompletos, inexatos ou desatualizados;</li>
+          <li>anonimização, bloqueio ou eliminação de dados desnecessários ou tratados em desconformidade com a lei;</li>
+          <li>eliminação de dados tratados com base no seu consentimento;</li>
+          <li>informação sobre com quem compartilhamos dados;</li>
+          <li>informação sobre a possibilidade de não consentir e suas consequências, e revogação do consentimento;</li>
+          <li>oposição a tratamento baseado em legítimo interesse, se você entender que ele não cumpre a lei.</li>
+        </ul>
+        <p>
+          Para exercer esses direitos, envie um e-mail para {contact ?? "o contato do site (a definir)"} descrevendo o
+          pedido. Responderemos em até 15 dias. Como o site não tem contas nem cadastro e não guarda o seu IP, na maioria
+          dos casos não teremos dados que permitam identificar você; nesse caso, informaremos isso na resposta. Para dados
+          tratados pelo Google no player ou nas miniaturas, use também os canais do Google. Você também pode apresentar
+          reclamação à Autoridade Nacional de Proteção de Dados (ANPD).
+        </p>
+      </LegalSection>
+
       <LegalSection title="Seus controles">
         <p>
           Você pode assistir sem carregar o player incorporado, usando os links para o YouTube. Para gerenciar dados que o
           Google associa à sua conta, use as configurações de segurança da sua Conta do Google (
           <ExternalLink href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</ExternalLink>
           ).
+        </p>
+      </LegalSection>
+
+      <LegalSection title="Atualizações desta política">
+        <p>
+          Esta política vale a partir de{" "}
+          <time dateTime={siteConfig.legal.updatedAt}>{dateFmt.format(new Date(`${siteConfig.legal.updatedAt}T00:00:00Z`))}</time>
+          . Se o funcionamento do site mudar, atualizaremos este texto e a data no topo da página. Os itens sobre a LGPD
+          estão em revisão jurídica e podem ser ajustados.
         </p>
       </LegalSection>
     </LegalPage>

@@ -148,7 +148,7 @@ O projeto está finalizado quando:
 - [x] S-07 concluída: `robots.txt` e `sitemap.xml` em produção.
 - [ ] S-08 concluída: licença decidida e aplicada (ou decisão registrada de não licenciar).
 - [ ] S-10 concluída: estados e movimento reduzido verificados.
-- [ ] S-13 concluída: alertas configurados.
+- [x] S-13 concluída: alertas configurados.
 - [x] S-11: executada (spec `016-consent-notice`).
 - [ ] S-14: executada **ou** registrada como "não aplicável" com o motivo.
 - [ ] S-09, S-12, S-15: executadas **ou** registradas como "adiada por decisão do usuário".
@@ -646,6 +646,15 @@ Sobre os scripts:
 4. **Logs do app:** na Vercel → Logs, filtre por `budget_exhausted` e `store_error`. Se aparecerem com frequência, é sinal para a S-14 ou para investigar o Upstash.
 
 **Pronto quando:** os três painéis têm notificação ativa ou registrada como indisponível no plano.
+
+**Resultado (2026-11-22):** concluída.
+
+| Painel | Situação | Detalhe |
+| --- | --- | --- |
+| Upstash | Indisponível no plano | O banco `upstash-kv-copper-diamond` (Free, `us-east-1`) é gerenciado pela Vercel. Nem as configurações do banco no console do Upstash nem a aba Storage da Vercel têm alerta de uso. Uso no dia: 313 de 500 mil comandos/mês. Acompanhar pela aba Details do console do Upstash (Vercel → Storage → "Open in Upstash"). |
+| Vercel | Indisponível no plano | No Hobby, Settings → Alerts e Spend Management pedem upgrade para o Pro, e "My Notifications" não tem categoria de uso. Acompanhar pelo quadro Usage do dashboard. |
+| Google Cloud | Alerta ativo | Política do Cloud Monitoring "Quota usage - YouTube Data API v3 - Search Queries per day", criada a partir da tela de cotas. Dispara em **80%** da cota diária de `search.list` (80 de 100; o app trava em 90). Canal de e-mail "Radar de Lives - alertas", que envia para o e-mail da conta Google do responsável. |
+| Logs do app | Sem ocorrências | Runtime Logs da Vercel: nenhum `budget_exhausted` na última hora nem `store_error` nos últimos 30 min. O Hobby só guarda até 1 hora de logs, então essa verificação só vale para o momento. |
 
 ---
 

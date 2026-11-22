@@ -150,7 +150,7 @@ O projeto está finalizado quando:
 - [ ] S-10 concluída: estados e movimento reduzido verificados.
 - [x] S-13 concluída: alertas configurados.
 - [x] S-11: executada (spec `016-consent-notice`).
-- [ ] S-14: executada **ou** registrada como "não aplicável" com o motivo.
+- [x] S-14: registrada como "não aplicável" (gatilho não ocorreu; ver a seção da S-14).
 - [ ] S-09, S-12, S-15: executadas **ou** registradas como "adiada por decisão do usuário".
 
 ---
@@ -707,6 +707,12 @@ Sobre os scripts:
 4. Depois da aprovação, ajuste `YOUTUBE_SEARCH_DAILY_BUDGET` na Vercel (Production) para ficar abaixo da nova cota e faça um redeploy.
 
 **Pronto quando:** pedido enviado e resposta registrada, ou gatilho nunca ocorrido (registrar "não aplicável").
+
+**Resultado (2026-11-22):** não aplicável, porque o gatilho não ocorreu.
+- Painel de cotas da YouTube Data API v3: "Search Queries per day" com 5 de 100 (5%) no dia. O indicador "O pico de uso em 7 dias é maior que 90%" mostra 0 cotas.
+- Runtime Logs da Vercel: nenhum `budget_exhausted` (o Hobby guarda no máximo 1 hora de logs).
+- Nenhum pedido foi enviado ao YouTube.
+- **Como reabrir:** o alerta da S-13 manda e-mail quando `search.list` passa de 80% da cota diária. Se ele disparar em dias normais, ou se `budget_exhausted` aparecer nos logs, execute os passos acima.
 
 ---
 

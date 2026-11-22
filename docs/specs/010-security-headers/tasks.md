@@ -29,4 +29,9 @@ Legenda: [x] concluído e verificado · [ ] pendente
   - `Strict-Transport-Security` da Vercel mantido;
   - `/_vercel/insights/script.js` → 200 (Analytics carrega com os cabeçalhos novos) — CA4
 - [x] T7b PR aberto para `main`
-- [ ] T8 Depois do merge: cabeçalhos em produção e script do Analytics carregando — CA4 (parte Analytics)
+- [x] T8 Produção conferida em 2026-11-22 — CA1–CA4:
+  - 7 rotas (`/`, `/privacy`, `/terms`, `/api/lives`, `/opengraph-image`, `/robots.txt`, `/sitemap.xml`) com 5/5 cabeçalhos, sem `x-powered-by` nem `Cross-Origin-*`, e HSTS mantido;
+  - Analytics `/873175f0f7736088/script.js` e `/view` com 200; miniaturas de `i.ytimg.com` carregando;
+  - player com revalidação simulada (sem quota) carregou o iframe do YouTube; console sem mensagens.
+
+  Detalhes na seção S-05 do `sprint.md`.

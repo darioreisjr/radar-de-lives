@@ -142,8 +142,8 @@ O projeto está finalizado quando:
 - [x] S-01 concluída: textos legais revisados e publicados, sem pendência jurídica aberta. (Por decisão do usuário; pendências fora do código registradas na S-01.)
 - [x] S-02 concluída: política com os itens da LGPD.
 - [x] S-03 concluída: chave restrita à YouTube Data API v3.
-- [ ] S-04 concluída: CI verde em `main`.
-- [ ] S-05 concluída: cabeçalhos de segurança em produção, com player, miniaturas e Analytics funcionando.
+- [x] S-04 concluída: CI verde em `main`.
+- [x] S-05 concluída: cabeçalhos de segurança em produção, com player, miniaturas e Analytics funcionando.
 - [x] S-06 concluída: specs e README sem pendências falsas. (3 itens abertos com nota por falta de evidência; ver S-06.)
 - [x] S-07 concluída: `robots.txt` e `sitemap.xml` em produção.
 - [ ] S-08 concluída: licença decidida e aplicada (ou decisão registrada de não licenciar).
@@ -324,6 +324,12 @@ npm run dev   # abrir http://localhost:3000/privacy em 375 px e desktop
 - Valide o YAML localmente, se houver ferramenta disponível.
 - Depois do push autorizado: `gh run list --branch sprint/009-ci` e `gh run view <id>`.
 
+**Resultado (2026-11-22):** concluída, spec `009-ci`, PR #2 (`bc9890d`).
+- Critério 1 OK: o push de `sprint/009-ci` gerou a run 45013150638, verde em 33 s.
+- Critério 2 OK: a branch descartável `sprint/009-ci-falha` gerou a run 45013243468, que falhou na etapa Testes com `AssertionError`. A branch foi apagada.
+- Critério 3 OK: o workflow não referencia `secrets.` e tem `permissions: contents: read`.
+- Em `main`: o CI rodou em cada push depois do merge, e o commit `69e2208` está com a run 45015969099 em `success`. Uma run (`66c920f`) aparece como `cancelled`: foi substituída por um push mais novo, como prevê a regra de `concurrency`. Desde então, todos os PRs (#5 a #13) passaram pelo CI antes do merge.
+
 ---
 
 ## S-05 — Cabeçalhos de segurança HTTP
@@ -362,6 +368,15 @@ Além disso:
 5. lint, typecheck, testes e build verdes.
 
 **Verificação em Preview** (depois do push autorizado): o Preview exige login da Vercel. Use `vercel curl` ou um navegador logado para conferir os cabeçalhos. Em produção, só depois do merge.
+
+**Resultado (2026-11-22):** concluída, spec `010-security-headers`, PR #8 (`684c3a6`). Critérios 1 a 5 verificados localmente e no Preview (ver `tasks.md` da spec). Conferência em produção:
+- `curl -sI` em `/`, `/privacy`, `/terms`, `/api/lives`, `/opengraph-image`, `/robots.txt` e `/sitemap.xml`: todas com 200 e os 5 cabeçalhos. Nenhuma tem `x-powered-by` nem `Cross-Origin-*`, e o `Strict-Transport-Security` da Vercel continua.
+- Chrome na home de produção:
+  - Analytics: `/873175f0f7736088/script.js` e `/873175f0f7736088/view` com 200.
+  - Miniaturas: 50 de `i.ytimg.com`, carregadas sob demanda.
+  - Player: "Assistir aqui", com a revalidação `/api/lives/<id>` simulada no `fetch` (sem gastar quota), seguido de "Carregar player", carregou o iframe do YouTube e exibiu o vídeo. O iframe tem `referrerPolicy="strict-origin-when-cross-origin"` e `allow="encrypted-media; picture-in-picture; fullscreen"`.
+  - `document.featurePolicy`: `camera`, `microphone`, `geolocation`, `payment`, `usb` e `browsing-topics` bloqueados; `fullscreen`, `picture-in-picture`, `encrypted-media` e `autoplay` liberados.
+  - Console da página sem nenhuma mensagem durante o carregamento e a abertura do player.
 
 ---
 

@@ -18,8 +18,15 @@ Legenda: [x] concluído e verificado · [ ] pendente · [!] bloqueado
 - `npm install` removeu as bindings do rolldown do lockfile (npm/cli#4828). Lockfile regenerado: só `@upstash/redis` entrou; 0 de 492 pacotes mudou de versão.
 - Mensagem "O YouTube não respondeu" era imprecisa quando a falha é do store → "A busca não respondeu a tempo".
 
-## Pendências do usuário
-- [ ] Criar o banco Upstash pelo Marketplace da Vercel e conectar ao projeto.
-- [ ] Variáveis na Vercel: `YOUTUBE_API_KEY`, `NEXT_PUBLIC_SITE_URL`; opcional `RATE_LIMIT_SECRET`.
-- [ ] Depois do deploy: logs com `youtube_call` e sem `store_memory_in_production`.
-- [ ] Teste contra Upstash real (não feito: sem credenciais).
+## Deploy em produção (verificado em 2026-11-21)
+- [x] Projeto `radar-de-lives` na Vercel, ligado ao GitHub `darioreisjr/radar-de-lives`; domínio `radardelives.darioreis.dev` com HTTPS/HSTS.
+- [x] Upstash conectado pelo Marketplace: variáveis `KV_REST_API_URL`/`KV_REST_API_TOKEN` (aceitas pelo código).
+- [x] Variáveis: `YOUTUBE_API_KEY`, `NEXT_PUBLIC_SITE_URL`, `RATE_LIMIT_SECRET`.
+- [x] `/`, `/privacy`, `/terms`, `/opengraph-image` → 200; `og:image` no domínio final.
+- [x] `/api/lives`: 50 itens, `cached: true` em chamadas repetidas.
+- [x] Logs: um único `youtube_call` (`search.list`, `budgetUsed: 1/90`, + `videos.list` com 50 IDs) após o redeploy; demais requisições, de hosts diferentes, servidas do cache compartilhado; nenhum `store_error` nem `store_memory_in_production`; nenhum segredo nos logs.
+- [x] Aliases `*.vercel.app` respondem 302 (Proteção de Deploy da Vercel) — esperado.
+
+## Recomendações pendentes (decisão do usuário)
+- [ ] Remover `YOUTUBE_API_KEY` do ambiente **Preview** (hoje em Production e Preview). O orçamento é compartilhado no Upstash, mas deploys de branches gastariam a mesma quota.
+- [ ] Restrição de API da chave no Google Cloud: só "YouTube Data API v3" (a Vercel não tem IP fixo, então a restrição de aplicativo fica "Nenhuma").

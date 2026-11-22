@@ -15,8 +15,10 @@ export const siteConfig = {
    * `controller` e `contact`. Enquanto forem null, /privacy e /terms mostram aviso de versão preliminar.
    */
   legal: {
-    controller: "Radar de Lives, projeto independente de fãs" as string | null,
+    /** Pessoa física responsável (S-01, decisão do usuário em 2026-11-22). */
+    controller: "Dario Reis" as string | null,
     contact: "dev.darioreis@gmail.com" as string | null,
+    /** Também é a versão do aceite da política (spec 016): mudar a data pede novo aceite. */
     updatedAt: "2026-11-22",
   },
 } as const;

@@ -1,3 +1,4 @@
+import { PolicyGate } from "@/components/consent/policy-gate";
 import { HeroSection } from "@/components/hero/hero-section";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -19,10 +20,13 @@ export default function Home() {
       <SiteHeader />
       <main className="flex-1">
         {/* Estado das lives compartilhado entre o painel do radar e a grade (spec 007 D4). */}
-        <LivesProvider demoAllowed={demoAllowed}>
-          <HeroSection />
-          <LiveExplorer />
-        </LivesProvider>
+        {/* Concordância com a política antes de buscar lives e carregar miniaturas (spec 016). */}
+        <PolicyGate>
+          <LivesProvider demoAllowed={demoAllowed}>
+            <HeroSection />
+            <LiveExplorer />
+          </LivesProvider>
+        </PolicyGate>
       </main>
       <SiteFooter />
     </>

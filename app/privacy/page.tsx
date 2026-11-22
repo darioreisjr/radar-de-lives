@@ -15,9 +15,9 @@ export default function PrivacyPage() {
     <LegalPage title="Política de privacidade">
       <LegalSection title="Resumo">
         <p>
-          O {siteConfig.name} não tem contas, não usa cookies próprios, não usa ferramentas de análise de terceiros e não
-          guarda dados pessoais em banco de dados. Para mostrar lives, o site usa os <strong>YouTube API Services</strong>,
-          serviços do Google.
+          O {siteConfig.name} não tem contas, não usa cookies próprios e não guarda dados pessoais em banco de dados. Para
+          mostrar lives, o site usa os <strong>YouTube API Services</strong>, serviços do Google. Para contar visitas, usa o{" "}
+          <strong>Vercel Web Analytics</strong>, que não usa cookies de terceiros.
         </p>
       </LegalSection>
 
@@ -53,6 +53,23 @@ export default function PrivacyPage() {
             navegador.
           </li>
         </ul>
+      </LegalSection>
+
+      <LegalSection title="Estatísticas de visitas">
+        <p>
+          Usamos o Vercel Web Analytics para saber quantas pessoas visitam o site e quais páginas são vistas. Para cada
+          página vista, a Vercel registra: horário, endereço da página (sem parâmetros de busca, que removemos antes do
+          envio), página de origem (referrer), país, região e cidade aproximados, sistema operacional, navegador e tipo de
+          dispositivo.
+        </p>
+        <p>
+          Segundo a Vercel, esses dados são anônimos, não ficam associados ao seu endereço IP, não usam cookies de terceiros
+          e a identificação da visita (um código gerado a partir da requisição) é descartada após 24 horas. Mais detalhes na{" "}
+          <ExternalLink href="https://vercel.com/docs/analytics/privacy-policy">
+            documentação de privacidade do Vercel Web Analytics
+          </ExternalLink>
+          .
+        </p>
       </LegalSection>
 
       <LegalSection title="Conteúdo carregado do Google">

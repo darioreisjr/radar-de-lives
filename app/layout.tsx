@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Oswald } from "next/font/google";
+import { SiteAnalytics } from "@/components/analytics/site-analytics";
 import { siteConfig } from "@/lib/config/site";
 import "./globals.css";
 
@@ -42,7 +43,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-background text-text-primary">{children}</body>
+      <body className="flex min-h-full flex-col bg-background text-text-primary">
+        {children}
+        <SiteAnalytics />
+      </body>
     </html>
   );
 }

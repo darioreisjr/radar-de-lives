@@ -146,7 +146,7 @@ O projeto está finalizado quando:
 - [ ] S-05 concluída: cabeçalhos de segurança em produção, com player, miniaturas e Analytics funcionando.
 - [x] S-06 concluída: specs e README sem pendências falsas. (3 itens abertos com nota por falta de evidência; ver S-06.)
 - [x] S-07 concluída: `robots.txt` e `sitemap.xml` em produção.
-- [ ] S-08 concluída: licença decidida e aplicada (ou decisão registrada de não licenciar).
+- [x] S-08 concluída: licença decidida e aplicada (ou decisão registrada de não licenciar).
 - [ ] S-10 concluída: estados e movimento reduzido verificados.
 - [x] S-13 concluída: alertas configurados.
 - [x] S-11: executada (spec `016-consent-notice`).
@@ -493,6 +493,13 @@ Além disso:
 1. `LICENSE` com o texto oficial da licença escolhida, ano 2026 e titular informado pelo usuário.
 2. O GitHub reconhece a licença na página do repositório depois do merge.
 3. Se a escolha for "sem licença", a spec registra a decisão e nenhum arquivo é criado.
+
+**Resultado (2026-11-22):** concluída.
+- Decisão do usuário: **MIT**, titular **Dario Reis**, ano 2026. Spec `docs/specs/013-license/`.
+- PR #13, commit `89ea662` em `main`: `LICENSE` (idêntico ao modelo oficial do GitHub) e `"license": "MIT"` no `package.json`, com `"private": true` mantido.
+- lint, typecheck, testes 122/122 e build ok; CI e Preview da Vercel verdes.
+- GitHub reconhece a licença: `gh api repos/darioreisjr/radar-de-lives --jq .license.spdx_id` → `MIT`.
+- A licença cobre só o código; marcas e conteúdo de terceiros ficam de fora, e o crédito CC BY 4.0 da skill `unslop` continua no README.
 
 ---
 

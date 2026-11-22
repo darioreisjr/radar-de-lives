@@ -38,7 +38,7 @@ export function LegalPage({ title, children }: { title: string; children: ReactN
           <section className="mt-10 border-t border-border pt-6 text-sm text-text-secondary">
             <h2 className="text-lg font-medium text-text-primary">Responsável e contato</h2>
             <p className="mt-2">
-              {controller ?? "Responsável: a definir."} {contact ? <>Contato: {contact}</> : "Contato: a definir."}
+              Responsável (controlador dos dados): {controller ?? "a definir"}. Contato: {contact ?? "a definir"}.
             </p>
           </section>
         </article>

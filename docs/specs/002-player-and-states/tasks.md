@@ -1,7 +1,7 @@
 # 002 — Tarefas
 
 Legenda: [x] concluído e verificado · [ ] pendente · [!] bloqueado
-Última atualização: 2026-11-21
+Última atualização: 2026-11-22
 
 - [x] T1 `daily-budget.ts` extraído e usado por `service.ts` e `video-status.ts` (testes da 001 seguem verdes)
 - [x] T2 `video-status.ts` + testes: live/encerrada/agendada/indisponível, cache 60 s, orçamento, quota, sem chave — CA4, CA5
@@ -19,14 +19,14 @@ Legenda: [x] concluído e verificado · [ ] pendente · [!] bloqueado
   - iframe oficial carregou; com ID fictício o YouTube mostra "vídeo não disponível" e o link de fallback fica visível
 
 ## Não verificado / limitações
-- [ ] Fluxo com chave real e live real (sem chave neste ambiente).
-- [ ] Erros dentro do player (Content ID, região) não são detectados pelo app (D8); só o link de fallback.
-- [ ] Testes de componente automatizados (RTL/Playwright) — D7, exige nova dependência.
-- [ ] Reduced motion emulado no navegador (a regra global cobre `dialog-in`).
+- [ ] Fluxo com chave real e live real. Segundo o `sprint.md`, foi feito em produção (`videos.list` de 1 ID após "Assistir aqui"), mas a evidência ficou só na conversa de deploy. Os logs da Vercel consultados em 2026-11-22 começam às 10:04 UTC e não têm essa chamada. Fica aberto até haver registro (spec 011).
+- Limitação aceita, não é pendência: erros dentro do player (Content ID, região) não são detectados pelo app (D8); só o link de fallback.
+- [ ] Testes de componente automatizados (RTL/Playwright) — D7, exige nova dependência. → S-09 do `sprint.md`
+- [ ] Reduced motion emulado no navegador (a regra global cobre `dialog-in`). → S-10 do `sprint.md`
 
 ## Bloqueios
-- [!] **Política de privacidade própria** (Developer Policies) antes do lançamento — conteúdo/decisão do responsável.
-- [!] Cache compartilhado em produção — decisão de infraestrutura (herdado da 001).
+- [x] Política de privacidade própria — feita na spec 003; textos revisados e publicados na S-01 (spec 016). (Fechado em 2026-11-22, spec 011.)
+- [x] Cache compartilhado em produção — feito: spec 005 (Upstash Redis). (Fechado em 2026-11-22, spec 011.)
 
 ## Próxima fatia sugerida — 003-launch-readiness (Fase 4 do PRD)
 1. Páginas `privacy` e `terms` (texto a definir com o responsável) e link no rodapé.

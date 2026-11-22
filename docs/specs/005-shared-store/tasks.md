@@ -1,7 +1,7 @@
 # 005 — Tarefas
 
 Legenda: [x] concluído e verificado · [ ] pendente · [!] bloqueado
-Última atualização: 2026-11-21
+Última atualização: 2026-11-22
 
 - [x] T0 `@upstash/redis@^1.41.0` (publicado em 2026-11-02); nomes de variáveis (`UPSTASH_REDIS_REST_*` e `KV_REST_API_*`) e retorno `"OK" | null` do `SET NX` confirmados no código-fonte instalado
 - [x] T1 `lib/store`: interfaces `Counter`/`Lock`, memória e Upstash (prefixo `radar:v1:`, erros viram `StoreError` sem mensagem original) — CA1, CA6
@@ -28,5 +28,5 @@ Legenda: [x] concluído e verificado · [ ] pendente · [!] bloqueado
 - [x] Aliases `*.vercel.app` respondem 302 (Proteção de Deploy da Vercel) — esperado.
 
 ## Recomendações pendentes (decisão do usuário)
-- [ ] Remover `YOUTUBE_API_KEY` do ambiente **Preview** (hoje em Production e Preview). O orçamento é compartilhado no Upstash, mas deploys de branches gastariam a mesma quota.
-- [ ] Restrição de API da chave no Google Cloud: só "YouTube Data API v3" (a Vercel não tem IP fixo, então a restrição de aplicativo fica "Nenhuma").
+- [x] Remover `YOUTUBE_API_KEY` do ambiente **Preview** — feito: `vercel env ls` em 2026-11-22 mostra a variável só em Production. (Fechado em 2026-11-22, spec 011.)
+- [x] Restrição de API da chave no Google Cloud: só "YouTube Data API v3" — feito na S-03 do `sprint.md` (seção "Resultado", 2026-11-22). (Fechado em 2026-11-22, spec 011.)

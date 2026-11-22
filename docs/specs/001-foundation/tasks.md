@@ -1,7 +1,7 @@
 # 001 — Tarefas
 
 Legenda: [x] concluído e verificado · [ ] pendente · [!] bloqueado
-Última atualização: 2026-11-21
+Última atualização: 2026-11-22
 
 ## Base
 - [x] T1 Scaffold Next 16.4.6 (npm) + `zod@^4.6.7`, `vitest@^5.1.1`; scripts `typecheck` e `test` — CA14
@@ -30,16 +30,16 @@ Legenda: [x] concluído e verificado · [ ] pendente · [!] bloqueado
 - [x] T16 Chrome: desktop (1568 px) e 375 px via iframe; sem rolagem horizontal; filtro "2 de 8"; cooldown desativa o botão — CA1, CA9
 
 ## Não verificado / limitações desta fatia
-- [ ] Chamada real ao YouTube: sem chave neste ambiente. Coberta por testes com respostas simuladas; validar com chave real.
-- [ ] `prefers-reduced-motion` emulado no navegador: verificada só a regra no CSS compilado.
-- [ ] Contraste medido com ferramenta: escolhas seguem cálculo manual (texto escuro sobre rosa; badge AO VIVO com texto claro sobre fundo escuro).
-- [ ] Estados quota/erro/stale vistos na UI real: cobertos por lógica e testes de serviço, não por captura de tela.
-- [ ] Modo produção (`next start`) sem chave deve mostrar "Busca no YouTube não configurada" em vez de fixtures — não aberto no navegador.
+- [x] Chamada real ao YouTube — feita: spec 004 §2 (50 itens reais) e logs de produção na spec 005 ("Deploy em produção"). (Fechado em 2026-11-22, spec 011.)
+- [ ] `prefers-reduced-motion` emulado no navegador: verificada só a regra no CSS compilado. → S-10 do `sprint.md`
+- [x] Contraste medido com ferramenta — feito: `tests/contrast.test.ts` (spec 003 T2). (Fechado em 2026-11-22, spec 011.)
+- [ ] Estados quota/erro/stale vistos na UI real: cobertos por lógica e testes de serviço, não por captura de tela. → S-10 do `sprint.md`
+- [x] Modo produção (`next start`) sem chave — feito: spec 003 T7 (home com "Busca indisponível", sem cards simulados). (Fechado em 2026-11-22, spec 011.)
 
 ## Decisões pendentes do usuário
 - [x] TTL definido em 900 s pelo usuário (D3) — padrão em `lib/config/server-env.ts` e `.env.example`.
-- [!] Cache compartilhado em produção (Redis/Upstash ou outro) — custo/infraestrutura.
-- [!] Nome final e domínio.
+- [x] Cache compartilhado em produção — feito: spec 005 (Upstash Redis). (Fechado em 2026-11-22, spec 011.)
+- [x] Nome final e domínio — decidido: `radardelives.darioreis.dev` (`siteConfig.url` em `lib/config/site.ts`). (Fechado em 2026-11-22, spec 011.)
 
 ## Próxima fatia — 002-player-and-states (iniciada; ver docs/specs/002-player-and-states)
 1. `LivePlayerDialog` com iframe oficial (`youtube.com/embed`, ver 002 D2) só após clique, `title` acessível, sem autoplay com som, foco preso e Esc.

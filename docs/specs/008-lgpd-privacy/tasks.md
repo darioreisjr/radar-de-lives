@@ -9,4 +9,4 @@ Legenda: [x] concluído e verificado · [ ] pendente
 - [x] T5 lint ok · typecheck ok · testes 106/106 · build ok, `○ /privacy` estática — CA3, CA5
 - [x] T6 `next start` local: HTML de `/privacy` contém as 13 seções na ordem do plano, "YouTube API Services", `https://policies.google.com/privacy`, `https://www.youtube.com/t/terms`, `mailto:` do contato e a data "22 de novembro de 2026"; sem "Versão preliminar" — CA2
 - [x] T7 Visual: desktop (1920 px) e 375 px (iframe de 375 px) sem rolagem horizontal (`scrollWidth` 360 ≤ 375), sem caixa alta, padrão `LegalSection`/`ExternalLink` mantido
-- [ ] T8 Revisão jurídica do texto → S-01 do `sprint.md`
+- [x] T8 Revisão do texto — feita na S-01 do `sprint.md`, concluída por decisão do usuário. O texto foi substituído pela versão publicada na spec 016 (PR #5). (Fechado em 2026-11-22, spec 011.)

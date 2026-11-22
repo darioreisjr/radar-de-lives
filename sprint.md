@@ -140,12 +140,12 @@ Atualize o `tasks.md` da sua spec e escreva no PR:
 O projeto está finalizado quando:
 
 - [x] S-01 concluída: textos legais revisados e publicados, sem pendência jurídica aberta. (Por decisão do usuário; pendências fora do código registradas na S-01.)
-- [ ] S-02 concluída: política com os itens da LGPD.
+- [x] S-02 concluída: política com os itens da LGPD.
 - [x] S-03 concluída: chave restrita à YouTube Data API v3.
 - [ ] S-04 concluída: CI verde em `main`.
 - [ ] S-05 concluída: cabeçalhos de segurança em produção, com player, miniaturas e Analytics funcionando.
 - [ ] S-06 concluída: specs e README sem pendências falsas.
-- [ ] S-07 concluída: `robots.txt` e `sitemap.xml` em produção.
+- [x] S-07 concluída: `robots.txt` e `sitemap.xml` em produção.
 - [ ] S-08 concluída: licença decidida e aplicada (ou decisão registrada de não licenciar).
 - [ ] S-10 concluída: estados e movimento reduzido verificados.
 - [ ] S-13 concluída: alertas configurados.
@@ -249,6 +249,13 @@ Elas também falam em o usuário "concordar" com a política antes de usar o sit
 npm run lint && npm run typecheck && npm test && npm run build
 npm run dev   # abrir http://localhost:3000/privacy em 375 px e desktop
 ```
+
+**Resultado (2026-11-22):** concluída.
+- PR #1, commit `f3fb9b9` em `main`; spec `docs/specs/008-lgpd-privacy/`.
+- `/privacy` ganhou as 7 seções (controlador e contato, finalidades e bases legais, compartilhamento e operadores, transferência internacional, retenção, direitos do titular, atualizações), mantendo as seções e os links obrigatórios do Google e do YouTube.
+- lint, typecheck, testes 106/106 e build ok, com `○ /privacy`; visual conferido em desktop e 375 px.
+- Produção: deploy Vercel `success`; `/privacy` em produção mostrou as seções novas.
+- Depois, o PR #5 (S-01/S-11, `d55584d`) substituiu o texto pelas minutas da S-01. Conferido em produção em 2026-11-22: a política atual continua cobrindo os 7 itens (seções "Controlador e contato", "Dados tratados, finalidades e bases legais", "Fornecedores e compartilhamento", "Transferência internacional", "Retenção", "Seus direitos" e "Alterações e vigência"), com "YouTube API Services" e os links obrigatórios do Google e do YouTube.
 
 ---
 
@@ -438,6 +445,13 @@ Além disso:
 3. Nenhuma página privada ou de API no sitemap.
 
 **Depois do deploy (você):** opcionalmente, envie o sitemap no Google Search Console.
+
+**Resultado (2026-11-22):** concluída.
+- PR #4, commit `b5b7f71` em `main`; spec `docs/specs/012-seo-robots-sitemap/`.
+- `app/robots.ts` e `app/sitemap.ts`, com 4 testes novos (`tests/seo.test.ts`); testes 110/110; build com `○ /robots.txt` e `○ /sitemap.xml`.
+- CI (GitHub Actions) verde no PR e em `main`; deploy Vercel `success`.
+- Produção: `/robots.txt` → 200 com `Disallow: /api/` e `Sitemap: https://radardelives.darioreis.dev/sitemap.xml`; `/sitemap.xml` lista `/`, `/privacy` e `/terms` no domínio final.
+- Pendente (opcional, você): envio do sitemap no Google Search Console.
 
 ---
 

@@ -37,7 +37,8 @@ Mantidos (não são slop): ponto "ao vivo" pulsando (está de fato ao vivo), ani
 - **D4 — Estado compartilhado:** o estado da grade sobe para um provider cliente (`LivesProvider`) usado pelo hero e pela grade; o reducer puro (`explorer-state.ts`) não muda.
 - **D5 — Sentence case** em títulos, rótulos e selos; texto pequeno sem tracking; números `tabular-nums`.
 - **D6 — Hover sem cor:** cards ganham só um degrau de superfície/borda e no máximo 2 px de elevação (dentro do limite de 3 px do PRD).
-- **D7 — Fora do escopo:** imagem OG e páginas legais além do que vem dos componentes compartilhados (header, rodapé, selos).
+- **D7 — Páginas legais** recebem só o que vem dos componentes compartilhados (header, rodapé, selos, tipografia).
+- **D8 — Imagem Open Graph alinhada** (pedido do usuário em 2026-11-21): fundo neutro, título da home, marca do radar plana, ponto vermelho "ao vivo", sem gradientes nem violeta. **Sem números**: a imagem é gerada no build e dados ao vivo ficariam congelados.
 
 ## 4. Critérios de aceite
 

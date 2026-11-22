@@ -1,17 +1,30 @@
 import { ImageResponse } from "next/og";
 import { colors } from "@/lib/config/design-tokens";
 
-// Arte original (spec 003 D3): anéis de radar, horizonte e gradiente da identidade. Sem assets de terceiros.
+// Alinhada ao visual da home (spec 007): fundo neutro, tipografia sem caixa alta, uma cor de ação,
+// o ponto vermelho "ao vivo" como assinatura e a marca do radar plana. Sem números: a imagem é
+// gerada no build e dados ao vivo ficariam congelados.
 export const alt =
-  "Radar de Lives: lives de GTA 6 encontradas no YouTube. Arte com anéis de radar sobre horizonte urbano noturno.";
+  "Radar de Lives: lives de GTA 6 no ar agora, encontradas no YouTube. Marca de radar com ponto vermelho de ao vivo.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const BUILDINGS = [
-  [0, 120], [70, 180], [130, 150], [200, 260], [260, 190], [330, 230], [400, 160], [460, 300],
-  [520, 210], [590, 170], [650, 250], [720, 200], [790, 280], [850, 180], [920, 240], [990, 160],
-  [1050, 220], [1120, 190],
-] as const;
+/** Mesma geometria de components/ui/radar-mark.tsx, ampliada. */
+const radarSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<circle cx="16" cy="16" r="14" fill="none" stroke="${colors.border}" stroke-width="1"/>
+<circle cx="16" cy="16" r="9" fill="none" stroke="${colors.border}" stroke-width="1"/>
+<circle cx="16" cy="16" r="4" fill="none" stroke="${colors.border}" stroke-width="1"/>
+<path d="M16 16 L16 2 A14 14 0 0 1 29.3 11.7 Z" fill="${colors["accent-pink"]}"/>
+<circle cx="16" cy="16" r="1.6" fill="${colors["accent-cyan"]}"/>
+<circle cx="22.5" cy="8.5" r="1.3" fill="${colors["live-red"]}" stroke="${colors.background}" stroke-width="0.6"/>
+</svg>`;
+const radarSrc = `data:image/svg+xml;base64,${Buffer.from(radarSvg).toString("base64")}`;
+
+// Versão pequena: traços mais grossos e ponto sem contorno (no tamanho pequeno o contorno parece um furo).
+const smallMarkSvg = radarSvg
+  .replaceAll('stroke-width="1"', 'stroke-width="2"')
+  .replace(` stroke="${colors.background}" stroke-width="0.6"`, "");
+const smallMarkSrc = `data:image/svg+xml;base64,${Buffer.from(smallMarkSvg).toString("base64")}`;
 
 export default function OpengraphImage() {
   return new ImageResponse(
@@ -21,129 +34,62 @@ export default function OpengraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          position: "relative",
-          background: `linear-gradient(180deg, ${colors.background} 0%, #1b0d26 55%, #3a1648 100%)`,
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "72px 80px",
+          background: colors.background,
           color: colors["text-primary"],
           fontFamily: "sans-serif",
+          borderBottom: `1px solid ${colors.border}`,
         }}
       >
-        {/* sol / brilho */}
-        <div
-          style={{
-            position: "absolute",
-            right: 90,
-            bottom: 150,
-            width: 360,
-            height: 360,
-            borderRadius: 9999,
-            background: `linear-gradient(180deg, ${colors["accent-pink"]} 0%, ${colors["accent-violet"]} 100%)`,
-            opacity: 0.55,
-            display: "flex",
-          }}
-        />
-        {/* horizonte */}
-        {BUILDINGS.map(([x, h]) => (
-          <div
-            key={x}
-            style={{
-              position: "absolute",
-              left: x,
-              bottom: 0,
-              width: 64,
-              height: Math.round(h * 0.7),
-              background: "#101016",
-              borderTop: `3px solid ${colors["surface-raised"]}`,
-              display: "flex",
-            }}
-          />
-        ))}
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 4,
-            background: colors["accent-pink"],
-            opacity: 0.7,
-            display: "flex",
-          }}
-        />
-
-        {/* véu de legibilidade à esquerda, como no hero */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "linear-gradient(90deg, rgba(9,9,13,0.94) 0%, rgba(9,9,13,0.78) 45%, rgba(9,9,13,0) 75%)",
-            display: "flex",
-          }}
-        />
-
-        {/* conteúdo */}
-        <div style={{ display: "flex", flexDirection: "column", padding: "72px 80px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-            <div
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: 9999,
-                border: `5px solid ${colors.border}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                position: "relative",
-              }}
-            >
-              <div
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 9999,
-                  border: `5px solid ${colors.border}`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <div style={{ width: 12, height: 12, borderRadius: 9999, background: colors["accent-cyan"], display: "flex" }} />
-              </div>
-              <div
-                style={{
-                  position: "absolute",
-                  top: 6,
-                  right: 8,
-                  width: 12,
-                  height: 12,
-                  borderRadius: 9999,
-                  background: colors["live-red"],
-                  display: "flex",
-                }}
-              />
-            </div>
-            <div style={{ display: "flex", fontSize: 34, letterSpacing: 6, fontWeight: 700 }}>
-              RADAR&nbsp;<span style={{ color: colors["accent-pink"] }}>DE</span>&nbsp;LIVES
-            </div>
+        <div style={{ display: "flex", flexDirection: "column", maxWidth: 640 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (Satori) só aceita <img> */}
+            <img src={smallMarkSrc} width={48} height={48} alt="" />
+            <div style={{ display: "flex", fontSize: 32, fontWeight: 600 }}>Radar de Lives</div>
           </div>
 
-          <div style={{ display: "flex", marginTop: 70, fontSize: 92, fontWeight: 800, lineHeight: 1, letterSpacing: -2 }}>
-            LIVES DE GTA 6
-          </div>
           <div
             style={{
               display: "flex",
-              fontSize: 92,
-              fontWeight: 800,
-              lineHeight: 1.05,
+              flexDirection: "column",
+              marginTop: 72,
+              fontSize: 84,
+              fontWeight: 500,
+              lineHeight: 1.04,
               letterSpacing: -2,
-              color: colors["accent-pink"],
             }}
           >
-            NO RADAR
+            <span>Lives de GTA 6</span>
+            <span>no ar agora</span>
           </div>
-          <div style={{ display: "flex", marginTop: 28, fontSize: 30, color: colors["text-secondary"], maxWidth: 640 }}>
-            Transmissões públicas encontradas no YouTube.
+
+          <div style={{ display: "flex", marginTop: 28, fontSize: 30, lineHeight: 1.4, color: colors["text-secondary"] }}>
+            Transmissões públicas encontradas no YouTube, reunidas em um só lugar
           </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 40, fontSize: 26 }}>
+            <div style={{ display: "flex", width: 14, height: 14, borderRadius: 9999, background: colors["live-red"] }} />
+            <span style={{ color: colors["text-primary"] }}>Ao vivo</span>
+            <span style={{ color: colors["text-secondary"] }}>· radardelives.darioreis.dev</span>
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 400,
+            height: 400,
+            borderRadius: 32,
+            background: colors.surface,
+            border: `1px solid ${colors.border}`,
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (Satori) só aceita <img> */}
+          <img src={radarSrc} width={320} height={320} alt="" />
         </div>
       </div>
     ),

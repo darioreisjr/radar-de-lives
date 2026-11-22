@@ -9,10 +9,11 @@ Mostra **lives encontradas** pela busca da YouTube Data API v3. A busca **não g
 
 **Em produção:** https://radardelives.darioreis.dev — Vercel + Upstash Redis + Vercel Web Analytics.
 
-MVP do [PRD](docs/product/PRD_Radar_de_Lives_GTA6.md) concluído e verificado em produção (fatias 001–007). Pendências antes de divulgar: [ver abaixo](#pendências).
+MVP do [PRD](docs/product/PRD_Radar_de_Lives_GTA6.md) concluído e verificado em produção (fatias 001–007). O trabalho de finalização está no [`sprint.md`](sprint.md); veja [Pendências](#pendências).
 
 ## Funcionalidades
 
+- Aceite da política na primeira visita ("Li e concordo. Continuar"), exigido pelas políticas do YouTube. Antes dele, o site não busca lives nem carrega miniaturas; a escolha fica só no navegador ([spec 016](docs/specs/016-consent-notice/)).
 - Painel do radar no topo da página: lives no ar, distribuição por idioma estimado e maior público informado, calculados da mesma consulta da grade (sem quota extra e sem números inventados).
 - Grade de lives com miniatura, título, canal, horário de início, idioma estimado e espectadores (ou "Não informado", nunca zero).
 - Busca por texto, filtro de idioma estimado (pt/en/es/outro), ordenação por relevância, espectadores ou mais recentes.
@@ -136,12 +137,18 @@ Para mudar os ambientes de uma variável, use o painel: na Vercel CLI 59.x, `ver
 
 ## Pendências
 
-- [ ] Revisão jurídica de `/privacy` e `/terms` (responsável e contato preenchidos em `lib/config/site.ts`).
-- [ ] Confirmar a restrição da chave no Google Cloud (só YouTube Data API v3) e a quota atual.
+O trabalho pendente está organizado no [`sprint.md`](sprint.md), em tarefas independentes (S-01 a S-15). O estado de cada uma fica na seção [Definição de 100%](sprint.md#definição-de-100).
+
+- Já resolvidas: revisão dos textos legais (S-01) e restrição da chave no Google Cloud (S-03).
+- Pendências do responsável, sem código: confirmar com Vercel e Upstash o mecanismo de transferência internacional, e guardar o registro de legítimo interesse do limite de requisições (ver S-01).
 
 ## Desenvolvimento
 
 O projeto segue **Spec-Driven Development** ([skill](.claude/skills/sdd/SKILL.md)): cada mudança tem `spec.md`, `plan.md` e `tasks.md` em `docs/specs/`.
+
+**Trabalho pendente:** [`sprint.md`](sprint.md). Cada tarefa usa a branch `sprint/<id>` e só altera os arquivos listados nela.
+
+**CI:** cada push e PR para `main` roda lint, typecheck, testes e build no GitHub Actions ([`ci.yml`](.github/workflows/ci.yml), [spec 009](docs/specs/009-ci/)).
 
 | Fatia | Conteúdo | Status |
 | --- | --- | --- |
@@ -152,6 +159,11 @@ O projeto segue **Spec-Driven Development** ([skill](.claude/skills/sdd/SKILL.md
 | [005-shared-store](docs/specs/005-shared-store/) | Upstash Redis e deploy na Vercel | ✅ |
 | [006-web-analytics](docs/specs/006-web-analytics/) | Vercel Web Analytics | ✅ |
 | [007-unslop-home](docs/specs/007-unslop-home/) | Polimento visual, painel do radar, imagem Open Graph | ✅ |
+| [008-lgpd-privacy](docs/specs/008-lgpd-privacy/) | Itens da LGPD na política (S-02) | ✅ |
+| [009-ci](docs/specs/009-ci/) | CI no GitHub Actions (S-04) | ✅ |
+| [011-docs-cleanup](docs/specs/011-docs-cleanup/) | Documentação atualizada (S-06) | ✅ |
+| [012-seo-robots-sitemap](docs/specs/012-seo-robots-sitemap/) | `robots.txt` e `sitemap.xml` (S-07) | ✅ |
+| [016-consent-notice](docs/specs/016-consent-notice/) | Aceite da política e textos legais revisados (S-01, S-11) | ✅ |
 
 **Commits:** [Conventional Commits](https://www.conventionalcommits.org/pt-br/) em pt-BR, sem linha de coautor (ex.: `feat(store): ...`, `docs(specs): ...`).
 

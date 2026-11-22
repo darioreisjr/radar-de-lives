@@ -13,5 +13,5 @@ Legenda: [x] concluído e verificado · [ ] pendente
   - recarga: aviso não reaparece; com versão `2026-11-21` guardada, reaparece — CA1
   - 375 px (iframe): sem rolagem horizontal em `/`, `/privacy` e `/terms` — CA6
 - [x] T6 Links externos novos respondem 200 (Upstash, Vercel, ANPD, doc do Analytics)
-- [ ] Mecanismo de transferência internacional confirmado com Vercel e Upstash (ver spec, "Pendências conhecidas") — usuário
-- [ ] Registro de legítimo interesse do limite de requisições preenchido e guardado — usuário
+- [ ] Mecanismo de transferência internacional confirmado com Vercel e Upstash (ver spec, "Pendências conhecidas") → S-01 do `sprint.md` (pendências do usuário)
+- [ ] Registro de legítimo interesse do limite de requisições preenchido e guardado → S-01 do `sprint.md` (pendências do usuário)

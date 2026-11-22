@@ -139,7 +139,7 @@ Atualize o `tasks.md` da sua spec e escreva no PR:
 
 O projeto está finalizado quando:
 
-- [ ] S-01 concluída: textos legais revisados e publicados, sem pendência jurídica aberta.
+- [x] S-01 concluída: textos legais revisados e publicados, sem pendência jurídica aberta. (Por decisão do usuário; pendências fora do código registradas na S-01.)
 - [ ] S-02 concluída: política com os itens da LGPD.
 - [x] S-03 concluída: chave restrita à YouTube Data API v3.
 - [ ] S-04 concluída: CI verde em `main`.
@@ -149,7 +149,8 @@ O projeto está finalizado quando:
 - [ ] S-08 concluída: licença decidida e aplicada (ou decisão registrada de não licenciar).
 - [ ] S-10 concluída: estados e movimento reduzido verificados.
 - [ ] S-13 concluída: alertas configurados.
-- [ ] S-11, S-14: executadas **ou** registradas como "não aplicável" com o motivo.
+- [x] S-11: executada (spec `016-consent-notice`).
+- [ ] S-14: executada **ou** registrada como "não aplicável" com o motivo.
 - [ ] S-09, S-12, S-15: executadas **ou** registradas como "adiada por decisão do usuário".
 
 ---
@@ -182,6 +183,19 @@ Elas também falam em o usuário "concordar" com a política antes de usar o sit
 3. Aplique as correções de texto em `app/privacy/page.tsx`, `app/terms/page.tsx` e, se mudar responsável ou contato, `lib/config/site.ts`, atualizando `siteConfig.legal.updatedAt`. Um agente pode aplicar o texto aprovado.
 
 **Pronto quando:** o revisor aprovou, os textos aprovados estão em produção e as respostas 2 e 3 viraram decisão registrada (executar a S-11 ou marcá-la "não aplicável").
+
+**Resultado (2026-11-22):** concluída **por decisão do usuário**.
+- O usuário entregou o documento "Radar de Lives: respostas ao dossiê S-01 e minutas para revisão", com respostas às 7 perguntas e minutas de `/privacy` e `/terms`. O documento se declara minuta técnica, **não parecer jurídico**. Mesmo assim, o usuário decidiu publicar e considerar a S-01 concluída.
+- Decisões registradas na spec `016-consent-notice`:
+  - resposta 2: aceite afirmativo da política antes das funcionalidades → S-11 executada;
+  - resposta 3: miniaturas só depois desse aceite;
+  - resposta 4: Analytics continua sem depender do aceite;
+  - resposta 6: controlador é "Dario Reis", pessoa física.
+- Textos publicados em produção pelo PR #5 (`d55584d`); deploy da Vercel `success`; `/privacy` e `/terms` conferidas no ar.
+- Regiões verificadas pela Vercel CLI: funções da Vercel e banco Upstash em `iad1` (Washington, D.C., EUA).
+- **Pendências fora do código, com o usuário:**
+  - confirmar com Vercel e Upstash o mecanismo de transferência internacional. O DPA da Upstash cita as cláusulas da Comissão Europeia, não as cláusulas-padrão da ANPD. Por isso a política não afirma conformidade com o art. 33.
+  - preencher, datar e guardar o registro de legítimo interesse do limite de requisições.
 
 ---
 
@@ -551,6 +565,17 @@ Se encontrar bug, **não corrija nesta tarefa**: registre na spec e proponha uma
 2. Com recusa, nenhuma requisição ao script do Analytics.
 3. A política descreve exatamente o que é guardado no navegador.
 4. lint, typecheck, testes e build verdes; teste novo da lógica de consentimento.
+
+**Resultado (2026-11-22):** concluída, spec `016-consent-notice`, PR #5 (`d55584d`), em produção.
+- A S-01 foi o gatilho: resposta 2 do documento entregue pelo usuário.
+- Tela "Li e concordo. Continuar" / "Não concordo" na home. Até o aceite, não há requisição a `/api/lives` nem a `i.ytimg.com`.
+- O `localStorage` guarda só `{version, acceptedAt}`; nada vai ao servidor. A versão é `siteConfig.legal.updatedAt`: se a data mudar, o aceite é pedido de novo.
+- Critérios:
+  - 1 OK. Verificado no Chrome: o aviso não volta ao recarregar e volta se a versão guardada for antiga.
+  - 2 **não aplicado**, por orientação do documento, que tem precedência. A resposta 4 conclui que o Analytics anônimo não exige consentimento, então o script carrega com ou sem aceite. A política diz isso.
+  - 3 OK. A política descreve o que fica guardado no navegador.
+  - 4 OK. lint, typecheck, 113 testes (7 novos) e build verdes; CI do PR verde.
+- Também alterados, fora da lista acima: `app/page.tsx`, para o aceite envolver a home, e `components/legal/legal-page.tsx`, para o rótulo do controlador.
 
 ---
 

@@ -1,6 +1,6 @@
 # 006 — Vercel Web Analytics
 
-Status: implementada (ver `tasks.md`) · Data: 2026-11-21
+Status: implementada e verificada (ver `tasks.md`) · Data: 2026-11-21
 Fonte: pedido do usuário em 2026-11-21 ("habilite o analytics da Vercel"). PRD §9 etapa 4 cita "telemetria mínima"; contagem de visitas não estava no PRD, por isso esta fatia.
 
 ## 1. Objetivo

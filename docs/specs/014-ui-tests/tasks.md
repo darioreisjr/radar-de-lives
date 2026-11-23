@@ -13,3 +13,4 @@ Legenda: [x] concluído e verificado · [ ] pendente
 - [x] T9 Teste de mutação (sem commit), em desktop: `autoplay=1` no `embedSrc`, regra de movimento reduzido trocada para 0,3 s e título do estado de quota alterado → **3 falhas**, uma em cada teste esperado; código restaurado — confirma que os testes não são vazios
 - [x] T10 lint ok, typecheck ok (inclui `e2e/` e `playwright.config.ts`), Vitest **122/122** (igual à linha de base), build com a mesma tabela de rotas (`○` em `/`, `/privacy`, `/terms`, `/robots.txt`, `/sitemap.xml`, `/opengraph-image`) — CA3, CA4
 - [x] T11 PR #17: CI e Preview da Vercel verdes; merge `eee19e2`; CI do `main` e deploy de produção `success`; smoke de produção ok
+- [x] T12 Job `e2e` no CI (depois do `verify`): PR #27 com **46/46** em 25,4 s no GitHub Actions (job de 58 s), sem retries

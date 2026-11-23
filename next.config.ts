@@ -6,8 +6,32 @@ import type { NextConfig } from "next";
  * - Permissions-Policy NÃO restringe fullscreen, picture-in-picture, encrypted-media e autoplay,
  *   usados pelo iframe do YouTube.
  * - Sem Cross-Origin-Embedder/Opener-Policy: bloqueariam o iframe e as miniaturas de i.ytimg.com.
- * - A CSP completa é outra tarefa (S-12); aqui só frame-ancestors.
+ * - A CSP aplicada tem só frame-ancestors; a CSP completa (S-12) vai em Report-Only até ser validada.
  */
+
+const isDev = process.env.NODE_ENV === "development";
+
+/**
+ * CSP completa (spec 017 / sprint S-12). Sem nonce: nonce obriga renderização dinâmica e é
+ * incompatível com o prerender parcial (doc do Next 16, guia content-security-policy), então
+ * os scripts inline do Next exigem 'unsafe-inline'. 'unsafe-eval' só no next dev (React).
+ * - img-src: miniaturas oficiais em i.ytimg.com; frame-src: player em www.youtube.com.
+ * - O Vercel Web Analytics é servido no próprio domínio, coberto por 'self'.
+ */
+export const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://i.ytimg.com",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "frame-src https://www.youtube.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join("; ");
+
 export const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -17,6 +41,8 @@ export const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()",
   },
+  // Etapa A da S-12: só observa. Depois de validada em produção, substitui a CSP acima.
+  { key: "Content-Security-Policy-Report-Only", value: contentSecurityPolicy },
 ] as const;
 
 const nextConfig: NextConfig = {

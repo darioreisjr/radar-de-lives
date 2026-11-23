@@ -128,8 +128,19 @@ export const test = base.extend<{ acceptPolicy: boolean; api: ApiMock }>({
         if (host === "googleapis.com" || host.endsWith(".googleapis.com")) google.push(req.url());
       });
 
+      // Violações de CSP (aplicada ou Report-Only, spec 017): o Chrome as registra no console.
+      const csp: string[] = [];
+      page.on("console", (msg) => {
+        if (/Content Security Policy/i.test(msg.text())) csp.push(msg.text());
+      });
+
       const origin = new URL(baseURL!).origin;
       await page.route((u) => u.origin === origin && u.pathname.startsWith("/api/"), (r) => api.handle(r));
+      // Envios do Vercel Web Analytics: o script carrega (testa a CSP), mas nenhuma visita é registrada.
+      await page.route(
+        (u) => u.origin === origin && /^\/(_vercel\/insights|[0-9a-f]{16})\/(view|event|session)$/.test(u.pathname),
+        (r) => r.fulfill({ status: 200, body: "" }),
+      );
       // Nada sai para o Google: miniaturas e player respondidos localmente.
       await page.route((u) => u.hostname === "i.ytimg.com", (r) => r.fulfill({ contentType: "image/png", body: PNG }));
       await page.route(
@@ -148,8 +159,15 @@ export const test = base.extend<{ acceptPolicy: boolean; api: ApiMock }>({
         );
       }
 
+      await page.addInitScript(() => {
+        document.addEventListener("securitypolicyviolation", (e) =>
+          console.warn(`Content Security Policy violation: ${e.disposition} ${e.effectiveDirective} ${e.blockedURI}`),
+        );
+      });
+
       await use(api);
 
+      expect(csp, "nenhuma violação de CSP").toEqual([]);
       expect(google, "nenhuma requisição real a googleapis.com").toEqual([]);
       expect(api.unmocked, "toda rota de /api/ precisa estar simulada").toEqual([]);
     },

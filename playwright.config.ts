@@ -8,7 +8,12 @@ import { defineConfig, devices } from "@playwright/test";
  * - miniaturas (i.ytimg.com) e o player (www.youtube.com) são respondidos localmente.
  */
 const PORT = 3100;
-const baseURL = `http://127.0.0.1:${PORT}`;
+/**
+ * E2E_BASE_URL roda a mesma suíte contra um deploy (ex.: produção, spec 017), sem servidor local.
+ * A API continua simulada no navegador: nada de quota.
+ */
+const external = process.env.E2E_BASE_URL;
+const baseURL = external ?? `http://127.0.0.1:${PORT}`;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -27,11 +32,13 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } } },
     { name: "mobile-375", use: { ...devices["Desktop Chrome"], viewport: { width: 375, height: 812 } } },
   ],
-  webServer: {
-    command: `npm run build && npm run start -- -p ${PORT} -H 127.0.0.1`,
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 240_000,
-    env: { YOUTUBE_API_KEY: "", NEXT_TELEMETRY_DISABLED: "1" },
-  },
+  webServer: external
+    ? undefined
+    : {
+        command: `npm run build && npm run start -- -p ${PORT} -H 127.0.0.1`,
+        url: baseURL,
+        reuseExistingServer: !process.env.CI,
+        timeout: 240_000,
+        env: { YOUTUBE_API_KEY: "", NEXT_TELEMETRY_DISABLED: "1" },
+      },
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { embedSrc, resolvePlayerView, type StatusCheck } from "@/lib/lives/player-state";
+import { embedSrc, playerBadge, resolvePlayerView, type StatusCheck } from "@/lib/lives/player-state";
 import type { VideoStatusPayload } from "@/lib/youtube/types";
 
 const ok = (p: Partial<VideoStatusPayload>): StatusCheck => ({
@@ -40,5 +40,21 @@ describe("embedSrc (CA2)", () => {
     const src = embedSrc("aaaaaaaaaaa");
     expect(src.startsWith("https://www.youtube.com/embed/aaaaaaaaaaa?")).toBe(true);
     expect(src).not.toContain("autoplay");
+  });
+});
+
+describe("playerBadge (spec 018)", () => {
+  it("segue o estado revalidado: agendada e indisponível não viram 'encerrada'", () => {
+    expect(playerBadge({ demo: false, listIsLive: true, check: ok({ state: "live" }) })).toBe("live");
+    expect(playerBadge({ demo: false, listIsLive: true, check: ok({ state: "ended" }) })).toBe("ended");
+    expect(playerBadge({ demo: false, listIsLive: true, check: ok({ state: "upcoming" }) })).toBe("upcoming");
+    expect(playerBadge({ demo: false, listIsLive: true, check: ok({ state: "unavailable" }) })).toBe("unavailable");
+  });
+  it("sem revalidação, usa o estado da lista", () => {
+    expect(playerBadge({ demo: false, listIsLive: true, check: { status: "pending" } })).toBe("live");
+    expect(playerBadge({ demo: false, listIsLive: false, check: { status: "error", code: "network" } })).toBe("ended");
+  });
+  it("simulado tem selo próprio", () => {
+    expect(playerBadge({ demo: true, listIsLive: true, check: ok({ state: "ended" }) })).toBe("demo");
   });
 });

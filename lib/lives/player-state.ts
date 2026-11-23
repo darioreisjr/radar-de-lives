@@ -36,6 +36,19 @@ export function resolvePlayerView(input: {
   return consented ? { kind: "player", unverified: false } : { kind: "consent", unverified: false };
 }
 
+export type PlayerBadge = "demo" | "live" | "ended" | "upcoming" | "unavailable";
+
+/**
+ * Selo do cabeçalho do player (spec 018). Usa o estado revalidado quando existe;
+ * antes disso (ou se a revalidação falhar), o estado vindo da lista.
+ */
+export function playerBadge(input: { demo: boolean; listIsLive: boolean; check: StatusCheck }): PlayerBadge {
+  const { demo, listIsLive, check } = input;
+  if (demo) return "demo";
+  if (check.status === "ok") return check.data.state;
+  return listIsLive ? "live" : "ended";
+}
+
 /** URL oficial do player (player_parameters), sem autoplay (spec 002 D1/D2). */
 export function embedSrc(videoId: string): string {
   return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?playsinline=1&rel=0`;

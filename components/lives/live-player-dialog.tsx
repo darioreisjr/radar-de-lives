@@ -3,7 +3,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Badge, LiveBadge } from "@/components/ui/badge";
 import { Button, buttonBase, buttonStyles } from "@/components/ui/button";
-import { embedSrc, resolvePlayerView, type PlayerView, type StatusCheck } from "@/lib/lives/player-state";
+import { embedSrc, playerBadge, resolvePlayerView, type PlayerBadge, type PlayerView, type StatusCheck } from "@/lib/lives/player-state";
 import { formatViewers } from "@/lib/utils/format";
 import type { LiveItem, LivesErrorPayload, VideoStatusPayload } from "@/lib/youtube/types";
 
@@ -13,6 +13,14 @@ const MESSAGES: Partial<Record<PlayerView["kind"], { title: string; body: string
   upcoming: { title: "Ainda não começou", body: "O YouTube informa esta transmissão como agendada." },
   unavailable: { title: "Vídeo indisponível", body: "O vídeo pode ter sido removido, ficado privado ou não estar disponível na sua região." },
   embed_blocked: { title: "Player indisponível aqui", body: "O canal não permite incorporar este vídeo em outros sites. Assista direto no YouTube." },
+};
+
+/** Selo do cabeçalho conforme o estado revalidado (spec 018). "live" usa o LiveBadge. */
+const BADGE_LABEL: Record<Exclude<PlayerBadge, "live">, string> = {
+  demo: "Simulado",
+  ended: "Encerrada",
+  upcoming: "Agendada",
+  unavailable: "Indisponível",
 };
 
 function YoutubeLink({ href, primary }: { href: string; primary?: boolean }) {
@@ -76,7 +84,8 @@ export function LivePlayerDialog({
   const view = resolvePlayerView({ demo, listEmbedAllowed: item.embedAllowed, check, consented });
   const message = MESSAGES[view.kind];
   const titleId = "player-dialog-title";
-  const live = check.status === "ok" ? check.data.state === "live" : item.isLive;
+  const badge = playerBadge({ demo, listIsLive: item.isLive, check });
+  const live = badge === "live";
   const viewers =
     check.status === "ok" && check.data.state === "live"
       ? formatViewers(check.data.concurrentViewers ?? item.concurrentViewers)
@@ -92,7 +101,7 @@ export function LivePlayerDialog({
       <div className="flex items-start justify-between gap-4 p-4 sm:p-5">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            {demo ? <Badge tone="demo">Simulado</Badge> : live ? <LiveBadge /> : <Badge>Encerrada</Badge>}
+            {badge === "live" ? <LiveBadge /> : <Badge tone={badge === "demo" ? "demo" : "neutral"}>{BADGE_LABEL[badge]}</Badge>}
             {!demo && live && <span className="font-mono text-xs text-accent-cyan">{viewers.full}</span>}
           </div>
           <h2 id={titleId} className="mt-2 line-clamp-2 text-lg font-medium leading-snug">

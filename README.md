@@ -91,7 +91,8 @@ Modelo completo em [.env.example](.env.example).
 | `npm run dev` | Servidor de desenvolvimento |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Gera tipos de rota e roda `tsc --noEmit` |
-| `npm test` | Testes unitários (Vitest, 106 testes) |
+| `npm test` | Testes unitários (Vitest, 129 testes) |
+| `npm run test:e2e` | Testes de interface (Playwright, 46 testes em desktop e 375 px), sem chave e sem quota. Antes, uma vez: `npx playwright install chromium`. Com `E2E_BASE_URL=<url>`, roda contra um deploy |
 | `npm run build` / `npm start` | Build e servidor de produção |
 
 ## API
@@ -139,7 +140,7 @@ Para mudar os ambientes de uma variável, use o painel: na Vercel CLI 59.x, `ver
 
 O trabalho pendente está organizado no [`sprint.md`](sprint.md), em tarefas independentes (S-01 a S-15). O estado de cada uma fica na seção [Definição de 100%](sprint.md#definição-de-100).
 
-- Já resolvidas: revisão dos textos legais (S-01) e restrição da chave no Google Cloud (S-03).
+- Sprint concluído em 2026-11-23, exceto a S-15: apagar a linha `VERCEL_OIDC_TOKEN` do `.env.local` local (responsável).
 - Pendências do responsável, sem código: confirmar com Vercel e Upstash o mecanismo de transferência internacional, e guardar o registro de legítimo interesse do limite de requisições (ver S-01).
 
 ## Desenvolvimento
@@ -161,12 +162,18 @@ O projeto segue **Spec-Driven Development** ([skill](.claude/skills/sdd/SKILL.md
 | [007-unslop-home](docs/specs/007-unslop-home/) | Polimento visual, painel do radar, imagem Open Graph | ✅ |
 | [008-lgpd-privacy](docs/specs/008-lgpd-privacy/) | Itens da LGPD na política (S-02) | ✅ |
 | [009-ci](docs/specs/009-ci/) | CI no GitHub Actions (S-04) | ✅ |
+| [010-security-headers](docs/specs/010-security-headers/) | Cabeçalhos de segurança HTTP (S-05) | ✅ |
 | [011-docs-cleanup](docs/specs/011-docs-cleanup/) | Documentação atualizada (S-06) | ✅ |
 | [012-seo-robots-sitemap](docs/specs/012-seo-robots-sitemap/) | `robots.txt` e `sitemap.xml` (S-07) | ✅ |
+| [013-license](docs/specs/013-license/) | Licença MIT (S-08) | ✅ |
+| [014-ui-tests](docs/specs/014-ui-tests/) | Testes de interface com Playwright (S-09) | ✅ |
+| [015-manual-qa](docs/specs/015-manual-qa/) | QA de estados e movimento reduzido (S-10) | ✅ |
 | [016-consent-notice](docs/specs/016-consent-notice/) | Aceite da política e textos legais revisados (S-01, S-11) | ✅ |
+| [017-csp](docs/specs/017-csp/) | Content Security Policy completa (S-12) | ✅ |
+| [018-player-status-badge](docs/specs/018-player-status-badge/) | Selo do player conforme o estado revalidado (bug da S-10) | ✅ |
 
 **Commits:** [Conventional Commits](https://www.conventionalcommits.org/pt-br/) em pt-BR, sem linha de coautor (ex.: `feat(store): ...`, `docs(specs): ...`).
 
-**Windows + npm 11:** `npm install` pode remover do lockfile as bindings nativas do rolldown (npm/cli#4828), quebrando `npm test`. Contorno: apagar `node_modules` e `package-lock.json`, reinstalar e conferir que só o pacote novo mudou.
+**Windows + npm 11:** `npm install` pode remover do lockfile as bindings nativas do rolldown (npm/cli#4828), quebrando `npm test`. Em 2026-11-23 isso aconteceu mesmo com `node_modules` limpo. O contorno que preserva as outras versões é mesclar no lockfile original só as entradas novas do pacote e validar com `npm ci` (ver spec 014, D4).
 
 Orientações para agentes: [CLAUDE.md](CLAUDE.md).

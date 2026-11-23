@@ -12,4 +12,4 @@ Legenda: [x] concluído e verificado · [ ] pendente
 - [x] T8 `npm run test:e2e`: **46/46** (23 testes × desktop e 375 px) em 28,8 s — CA1, CA2 (a fixture falha o teste se houver `googleapis.com` ou `/api/` não simulada)
 - [x] T9 Teste de mutação (sem commit), em desktop: `autoplay=1` no `embedSrc`, regra de movimento reduzido trocada para 0,3 s e título do estado de quota alterado → **3 falhas**, uma em cada teste esperado; código restaurado — confirma que os testes não são vazios
 - [x] T10 lint ok, typecheck ok (inclui `e2e/` e `playwright.config.ts`), Vitest **122/122** (igual à linha de base), build com a mesma tabela de rotas (`○` em `/`, `/privacy`, `/terms`, `/robots.txt`, `/sitemap.xml`, `/opengraph-image`) — CA3, CA4
-- [ ] T11 PR: CI e Preview da Vercel verdes
+- [x] T11 PR #17: CI e Preview da Vercel verdes; merge `eee19e2`; CI do `main` e deploy de produção `success`; smoke de produção ok

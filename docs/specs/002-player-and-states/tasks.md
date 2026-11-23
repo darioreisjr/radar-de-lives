@@ -19,10 +19,10 @@ Legenda: [x] concluído e verificado · [ ] pendente · [!] bloqueado
   - iframe oficial carregou; com ID fictício o YouTube mostra "vídeo não disponível" e o link de fallback fica visível
 
 ## Não verificado / limitações
-- [ ] Fluxo com chave real e live real. Segundo o `sprint.md`, foi feito em produção (`videos.list` de 1 ID após "Assistir aqui"), mas a evidência ficou só na conversa de deploy. Os logs da Vercel consultados em 2026-11-22 começam às 10:04 UTC e não têm essa chamada. Fica aberto até haver registro (spec 011).
+- [x] Fluxo com chave real e live real (2026-11-23): em produção, sem simulação, "Assistir aqui" chamou `/api/lives/<id>` (200) e "Carregar player" abriu o iframe `https://www.youtube.com/embed/<id>?playsinline=1&rel=0` (spec 017, T8 e T10b)
 - Limitação aceita, não é pendência: erros dentro do player (Content ID, região) não são detectados pelo app (D8); só o link de fallback.
-- [ ] Testes de componente automatizados (RTL/Playwright) — D7, exige nova dependência. → S-09 do `sprint.md`
-- [ ] Reduced motion emulado no navegador (a regra global cobre `dialog-in`). → S-10 do `sprint.md`
+- [x] Testes de interface automatizados (2026-11-23): Playwright, 46 testes (spec 014 / S-09)
+- [x] Reduced motion emulado no navegador (2026-11-23): `dialog-in` com 0,01 ms (spec 015, caso 9; spec 014)
 
 ## Bloqueios
 - [x] Política de privacidade própria — feita na spec 003; textos revisados e publicados na S-01 (spec 016). (Fechado em 2026-11-22, spec 011.)

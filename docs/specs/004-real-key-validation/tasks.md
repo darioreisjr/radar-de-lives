@@ -11,8 +11,8 @@ Legenda: [x] concluído e verificado · [ ] pendente · [!] bloqueado
 
 ## Pendente (depende do usuário)
 - [x] Quota real por atualização — conferida nos logs de produção da Vercel (não no `npm run dev`). Em 2026-11-22 houve 4 buscas novas, às 10:04, 10:19, 10:34 e 10:50 UTC. Cada uma gastou exatamente 1 `search.list` (`page: first`, `budgetUsed` de 1 a 4 de 90) e 1 `videos.list` com 50 IDs. (Fechado em 2026-11-22, spec 011.)
-- [ ] Testar "Assistir aqui" com uma live real (1 unidade de `videos.list`). Segundo o `sprint.md`, foi feito em produção, mas os logs disponíveis (desde 2026-11-22 10:04 UTC) não têm `videos.list` de 1 ID. Fica aberto até haver registro (spec 011).
-- [ ] "Carregar mais" com dados reais (gasta 1 `search.list` do limite de 100/dia). Segundo o `sprint.md`, foi feito em produção, mas os logs disponíveis não têm `search.list` com `page: next`. Fica aberto até haver registro (spec 011).
+- [x] "Assistir aqui" com uma live real (2026-11-23): `/api/lives/<id>` 200 em produção e iframe do YouTube carregado (spec 017)
+- [x] "Carregar mais" com dados reais (2026-11-23): em produção, de "50 lives encontradas" para "95 lives encontradas"; `/api/lives` e `/api/lives?pageToken=…` com 200, sem erro (1 `search.list` com `page: next`)
 
 ## Pendências de lançamento (herdadas da 003; resolvidas em 2026-11-22, ver 003 e spec 011)
 - Responsável/contato em `siteConfig.legal` + revisão jurídica → S-01 (spec 016).

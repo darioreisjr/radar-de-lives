@@ -147,11 +147,12 @@ O projeto está finalizado quando:
 - [x] S-06 concluída: specs e README sem pendências falsas. (3 itens abertos com nota por falta de evidência; ver S-06.)
 - [x] S-07 concluída: `robots.txt` e `sitemap.xml` em produção.
 - [x] S-08 concluída: licença decidida e aplicada (ou decisão registrada de não licenciar).
-- [ ] S-10 concluída: estados e movimento reduzido verificados.
+- [x] S-10 concluída: estados e movimento reduzido verificados. (Bug B1 encontrado e corrigido na spec 018.)
 - [x] S-13 concluída: alertas configurados.
 - [x] S-11: executada (spec `016-consent-notice`).
 - [x] S-14: registrada como "não aplicável" (gatilho não ocorreu; ver a seção da S-14).
-- [ ] S-09, S-12, S-15: executadas **ou** registradas como "adiada por decisão do usuário".
+- [x] S-09 executada (spec `014-ui-tests`) e S-12 executada (spec `017-csp`, CSP aplicada em produção).
+- [ ] S-15: falta só apagar a linha `VERCEL_OIDC_TOKEN` do `.env.local` (você; ver a seção da S-15).
 
 ---
 
@@ -549,6 +550,15 @@ Além disso:
 2. Nenhuma requisição real a `googleapis.com` durante os testes (verifique com `page.on("request")`).
 3. `npm test` (Vitest) continua com o mesmo número de testes.
 
+**Resultado (2026-11-23):** concluída, spec `014-ui-tests`, PR #17 (`eee19e2`).
+- `@playwright/test` 1.65.0 (fixo) e `npm run test:e2e`: **46 testes** (23 × desktop e 375 px), contra `next build && next start` sem chave.
+- A API é simulada no navegador. Miniaturas e player respondem localmente. O teste falha se houver requisição a `googleapis.com`, rota de `/api/` não simulada ou, depois da S-12, violação de CSP.
+- Critérios: 1 OK (46/46); 2 OK; 3 OK (Vitest 122/122 no PR).
+- Teste de mutação: 3 quebras propositais detectadas (autoplay no player, movimento reduzido desligado, título de quota).
+- Lockfile: o npm 11 apagou as bindings do rolldown mesmo com `node_modules` limpo. O lock original recebeu só as 3 entradas do Playwright, e o `npm ci` confirmou.
+- O e2e não entrou no CI. A spec descreve o job proposto.
+- Desde a S-12, `E2E_BASE_URL=<url> npm run test:e2e` roda a mesma suíte contra um deploy (API simulada, sem quota).
+
 ---
 
 ## S-10 — QA manual de estados e movimento reduzido
@@ -580,6 +590,13 @@ Para o player, simule `/api/lives/<id>` com `state: "ended"`, `"upcoming"`, `"un
 Se encontrar bug, **não corrija nesta tarefa**: registre na spec e proponha uma tarefa nova ao usuário.
 
 **Critérios de aceite:** uma tabela na spec com estado, como foi simulado, resultado esperado, resultado observado e OK ou bug, cobrindo os 9 casos (4 da grade, 4 do player e movimento reduzido) em desktop e 375 px.
+
+**Resultado (2026-11-23):** concluída, spec `015-manual-qa`, PR #18 (`7cb479e`).
+- Chromium real contra `next start` sem chave, com a API simulada. Capturas inspecionadas em 1280 px e 375 px, sem quota.
+- Movimento reduzido emulado no navegador (`emulateMedia`), que é o mesmo sinal da configuração do Windows. Resultado: `matchMedia` true; card, hero, pulso e diálogo com 0,01 ms e 1 iteração.
+- 8 de 9 casos OK.
+- **Bug B1:** o selo do player mostrava "Encerrada" para `upcoming` e `unavailable`. Corrigido na tarefa nova `018-player-status-badge`, PR #19 (`4c18380`), com teste unitário e e2e.
+- Duas observações que não são bugs (O1, O2) estão registradas na spec.
 
 ---
 
@@ -662,6 +679,16 @@ Sobre os scripts:
 2. Só depois disso aplicar a versão definitiva, com aprovação do usuário.
 3. Páginas que eram estáticas continuam estáticas, ou o impacto foi registrado e aceito pelo usuário.
 
+**Resultado (2026-11-23):** concluída, spec `017-csp`. A aprovação da etapa definitiva foi delegada pelo usuário ("decida as melhores escolhas").
+- **Sem nonce:** o nonce obrigaria renderização dinâmica e é incompatível com o prerender parcial. A política usa `script-src 'self' 'unsafe-inline'` e fecha o resto. A spec registra o motivo e o risco residual.
+- **Etapa A, PR #20 (`3418986`):** Report-Only em produção, com 0 violações.
+  - e2e contra produção: 46/46.
+  - Visita real sem simulação: 50 lives, 32 miniaturas, iframe do YouTube, Analytics 200 e OG 200.
+- **Etapa B, PR #21 (`6943730`):** CSP aplicada. A mesma verificação em produção deu 0 violações e 0 erros.
+- Os testes de mutação pegaram `i.ytimg.com` fora do `img-src` (Report-Only) e `frame-src 'none'` (aplicada).
+- Critério 3 OK: `/`, `/privacy`, `/terms`, `/robots.txt`, `/sitemap.xml` e `/opengraph-image` continuam `○`.
+- **Atenção para mudanças futuras:** uma nova origem externa (imagem, script, iframe ou API chamada do navegador) precisa entrar em `contentSecurityPolicy` no `next.config.ts`. O e2e acusa a falta.
+
 ---
 
 ## S-13 — Alertas de uso e de quota
@@ -726,6 +753,8 @@ Sobre os scripts:
 3. Opcional: rode `git status` e confirme que não há nada pendente.
 
 **Pronto quando:** `.env.local` só tem as variáveis do `.env.example`, com seus valores.
+
+**Situação (2026-11-23):** pendente com você. O `.env.local` ainda tem `VERCEL_OIDC_TOKEN`. O agente não editou o arquivo porque ele guarda segredos e a tarefa é sua. Decisão: manter a pasta `.vercel/` para usar o `vercel curl` em verificações futuras.
 
 ---
 

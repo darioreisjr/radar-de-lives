@@ -31,9 +31,9 @@ Legenda: [x] concluído e verificado · [ ] pendente · [!] bloqueado
 
 ## Não verificado / limitações desta fatia
 - [x] Chamada real ao YouTube — feita: spec 004 §2 (50 itens reais) e logs de produção na spec 005 ("Deploy em produção"). (Fechado em 2026-11-22, spec 011.)
-- [ ] `prefers-reduced-motion` emulado no navegador: verificada só a regra no CSS compilado. → S-10 do `sprint.md`
+- [x] `prefers-reduced-motion` emulado no navegador (2026-11-23): cards, hero, pulso e diálogo com 0,01 ms e 1 iteração em desktop e 375 px (spec 015, caso 9) e teste automatizado (spec 014)
 - [x] Contraste medido com ferramenta — feito: `tests/contrast.test.ts` (spec 003 T2). (Fechado em 2026-11-22, spec 011.)
-- [ ] Estados quota/erro/stale vistos na UI real: cobertos por lógica e testes de serviço, não por captura de tela. → S-10 do `sprint.md`
+- [x] Estados quota/erro/stale vistos na UI real (2026-11-23): capturas inspecionadas em desktop e 375 px (spec 015) e cobertos por e2e (spec 014)
 - [x] Modo produção (`next start`) sem chave — feito: spec 003 T7 (home com "Busca indisponível", sem cards simulados). (Fechado em 2026-11-22, spec 011.)
 
 ## Decisões pendentes do usuário

@@ -13,7 +13,7 @@ Testes e2e contra `next build && next start`, **sem chave e sem quota**, cobrind
 ## Escopo
 
 Incluído: `@playwright/test` (devDependency), `playwright.config.ts`, `e2e/*`, script `test:e2e`, pastas de saída no `.gitignore`, esta spec.
-Excluído: integração ao CI (ver "Integração futura ao CI"); alterações em `vitest.config.mts` e no código da aplicação.
+Excluído: alterações em `vitest.config.mts` e no código da aplicação.
 
 ## Requisitos
 
@@ -41,22 +41,6 @@ Excluído: integração ao CI (ver "Integração futura ao CI"); alterações em
 - **D3 Dois projetos:** `desktop` (1280×800) e `mobile-375` (375×812): todos os testes rodam nas duas larguras.
 - **D4 Lockfile:** o `npm install` do npm 11 apagou as 17 bindings do rolldown, mesmo com `node_modules` limpo. Em vez de recriar o lockfile (o que poderia subir outras versões), o lock original recebeu só as 3 entradas novas (`@playwright/test`, `playwright`, `playwright-core`) e o bloco raiz. `npm ci` validou o resultado.
 
-## Integração futura ao CI (fora desta tarefa)
+## Integração ao CI
 
-Um job separado em `.github/workflows/ci.yml`, depois do job `verify`:
-
-```yaml
-  e2e:
-    needs: verify
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@<sha> # mesma política de SHA da spec 009
-      - uses: actions/setup-node@<sha>
-        with: { node-version: 22, cache: npm }
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e   # CI=1: retries 1, reporter github, sem reutilizar servidor
-```
-
-Custo estimado: ~2 min por execução (instalação do navegador + build + 46 testes).
+Job `e2e` em [`.github/workflows/ci.yml`](../../../.github/workflows/ci.yml), depois do job `verify` (só roda se lint, typecheck, testes e build passarem). Usa as mesmas actions fixadas por SHA da spec 009, instala só o Chromium (`npx playwright install --with-deps chromium`) e roda `npm run test:e2e` com `CI=1` (retries 1, reporter `github`, servidor sempre novo). Nenhum segredo é usado: `YOUTUBE_API_KEY` vazia e `/api/` simulada no navegador.

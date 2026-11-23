@@ -150,7 +150,7 @@ O projeto segue **Spec-Driven Development** ([skill](.claude/skills/sdd/SKILL.md
 
 **Trabalho pendente:** [`sprint.md`](sprint.md). Cada tarefa usa a branch `sprint/<id>` e só altera os arquivos listados nela.
 
-**CI:** cada push e PR para `main` roda lint, typecheck, testes e build no GitHub Actions ([`ci.yml`](.github/workflows/ci.yml), [spec 009](docs/specs/009-ci/)).
+**CI:** cada push e PR para `main` roda lint, typecheck, testes e build no GitHub Actions; se passarem, o job `e2e` roda os 46 testes de interface (Playwright) ([`ci.yml`](.github/workflows/ci.yml), [spec 009](docs/specs/009-ci/)).
 
 | Fatia | Conteúdo | Status |
 | --- | --- | --- |

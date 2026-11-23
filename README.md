@@ -142,7 +142,7 @@ O trabalho pendente está organizado no [`sprint.md`](sprint.md), em tarefas ind
 
 - Sprint concluído em 2026-11-23 (S-01 a S-15).
 - Não apagar `public/googleae0552e8a704d280.html`: é a verificação do Google Search Console.
-- Pendências do responsável, sem código: confirmar com Vercel e Upstash o mecanismo de transferência internacional, e guardar o registro de legítimo interesse do limite de requisições (ver S-01).
+- Registros de legítimo interesse e de transferência internacional guardados pelo responsável (fora do repositório; revisão anual). Se Vercel ou Upstash oferecerem as cláusulas-padrão da ANPD, atualizar a seção "Transferência internacional" de `/privacy`.
 
 ## Desenvolvimento
 

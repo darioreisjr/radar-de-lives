@@ -194,9 +194,12 @@ Elas também falam em o usuário "concordar" com a política antes de usar o sit
   - resposta 6: controlador é "Dario Reis", pessoa física.
 - Textos publicados em produção pelo PR #5 (`d55584d`); deploy da Vercel `success`; `/privacy` e `/terms` conferidas no ar.
 - Regiões verificadas pela Vercel CLI: funções da Vercel e banco Upstash em `iad1` (Washington, D.C., EUA).
-- **Pendências fora do código, com o usuário:**
-  - confirmar com Vercel e Upstash o mecanismo de transferência internacional. O DPA da Upstash cita as cláusulas da Comissão Europeia, não as cláusulas-padrão da ANPD. Por isso a política não afirma conformidade com o art. 33.
-  - preencher, datar e guardar o registro de legítimo interesse do limite de requisições.
+- **Pendências fora do código:** resolvidas em 2026-11-23.
+  - **Transferência internacional:** os DPAs completos da Vercel (vigente desde 31/03/2026) e da Upstash (abr/2025) foram lidos. Eles usam as cláusulas da Comissão Europeia (e a Upstash, também o Data Privacy Framework). Nenhum cita Brasil, LGPD ou ANPD.
+    - O controlador registrou a decisão de manter a política sem afirmar conformidade com o art. 33.
+    - Foi preparado o pedido das cláusulas-padrão da ANPD aos dois fornecedores. Se algum oferecer o aditivo, atualize a seção "Transferência internacional" de `/privacy`.
+  - **Legítimo interesse:** registro do limite de requisições preenchido e guardado pelo controlador.
+  - Os dois registros ficam fora do repositório e são revisados uma vez por ano.
 
 ---
 

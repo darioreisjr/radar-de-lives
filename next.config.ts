@@ -6,7 +6,7 @@ import type { NextConfig } from "next";
  * - Permissions-Policy NÃO restringe fullscreen, picture-in-picture, encrypted-media e autoplay,
  *   usados pelo iframe do YouTube.
  * - Sem Cross-Origin-Embedder/Opener-Policy: bloqueariam o iframe e as miniaturas de i.ytimg.com.
- * - A CSP aplicada tem só frame-ancestors; a CSP completa (S-12) vai em Report-Only até ser validada.
+ * - CSP completa aplicada (S-12), validada antes em Report-Only; inclui frame-ancestors 'none'.
  */
 
 const isDev = process.env.NODE_ENV === "development";
@@ -36,13 +36,11 @@ export const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "X-Frame-Options", value: "DENY" },
-  { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
   {
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()",
   },
-  // Etapa A da S-12: só observa. Depois de validada em produção, substitui a CSP acima.
-  { key: "Content-Security-Policy-Report-Only", value: contentSecurityPolicy },
 ] as const;
 
 const nextConfig: NextConfig = {

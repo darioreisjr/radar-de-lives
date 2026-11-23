@@ -25,10 +25,10 @@ test("live confirmada: consentimento e iframe oficial sem autoplay", async ({ pa
 });
 
 const blocked = [
-  { state: "ended", over: {}, title: "Esta live terminou" },
-  { state: "upcoming", over: {}, title: "Ainda não começou" },
-  { state: "unavailable", over: {}, title: "Vídeo indisponível" },
-  { state: "live", over: { embedAllowed: false }, title: "Player indisponível aqui" },
+  { state: "ended", over: {}, title: "Esta live terminou", badge: "Encerrada" },
+  { state: "upcoming", over: {}, title: "Ainda não começou", badge: "Agendada" },
+  { state: "unavailable", over: {}, title: "Vídeo indisponível", badge: "Indisponível" },
+  { state: "live", over: { embedAllowed: false }, title: "Player indisponível aqui", badge: "Ao vivo" },
 ] as const;
 
 for (const c of blocked) {
@@ -36,6 +36,8 @@ for (const c of blocked) {
     api.status = (id) => ok(statusPayload(id, c.state, c.over));
     const dialog = await openFirstPlayer(page);
     await expect(dialog.getByText(c.title)).toBeVisible();
+    // Selo do cabeçalho segue o estado revalidado (spec 018).
+    await expect(dialog.locator("span.rounded-md").first()).toHaveText(c.badge);
     await expect(dialog.locator("iframe")).toHaveCount(0);
     await expect(dialog.getByRole("button", { name: "Carregar player" })).toHaveCount(0);
     await expect(dialog.getByRole("link", { name: /Abrir no YouTube/ })).toHaveAttribute(

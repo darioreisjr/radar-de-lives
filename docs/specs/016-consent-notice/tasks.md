@@ -18,5 +18,5 @@ Legenda: [x] concluído e verificado · [ ] pendente
   - Upstash (abr/2025): Data Privacy Framework e cláusulas-padrão da Comissão Europeia;
   - nenhum dos dois cita Brasil, LGPD ou ANPD.
 
-  Decisão registrada pelo controlador (documento fora do repositório): manter a política sem afirmar conformidade com o art. 33. Pedido das cláusulas da ANPD preparado para os dois fornecedores (rascunhos de e-mail).
+  Decisão registrada pelo controlador (documento fora do repositório): manter a política sem afirmar conformidade com o art. 33. Pedido das cláusulas da ANPD enviado aos dois fornecedores em 23/11/2026.
 - [x] Registro de legítimo interesse do limite de requisições preenchido e guardado pelo controlador em 23/11/2026 (documento fora do repositório; revisão anual)

@@ -197,7 +197,7 @@ Elas também falam em o usuário "concordar" com a política antes de usar o sit
 - **Pendências fora do código:** resolvidas em 2026-11-23.
   - **Transferência internacional:** os DPAs completos da Vercel (vigente desde 31/03/2026) e da Upstash (abr/2025) foram lidos. Eles usam as cláusulas da Comissão Europeia (e a Upstash, também o Data Privacy Framework). Nenhum cita Brasil, LGPD ou ANPD.
     - O controlador registrou a decisão de manter a política sem afirmar conformidade com o art. 33.
-    - Foi preparado o pedido das cláusulas-padrão da ANPD aos dois fornecedores. Se algum oferecer o aditivo, atualize a seção "Transferência internacional" de `/privacy`.
+    - O pedido das cláusulas-padrão da ANPD foi enviado aos dois fornecedores em 23/11/2026; aguardando resposta. Se algum oferecer o aditivo, atualize a seção "Transferência internacional" de `/privacy`.
   - **Legítimo interesse:** registro do limite de requisições preenchido e guardado pelo controlador.
   - Os dois registros ficam fora do repositório e são revisados uma vez por ano.
 

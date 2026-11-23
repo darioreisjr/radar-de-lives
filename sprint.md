@@ -152,7 +152,7 @@ O projeto está finalizado quando:
 - [x] S-11: executada (spec `016-consent-notice`).
 - [x] S-14: registrada como "não aplicável" (gatilho não ocorreu; ver a seção da S-14).
 - [x] S-09 executada (spec `014-ui-tests`) e S-12 executada (spec `017-csp`, CSP aplicada em produção).
-- [ ] S-15: falta só apagar a linha `VERCEL_OIDC_TOKEN` do `.env.local` (você; ver a seção da S-15).
+- [x] S-15 concluída: `.env.local` sem `VERCEL_OIDC_TOKEN` (2026-11-23).
 
 ---
 
@@ -476,7 +476,7 @@ Além disso:
 - `app/robots.ts` e `app/sitemap.ts`, com 4 testes novos (`tests/seo.test.ts`); testes 110/110; build com `○ /robots.txt` e `○ /sitemap.xml`.
 - CI (GitHub Actions) verde no PR e em `main`; deploy Vercel `success`.
 - Produção: `/robots.txt` → 200 com `Disallow: /api/` e `Sitemap: https://radardelives.darioreis.dev/sitemap.xml`; `/sitemap.xml` lista `/`, `/privacy` e `/terms` no domínio final.
-- Pendente (opcional, você): envio do sitemap no Google Search Console.
+- Search Console (2026-11-23): propriedade `https://radardelives.darioreis.dev/` verificada pelo arquivo HTML `public/googleae0552e8a704d280.html` (PR #23, `6bd6872`; o arquivo precisa continuar publicado) e `sitemap.xml` enviado com sucesso, segundo o usuário.
 
 ---
 
@@ -754,7 +754,7 @@ Sobre os scripts:
 
 **Pronto quando:** `.env.local` só tem as variáveis do `.env.example`, com seus valores.
 
-**Situação (2026-11-23):** pendente com você. O `.env.local` ainda tem `VERCEL_OIDC_TOKEN`. O agente não editou o arquivo porque ele guarda segredos e a tarefa é sua. Decisão: manter a pasta `.vercel/` para usar o `vercel curl` em verificações futuras.
+**Resultado (2026-11-23):** concluída. O usuário apagou a linha. Conferência feita só pelos nomes das variáveis, sem ler valores: `VERCEL_OIDC_TOKEN` ausente, e nenhuma variável fora do `.env.example`. Decisão: manter a pasta `.vercel/` para usar o `vercel curl` em verificações futuras.
 
 ---
 

@@ -140,7 +140,8 @@ Para mudar os ambientes de uma variável, use o painel: na Vercel CLI 59.x, `ver
 
 O trabalho pendente está organizado no [`sprint.md`](sprint.md), em tarefas independentes (S-01 a S-15). O estado de cada uma fica na seção [Definição de 100%](sprint.md#definição-de-100).
 
-- Sprint concluído em 2026-11-23, exceto a S-15: apagar a linha `VERCEL_OIDC_TOKEN` do `.env.local` local (responsável).
+- Sprint concluído em 2026-11-23 (S-01 a S-15).
+- Não apagar `public/googleae0552e8a704d280.html`: é a verificação do Google Search Console.
 - Pendências do responsável, sem código: confirmar com Vercel e Upstash o mecanismo de transferência internacional, e guardar o registro de legítimo interesse do limite de requisições (ver S-01).
 
 ## Desenvolvimento

@@ -2,15 +2,14 @@ import { describe, expect, it } from "vitest";
 import nextConfig, { contentSecurityPolicy, securityHeaders } from "../next.config";
 
 const byKey: Record<string, string> = Object.fromEntries(securityHeaders.map((h) => [h.key, h.value]));
-const { "Content-Security-Policy-Report-Only": reportOnly, ...s05 } = byKey;
 
 describe("cabeçalhos de segurança (spec 010)", () => {
-  it("tem exatamente os 5 cabeçalhos da S-05", () => {
-    expect(s05).toEqual({
+  it("tem exatamente os 5 cabeçalhos da S-05 (a CSP agora é a completa da S-12)", () => {
+    expect(byKey).toEqual({
       "X-Content-Type-Options": "nosniff",
       "Referrer-Policy": "strict-origin-when-cross-origin",
       "X-Frame-Options": "DENY",
-      "Content-Security-Policy": "frame-ancestors 'none'",
+      "Content-Security-Policy": contentSecurityPolicy,
       "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()",
     });
   });
@@ -45,8 +44,10 @@ const csp = Object.fromEntries(
 );
 
 describe("CSP completa (spec 017)", () => {
-  it("está em Report-Only com a mesma política exportada", () => {
-    expect(reportOnly).toBe(contentSecurityPolicy);
+  it("está aplicada, sem Report-Only, e continua impedindo o embutimento", () => {
+    expect(byKey["Content-Security-Policy"]).toBe(contentSecurityPolicy);
+    expect(byKey).not.toHaveProperty("Content-Security-Policy-Report-Only");
+    expect(byKey["Content-Security-Policy"]).toContain("frame-ancestors 'none'");
   });
 
   it("libera só o necessário para miniaturas, player e Analytics", () => {

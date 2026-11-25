@@ -27,6 +27,8 @@ export function getServerEnv() {
     upstashToken,
     /** Chave do HMAC que pseudonimiza o IP no rate limit (spec 005 D5). */
     rateLimitSecret: process.env.RATE_LIMIT_SECRET?.trim() || upstashToken || PROCESS_SECRET,
+    /** Texto bruto de LIVES_PROVIDERS; interpretado por parseProviderList (spec 023). */
+    livesProviders: process.env.LIVES_PROVIDERS ?? null,
     cacheTtlSeconds: int("LIVE_CACHE_TTL_SECONDS", 900, 30, 86_400),
     staleTtlSeconds: int("LIVE_STALE_TTL_SECONDS", 600, 0, 86_400),
     rateLimitSeconds: int("LIVE_RATE_LIMIT_SECONDS", 30, 5, 3_600),

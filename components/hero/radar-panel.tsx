@@ -1,7 +1,9 @@
 "use client";
 
 import { useLives } from "@/components/lives/lives-provider";
-import { languageBreakdown, liveCount, topAudience } from "@/lib/lives/radar-stats";
+import { platformMeta } from "@/lib/lives/platforms";
+import { languageBreakdown, liveCount, platformBreakdown, topAudience } from "@/lib/lives/radar-stats";
+import { activePlatforms } from "@/lib/lives/sources";
 import { formatClock, formatViewers } from "@/lib/utils/format";
 import type { LiveLanguage } from "@/lib/youtube/types";
 
@@ -18,6 +20,9 @@ export function RadarPanel() {
   const total = liveCount(state.items);
   const langs = languageBreakdown(state.items);
   const top = topAudience(state.items);
+  const platforms = activePlatforms(state.meta?.sources);
+  // Contagem por plataforma só com 2 ou mais ativas (spec 026 D2).
+  const byPlatform = platforms.length > 1 ? platformBreakdown(state.items, platforms) : [];
 
   return (
     <section
@@ -56,6 +61,20 @@ export function RadarPanel() {
             <span className="font-mono text-5xl font-medium tabular-nums text-text-primary">{total}</span>
             <span className="text-sm text-text-secondary">{total === 1 ? "live no ar" : "lives no ar"}</span>
           </p>
+
+          {byPlatform.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-xs text-text-secondary">Por plataforma</h3>
+              <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+                {byPlatform.map((p) => (
+                  <li key={p.platform} className="flex items-baseline gap-2">
+                    <span className="text-text-primary">{platformMeta(p.platform).label}</span>
+                    <span className="font-mono tabular-nums text-text-secondary">{p.count}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {langs.length > 0 && (
             <div className="mt-6">

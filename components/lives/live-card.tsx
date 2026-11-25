@@ -27,12 +27,15 @@ export function LiveCard({
   index,
   now,
   onWatchHere,
+  showPlatform = false,
 }: {
   item: LiveItem;
   demo: boolean;
   index: number;
   now: number;
   onWatchHere: () => void;
+  /** Selo da plataforma: só com 2 ou mais plataformas ativas (spec 026 D2). */
+  showPlatform?: boolean;
 }) {
   const ended = !item.isLive;
   const viewers = formatViewers(item.concurrentViewers);
@@ -61,7 +64,12 @@ export function LiveCard({
         )}
         <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
           {ended ? <Badge>Encerrada</Badge> : <LiveBadge />}
-          {demo && <Badge tone="demo">Simulado</Badge>}
+          <div className="flex flex-wrap justify-end gap-2">
+            {demo && <Badge tone="demo">Simulado</Badge>}
+            {/* Só texto, sem logo nem cor de marca (spec 026 D3). */}
+            {showPlatform && <Badge>{platform.label}</Badge>}
+            {item.isMature && <Badge tone="live">Conteúdo adulto</Badge>}
+          </div>
         </div>
         <div className={`absolute bottom-3 right-3 ${ended ? "hidden" : ""}`}>
           <span

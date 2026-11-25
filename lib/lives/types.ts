@@ -64,6 +64,21 @@ export interface LivesPayload {
   sources?: SourceStatus[];
 }
 
+export type LiveState = "live" | "ended" | "upcoming" | "unavailable";
+
+/** Resposta de GET /api/status/[platform]/[id] e de /api/lives/[videoId] (spec 024 D3). */
+export interface LiveStatusPayload {
+  platform: Platform;
+  sourceId: string;
+  /** @deprecated Igual a `sourceId`; mantido porque a rota antiga já o devolvia (spec 024 D3). */
+  videoId: string;
+  state: LiveState;
+  embedAllowed: boolean | "unknown";
+  concurrentViewers: number | null;
+  checkedAt: string;
+  cached: boolean;
+}
+
 export type LivesErrorCode =
   | "missing_api_key"
   | "quota_exceeded"

@@ -2,7 +2,10 @@ import "server-only";
 import { getServerEnv } from "@/lib/config/server-env";
 import { createLivesAggregator, type LivesAggregator } from "@/lib/lives/aggregator";
 import { parseProviderList, selectProviders } from "@/lib/lives/providers/select";
+import type { LivesProvider } from "@/lib/lives/providers/types";
 import { createYoutubeProvider } from "@/lib/lives/providers/youtube";
+import { createStatusHandler, type StatusHandler } from "@/lib/lives/status-handler";
+import type { Platform } from "@/lib/lives/types";
 import { logEvent } from "@/lib/telemetry";
 import { createRateLimiter, type RateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { createStores, type Stores } from "@/lib/store";
@@ -22,9 +25,13 @@ interface Runtime {
   signature: string;
   stores: Stores;
   lives: LivesService;
-  /** Ponto único da rota /api/lives (spec 022). Por enquanto, só o YouTube. */
+  /** Ponto único da rota /api/lives (spec 022). */
   aggregator: LivesAggregator;
+  /** Provedores ativos, selecionados por LIVES_PROVIDERS (spec 023). */
+  providers: LivesProvider[];
   status: VideoStatusService;
+  /** Handler das rotas de status (spec 024). */
+  statusHandler: StatusHandler;
   rateLimit: RateLimiter;
 }
 
@@ -54,26 +61,36 @@ function build(): Runtime {
     },
   });
 
+  // Revalidação ao abrir o player (002 D5): cache de 60 s.
+  const status = createVideoStatusService({
+    client,
+    cache: stores.cache<StatusData>("status", 500),
+    counter: stores.counter,
+    ttlMs: 60_000,
+    dailyBudget: env.dailyDetailsBudget,
+  });
+
+  // 30 requisições por minuto por cliente (001 D6).
+  const rateLimit = createRateLimiter({
+    counter: stores.counter,
+    limit: 30,
+    windowMs: 60_000,
+    secret: env.rateLimitSecret,
+  });
+
+  const providers = activeProviders(env.livesProviders, {
+    youtube: createYoutubeProvider(lives, client !== null, status),
+  });
+
   g.__radarRuntime = {
     signature,
     stores,
     lives,
-    aggregator: createLivesAggregator({ providers: activeProviders(env.livesProviders, lives, client !== null) }),
-    // Revalidação ao abrir o player (002 D5): cache de 60 s.
-    status: createVideoStatusService({
-      client,
-      cache: stores.cache<StatusData>("status", 500),
-      counter: stores.counter,
-      ttlMs: 60_000,
-      dailyBudget: env.dailyDetailsBudget,
-    }),
-    // 30 requisições por minuto por cliente (001 D6).
-    rateLimit: createRateLimiter({
-      counter: stores.counter,
-      limit: 30,
-      windowMs: 60_000,
-      secret: env.rateLimitSecret,
-    }),
+    aggregator: createLivesAggregator({ providers }),
+    providers,
+    status,
+    statusHandler: createStatusHandler({ rateLimit: () => rateLimit, providers: () => providers }),
+    rateLimit,
   };
   return g.__radarRuntime;
 }
@@ -82,18 +99,17 @@ export const getLivesService = () => build().lives;
 export const getLivesAggregator = () => build().aggregator;
 export const getVideoStatusService = () => build().status;
 export const getRouteRateLimit = () => build().rateLimit;
+export const getStatusHandler = () => build().statusHandler;
 
 /**
  * Provedores ativos conforme LIVES_PROVIDERS (spec 023). Roda uma vez por instância
  * (por assinatura do runtime), então os logs também saem uma vez.
  */
-function activeProviders(raw: string | null, lives: LivesService, youtubeConfigured: boolean) {
+function activeProviders(raw: string | null, candidates: Partial<Record<Platform, LivesProvider>>) {
   const { platforms, ignored } = parseProviderList(raw);
   if (ignored > 0) logEvent("config_warning", { variable: "LIVES_PROVIDERS", ignored });
-  // Twitch e Kick entram aqui nas Fases 2 e 3.
-  const { providers, disabled } = selectProviders(platforms, {
-    youtube: createYoutubeProvider(lives, youtubeConfigured),
-  });
+  // Twitch e Kick entram nos candidatos nas Fases 2 e 3.
+  const { providers, disabled } = selectProviders(platforms, candidates);
   for (const d of disabled) logEvent("provider_disabled", { platform: d.platform, reason: d.reason });
   return providers;
 }

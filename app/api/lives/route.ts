@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { applyLiveFilters } from "@/lib/lives/filter";
+import { withIdentity } from "@/lib/lives/identity";
 import { getLivesService, getRouteRateLimit } from "@/lib/lives/server";
 import { parseLivesQuery } from "@/lib/validation/lives-query";
 import { clientKey, errorResponse } from "@/lib/lives/http";
@@ -18,7 +19,8 @@ export async function GET(request: NextRequest) {
   try {
     const result = await getLivesService().getLives(pageToken);
     const body: LivesPayload = {
-      items: applyLiveFilters(result.items, { q, lang, sort }),
+      // withIdentity: o cache pode ter itens gravados antes da spec 021, sem id/platform.
+      items: applyLiveFilters(result.items.map(withIdentity), { q, lang, sort }),
       updatedAt: result.updatedAt,
       cached: result.cached,
       stale: result.stale,

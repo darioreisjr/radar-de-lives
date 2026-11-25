@@ -5,6 +5,18 @@ export function liveId(platform: Platform, sourceId: string): string {
   return `${platform}:${sourceId}`;
 }
 
+/**
+ * Completa itens gravados no cache antes da spec 021, que só tinham `videoId`.
+ * Sem isso, todos chegariam ao cliente com `id` indefinido e o dedupe por `id`
+ * deixaria um único item. Itens já no formato novo passam sem mudança.
+ */
+export function withIdentity(item: LiveItem): LiveItem {
+  if (item.id && item.platform && item.sourceId && typeof item.isMature === "boolean") return item;
+  const platform: Platform = item.platform ?? "youtube";
+  const sourceId = item.sourceId ?? item.videoId;
+  return { ...item, platform, sourceId, id: item.id ?? liveId(platform, sourceId), isMature: item.isMature ?? false };
+}
+
 /** Remove duplicatas por `id`, mantendo a primeira ocorrência (melhor posição). */
 export function dedupeById<T extends Pick<LiveItem, "id">>(items: readonly T[]): T[] {
   const seen = new Set<string>();

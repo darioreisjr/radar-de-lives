@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from "react";
 import { Badge, LiveBadge } from "@/components/ui/badge";
 import { Button, buttonBase, buttonStyles } from "@/components/ui/button";
 import { embedSrc, playerBadge, resolvePlayerView, type PlayerBadge, type PlayerView, type StatusCheck } from "@/lib/lives/player-state";
@@ -17,6 +17,10 @@ function messages(p: PlatformMeta): Partial<Record<PlayerView["kind"], { title: 
     unavailable: { title: "Vídeo indisponível", body: "O vídeo pode ter sido removido, ficado privado ou não estar disponível na sua região." },
     embed_blocked: { title: "Player indisponível aqui", body: `O canal não permite incorporar este vídeo em outros sites. Assista direto ${p.inLabel}.` },
     link_only: { title: `Assista ${p.inLabel}`, body: `O player ${p.ofLabel} ainda não pode ser exibido aqui. Abra a live direto ${p.inLabel}.` },
+    too_small: {
+      title: "Tela estreita para o player",
+      body: `O player ${p.ofLabel} precisa de uma área maior que esta tela. Abra a live direto ${p.inLabel} ou gire o aparelho.`,
+    },
   };
 }
 
@@ -87,7 +91,15 @@ export function LivePlayerDialog({
   }, [demo, item.platform, item.sourceId]);
 
   const platform = platformMeta(item.platform);
-  const view = resolvePlayerView({ demo, platformEmbed: platform.embed, listEmbedAllowed: item.embedAllowed, check, consented });
+  const fitsPlayer = useFitsWidth(platform.minPlayer?.width);
+  const view = resolvePlayerView({
+    demo,
+    platformEmbed: platform.embed,
+    fitsPlayer,
+    listEmbedAllowed: item.embedAllowed,
+    check,
+    consented,
+  });
   const message = messages(platform)[view.kind];
   // O diálogo só renderiza no cliente, depois do clique (spec 025 D4).
   const src = view.kind === "player" ? embedSrc(item, { hostname: window.location.hostname }) : null;
@@ -125,7 +137,11 @@ export function LivePlayerDialog({
       </div>
 
       {/* Área do player: ≥ 200 px de altura e nada sobreposto ao iframe (RMF). */}
-      <div className="relative aspect-video min-h-[200px] w-full bg-background">
+      <div
+        className="relative aspect-video min-h-[200px] w-full bg-background"
+        // Altura mínima exigida pelo player da plataforma (Twitch: 300 px, spec 032 D3).
+        style={src && platform.minPlayer ? { minHeight: platform.minPlayer.height } : undefined}
+      >
         {src ? (
           <iframe
             src={src}
@@ -153,7 +169,7 @@ export function LivePlayerDialog({
                     </p>
                   )}
                   <p className="text-sm leading-relaxed text-text-secondary">
-                    O player é carregado {platform.consent.from}, que pode coletar dados de uso conforme a{" "}
+                    O player é carregado {platform.consent.from}, que pode coletar dados de uso conforme {platform.consent.privacyArticle}{" "}
                     <a href={platform.consent.privacyUrl} target="_blank" rel="noopener noreferrer" className="text-accent-cyan underline underline-offset-2">
                       {platform.consent.privacyName}
                     </a>
@@ -187,5 +203,26 @@ export function LivePlayerDialog({
         </div>
       )}
     </dialog>
+  );
+}
+
+/** Margem horizontal do diálogo: w-[min(960px,calc(100vw-2rem))]. */
+const DIALOG_GUTTER_PX = 32;
+
+/**
+ * A janela comporta a largura mínima do player? (spec 032 D3). Acompanha a mudança de
+ * tamanho e a rotação do aparelho. Sem mínimo definido, sempre true.
+ */
+function useFitsWidth(minWidth: number | undefined): boolean {
+  const query = minWidth ? `(min-width: ${minWidth + DIALOG_GUTTER_PX}px)` : null;
+  return useSyncExternalStore(
+    (notify) => {
+      if (!query) return () => {};
+      const mq = window.matchMedia(query);
+      mq.addEventListener("change", notify);
+      return () => mq.removeEventListener("change", notify);
+    },
+    () => (query ? window.matchMedia(query).matches : true),
+    () => true,
   );
 }

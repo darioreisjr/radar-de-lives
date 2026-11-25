@@ -49,8 +49,30 @@ describe("embedSrc (CA2)", () => {
     }
   });
   it("plataforma sem embed não tem URL de iframe (spec 025)", () => {
-    expect(embedSrc({ platform: "twitch", sourceId: "canal" }, { hostname: "x" })).toBeNull();
     expect(embedSrc({ platform: "kick", sourceId: "canal" }, { hostname: "x" })).toBeNull();
+  });
+  it("Twitch: player oficial com channel, parent do domínio, sem autoplay e sem som (spec 032 CA1)", () => {
+    expect(embedSrc({ platform: "twitch", sourceId: "canal_x" }, { hostname: "radardelives.darioreis.dev" })).toBe(
+      "https://player.twitch.tv/?channel=canal_x&parent=radardelives.darioreis.dev&autoplay=false&muted=true",
+    );
+    // parent segue o domínio atual (Preview, localhost).
+    expect(embedSrc({ platform: "twitch", sourceId: "canal_x" }, { hostname: "localhost" })).toContain("parent=localhost");
+  });
+});
+
+describe("tela estreita para o player (spec 032 D3, CA4)", () => {
+  it("sem largura mínima, troca consentimento e player por too_small", () => {
+    expect(resolvePlayerView({ ...base, fitsPlayer: false, check: ok({}) })).toEqual({ kind: "too_small" });
+    expect(resolvePlayerView({ ...base, fitsPlayer: false, check: ok({}), consented: true })).toEqual({ kind: "too_small" });
+    expect(resolvePlayerView({ ...base, fitsPlayer: false, check: { status: "error", code: "network" } })).toEqual({ kind: "too_small" });
+  });
+  it("estados da live têm prioridade sobre a tela estreita", () => {
+    expect(resolvePlayerView({ ...base, fitsPlayer: false, check: ok({ state: "ended" }) }).kind).toBe("ended");
+    expect(resolvePlayerView({ ...base, fitsPlayer: false, check: { status: "pending" } }).kind).toBe("checking");
+    expect(resolvePlayerView({ ...base, demo: true, fitsPlayer: false, check: ok({}) }).kind).toBe("demo");
+  });
+  it("com largura suficiente (ou sem mínimo), o fluxo é o de sempre", () => {
+    expect(resolvePlayerView({ ...base, fitsPlayer: true, check: ok({}), consented: true })).toEqual({ kind: "player", unverified: false });
   });
 });
 

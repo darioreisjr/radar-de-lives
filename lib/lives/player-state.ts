@@ -15,6 +15,8 @@ export type PlayerView =
   | { kind: "embed_blocked" }
   /** A plataforma não tem player embutido neste site: só o link (spec 025). */
   | { kind: "link_only" }
+  /** A tela não comporta o tamanho mínimo do player da plataforma (spec 032 D3). */
+  | { kind: "too_small" }
   /** unverified: não foi possível confirmar o estado atual (spec 002 D6). */
   | { kind: "consent"; unverified: boolean }
   | { kind: "player"; unverified: boolean };
@@ -23,10 +25,19 @@ export function resolvePlayerView(input: {
   demo: boolean;
   /** A plataforma aceita player embutido (PLATFORMS[platform].embed). Padrão: true. */
   platformEmbed?: boolean;
+  /** A tela comporta o tamanho mínimo do player da plataforma. Padrão: true (spec 032 D3). */
+  fitsPlayer?: boolean;
   listEmbedAllowed: boolean | "unknown";
   check: StatusCheck;
   consented: boolean;
 }): PlayerView {
+  const view = baseView(input);
+  // Tela estreita demais só substitui o consentimento e o player; estados da live têm prioridade.
+  if (input.fitsPlayer === false && (view.kind === "consent" || view.kind === "player")) return { kind: "too_small" };
+  return view;
+}
+
+function baseView(input: Parameters<typeof resolvePlayerView>[0]): PlayerView {
   const { demo, listEmbedAllowed, check, consented } = input;
   if (demo) return { kind: "demo" };
   if (input.platformEmbed === false) return { kind: "link_only" };

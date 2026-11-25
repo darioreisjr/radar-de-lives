@@ -9,7 +9,9 @@ export type TelemetryEvent =
   | "stale_served"
   | "route_error"
   | "store_error"
-  | "store_memory_in_production";
+  | "store_memory_in_production"
+  /** Uma plataforma falhou e as outras responderam (spec 022). Só platform e code. */
+  | "provider_failed";
 
 export type TelemetryFields = Record<string, string | number | boolean | null>;
 
@@ -17,7 +19,7 @@ export type Logger = (evt: TelemetryEvent, fields?: TelemetryFields) => void;
 
 export const logEvent: Logger = (evt, fields = {}) => {
   const line = JSON.stringify({ ts: new Date().toISOString(), evt, ...fields });
-  const warn = evt === "youtube_error" || evt === "route_error" || evt === "budget_exhausted" || evt.startsWith("store_");
+  const warn = evt === "youtube_error" || evt === "route_error" || evt === "budget_exhausted" || evt === "provider_failed" || evt.startsWith("store_");
   if (warn) console.warn(line);
   else console.info(line);
 };

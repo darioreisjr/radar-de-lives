@@ -1,5 +1,7 @@
 import "server-only";
 import { getServerEnv } from "@/lib/config/server-env";
+import { createLivesAggregator, type LivesAggregator } from "@/lib/lives/aggregator";
+import { createYoutubeProvider } from "@/lib/lives/providers/youtube";
 import { createRateLimiter, type RateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { createStores, type Stores } from "@/lib/store";
 import { createYoutubeClient } from "@/lib/youtube/client";
@@ -18,6 +20,8 @@ interface Runtime {
   signature: string;
   stores: Stores;
   lives: LivesService;
+  /** Ponto único da rota /api/lives (spec 022). Por enquanto, só o YouTube. */
+  aggregator: LivesAggregator;
   status: VideoStatusService;
   rateLimit: RateLimiter;
 }
@@ -34,22 +38,25 @@ function build(): Runtime {
     ? createYoutubeClient({ apiKey: env.apiKey, regionCode: env.region, relevanceLanguage: env.language })
     : null;
 
+  const lives = createLivesService({
+    client,
+    cache: stores.cache<PageData>("lives", 50),
+    counter: stores.counter,
+    lock: stores.lock,
+    config: {
+      query: buildCombinedQuery(),
+      ttlMs: env.cacheTtlSeconds * 1000,
+      staleMs: env.staleTtlSeconds * 1000,
+      minUpstreamIntervalMs: env.rateLimitSeconds * 1000,
+      dailySearchBudget: env.dailySearchBudget,
+    },
+  });
+
   g.__radarRuntime = {
     signature,
     stores,
-    lives: createLivesService({
-      client,
-      cache: stores.cache<PageData>("lives", 50),
-      counter: stores.counter,
-      lock: stores.lock,
-      config: {
-        query: buildCombinedQuery(),
-        ttlMs: env.cacheTtlSeconds * 1000,
-        staleMs: env.staleTtlSeconds * 1000,
-        minUpstreamIntervalMs: env.rateLimitSeconds * 1000,
-        dailySearchBudget: env.dailySearchBudget,
-      },
-    }),
+    lives,
+    aggregator: createLivesAggregator({ providers: [createYoutubeProvider(lives, client !== null)] }),
     // Revalidação ao abrir o player (002 D5): cache de 60 s.
     status: createVideoStatusService({
       client,
@@ -70,5 +77,6 @@ function build(): Runtime {
 }
 
 export const getLivesService = () => build().lives;
+export const getLivesAggregator = () => build().aggregator;
 export const getVideoStatusService = () => build().status;
 export const getRouteRateLimit = () => build().rateLimit;

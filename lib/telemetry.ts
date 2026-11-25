@@ -19,7 +19,9 @@ export type TelemetryEvent =
   /** Token de app da Twitch emitido ou invalidado (spec 027). Nunca o valor do token. */
   | "twitch_token"
   /** Falha na Twitch: só stage, status HTTP e code (spec 027 D5). */
-  | "twitch_error";
+  | "twitch_error"
+  /** Busca feita na Twitch (spec 029): só a quantidade de itens. */
+  | "twitch_call";
 
 export type TelemetryFields = Record<string, string | number | boolean | null>;
 

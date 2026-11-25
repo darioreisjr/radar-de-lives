@@ -1,4 +1,4 @@
-import { dedupeById } from "@/lib/lives/identity";
+import { dedupeById, withIdentity } from "@/lib/lives/identity";
 import type { LiveItem, LivesErrorCode, LivesPayload } from "@/lib/lives/types";
 import type { VideoStatusPayload } from "@/lib/youtube/types";
 
@@ -48,7 +48,7 @@ export function explorerReducer(s: ExplorerState, a: ExplorerAction): ExplorerSt
         ...s,
         phase: "ready",
         refreshing: false,
-        items: dedupeById(a.payload.items),
+        items: dedupeById(a.payload.items.map(withIdentity)),
         next: a.payload.nextPageToken,
         meta: { updatedAt: a.payload.updatedAt, cached: a.payload.cached, stale: a.payload.stale, source: a.payload.source },
         error: null,
@@ -63,7 +63,7 @@ export function explorerReducer(s: ExplorerState, a: ExplorerAction): ExplorerSt
     case "more-loaded": {
       // Mantém a ordem de relevância global: páginas seguintes vêm depois.
       const offset = s.items.reduce((m, it) => Math.max(m, it.rank), -1) + 1;
-      const appended = a.payload.items.map((it) => ({ ...it, rank: it.rank + offset }));
+      const appended = a.payload.items.map((it) => ({ ...withIdentity(it), rank: it.rank + offset }));
       return {
         ...s,
         loadingMore: false,

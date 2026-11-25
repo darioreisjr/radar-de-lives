@@ -1,24 +1,12 @@
 import type { NextRequest } from "next/server";
-import { clientKey, errorResponse } from "@/lib/lives/http";
-import { getRouteRateLimit, getVideoStatusService } from "@/lib/lives/server";
-import { logEvent } from "@/lib/telemetry";
-import { LivesError } from "@/lib/youtube/errors";
-import { VIDEO_ID } from "@/lib/youtube/normalize";
+import { getStatusHandler } from "@/lib/lives/server";
 
-/** Revalida um vídeo antes de abrir o player (spec 002). */
+/**
+ * Revalida um vídeo do YouTube antes de abrir o player (spec 002).
+ * @deprecated Use /api/status/youtube/[id] (spec 024). Mantida com a mesma resposta e as
+ * mesmas mensagens; a remoção fica para a consolidação (#57).
+ */
 export async function GET(request: NextRequest, ctx: RouteContext<"/api/lives/[videoId]">) {
-  const limited = await getRouteRateLimit().check(clientKey(request));
-  if (!limited.ok) return errorResponse("rate_limited", undefined, limited.retryAfterSeconds);
-
   const { videoId } = await ctx.params;
-  if (!VIDEO_ID.test(videoId)) return errorResponse("invalid_params", "Parâmetros inválidos: videoId inválido");
-
-  try {
-    const body = await getVideoStatusService().getStatus(videoId);
-    return Response.json(body, { headers: { "Cache-Control": "no-store" } });
-  } catch (e) {
-    if (e instanceof LivesError) return errorResponse(e.code, undefined, e.retryAfterSeconds);
-    logEvent("route_error", { route: "/api/lives/[videoId]" });
-    return errorResponse("upstream_unavailable");
-  }
+  return getStatusHandler()(request, "youtube", videoId, { idLabel: "videoId", route: "/api/lives/[videoId]" });
 }

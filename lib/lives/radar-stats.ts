@@ -1,4 +1,4 @@
-import type { LiveItem, LiveLanguage } from "@/lib/lives/types";
+import type { LiveItem, LiveLanguage, Platform } from "@/lib/lives/types";
 
 export interface LanguageShare {
   language: LiveLanguage;
@@ -33,4 +33,20 @@ export function topAudience(items: readonly LiveItem[]): LiveItem | null {
 
 export function liveCount(items: readonly LiveItem[]): number {
   return items.filter((it) => it.isLive).length;
+}
+
+export interface PlatformShare {
+  platform: Platform;
+  count: number;
+}
+
+/**
+ * Lives ao vivo por plataforma, na ordem das plataformas ativas (spec 026).
+ * Plataformas ativas sem nenhuma live aparecem com 0.
+ */
+export function platformBreakdown(items: readonly LiveItem[], platforms: readonly Platform[]): PlatformShare[] {
+  return platforms.map((platform) => ({
+    platform,
+    count: items.filter((it) => it.isLive && it.platform === platform).length,
+  }));
 }

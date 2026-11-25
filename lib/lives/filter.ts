@@ -1,9 +1,11 @@
-import type { LangFilter, LiveItem, SortOption } from "@/lib/lives/types";
+import type { LangFilter, LiveItem, Platform, SortOption } from "@/lib/lives/types";
 
 export interface LiveFilters {
   q?: string;
   lang: LangFilter;
   sort: SortOption;
+  /** Filtro por plataforma (spec 026). Ausente ou "all" = todas. */
+  platform?: Platform | "all";
 }
 
 function fold(s: string): string {
@@ -15,6 +17,7 @@ export function applyLiveFilters(items: readonly LiveItem[], f: LiveFilters): Li
   const needle = f.q ? fold(f.q.trim()) : "";
   const filtered = items.filter((it) => {
     if (f.lang !== "all" && it.language !== f.lang) return false;
+    if (f.platform && f.platform !== "all" && it.platform !== f.platform) return false;
     if (needle && !fold(`${it.title} ${it.channelTitle}`).includes(needle)) return false;
     return true;
   });

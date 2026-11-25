@@ -2,7 +2,7 @@ import { dedupeById, liveId, withIdentity } from "@/lib/lives/identity";
 import type { LiveItem, LivesErrorCode, LivesPayload, LiveStatusPayload } from "@/lib/lives/types";
 
 export type ApiError = { code: LivesErrorCode | "network"; message: string };
-export type Meta = Pick<LivesPayload, "updatedAt" | "cached" | "stale" | "source">;
+export type Meta = Pick<LivesPayload, "updatedAt" | "cached" | "stale" | "source" | "sources">;
 
 export interface ExplorerState {
   phase: "loading" | "ready" | "error";
@@ -49,7 +49,14 @@ export function explorerReducer(s: ExplorerState, a: ExplorerAction): ExplorerSt
         refreshing: false,
         items: dedupeById(a.payload.items.map(withIdentity)),
         next: a.payload.nextPageToken,
-        meta: { updatedAt: a.payload.updatedAt, cached: a.payload.cached, stale: a.payload.stale, source: a.payload.source },
+        meta: {
+          updatedAt: a.payload.updatedAt,
+          cached: a.payload.cached,
+          stale: a.payload.stale,
+          source: a.payload.source,
+          // Plataformas ativas e estado de cada uma (spec 026).
+          sources: a.payload.sources,
+        },
         error: null,
         notice: a.notice ?? null,
         moreError: null,

@@ -11,8 +11,9 @@ import { EmptyState, ErrorState, QuotaState, SetupState } from "@/components/liv
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/lib/config/site";
 import { applyLiveFilters } from "@/lib/lives/filter";
+import { activePlatforms, hasPartialFailure } from "@/lib/lives/sources";
 
-const EMPTY_FILTERS: FilterValue = { q: "", lang: "all", sort: "relevance" };
+const EMPTY_FILTERS: FilterValue = { q: "", lang: "all", sort: "relevance", platform: "all" };
 
 const notice = "rounded-lg bg-surface px-4 py-3 text-sm text-text-secondary ring-1 ring-border";
 
@@ -24,9 +25,13 @@ export function LiveExplorer() {
   const triggerRef = useRef<HTMLElement | null>(null);
   const [filters, setFilters] = useState<FilterValue>(EMPTY_FILTERS);
 
+  const platforms = activePlatforms(state.meta?.sources);
+  const multi = platforms.length > 1;
+  // Com uma plataforma ativa, o filtro de plataforma é ignorado (spec 026 D4).
+  const platformFilter = multi ? filters.platform : "all";
   const visible = useMemo(
-    () => applyLiveFilters(state.items, { q: filters.q, lang: filters.lang, sort: filters.sort }),
-    [state.items, filters],
+    () => applyLiveFilters(state.items, { q: filters.q, lang: filters.lang, sort: filters.sort, platform: platformFilter }),
+    [state.items, filters, platformFilter],
   );
   const selected = selectedId ? state.items.find((it) => it.id === selectedId) : undefined;
 
@@ -40,7 +45,8 @@ export function LiveExplorer() {
     // Devolve o foco ao botão que abriu o diálogo.
     triggerRef.current?.focus();
   }
-  const filtered = filters.q.trim() !== "" || filters.lang !== "all";
+  const filtered = filters.q.trim() !== "" || filters.lang !== "all" || platformFilter !== "all";
+  const partial = hasPartialFailure(state.meta?.sources);
   const err = state.error;
 
   return (
@@ -71,7 +77,7 @@ export function LiveExplorer() {
             onRefresh={refresh}
           />
 
-          <LiveFilters value={filters} onChange={setFilters} disabled={state.phase !== "ready"} />
+          <LiveFilters value={filters} onChange={setFilters} disabled={state.phase !== "ready"} platforms={platforms} />
 
           <p className="text-xs leading-relaxed text-text-secondary">
             {siteConfig.coverageNote} Idioma estimado a partir de metadados e título.
@@ -79,8 +85,14 @@ export function LiveExplorer() {
 
           {state.meta?.stale && !err && (
             <div role="status" className={notice}>
-              O YouTube não respondeu agora. Mostrando resultados salvos da última consulta; algumas lives podem já ter
-              terminado.
+              {multi ? "Uma das plataformas" : "O YouTube"} não respondeu agora. Mostrando resultados salvos da última
+              consulta; algumas lives podem já ter terminado.
+            </div>
+          )}
+
+          {state.phase === "ready" && partial && (
+            <div role="status" className={notice}>
+              Algumas plataformas estão indisponíveis agora. Mostrando as lives das que responderam.
             </div>
           )}
 
@@ -112,12 +124,23 @@ export function LiveExplorer() {
 
           {state.phase === "ready" && (
             visible.length === 0 ? (
-              <EmptyState filtered={filtered && state.items.length > 0} onClear={() => setFilters(EMPTY_FILTERS)} />
+              <EmptyState
+                filtered={filtered && state.items.length > 0}
+                platformFilter={multi}
+                onClear={() => setFilters(EMPTY_FILTERS)}
+              />
             ) : (
               <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {visible.map((item, i) => (
                   <li key={item.id}>
-                    <LiveCard item={item} demo={demo} index={i} now={now} onWatchHere={() => openPlayer(item.id)} />
+                    <LiveCard
+                      item={item}
+                      demo={demo}
+                      index={i}
+                      now={now}
+                      showPlatform={multi}
+                      onWatchHere={() => openPlayer(item.id)}
+                    />
                   </li>
                 ))}
               </ul>

@@ -25,10 +25,20 @@ function Panel({
   );
 }
 
-export function EmptyState({ filtered, onClear }: { filtered: boolean; onClear: () => void }) {
+export function EmptyState({
+  filtered,
+  onClear,
+  platformFilter = false,
+}: {
+  filtered: boolean;
+  onClear: () => void;
+  /** O filtro de plataforma está visível (spec 026). */
+  platformFilter?: boolean;
+}) {
   return filtered ? (
     <Panel tone="neutral" title="Nenhum resultado com esses filtros" role="status" action={<Button onClick={onClear}>Limpar filtros</Button>}>
-      Os filtros atuais escondem todas as lives encontradas. Ajuste o texto ou o idioma.
+      Os filtros atuais escondem todas as lives encontradas.{" "}
+      {platformFilter ? "Ajuste o texto, o idioma ou a plataforma." : "Ajuste o texto ou o idioma."}
     </Panel>
   ) : (
     <Panel tone="neutral" title="Nenhuma live encontrada agora" role="status">

@@ -22,6 +22,8 @@ test("live confirmada: consentimento e iframe oficial sem autoplay", async ({ pa
   expect(await iframe.getAttribute("src")).not.toContain("autoplay");
   expect(await iframe.getAttribute("allow")).not.toContain("autoplay");
   expect(api.statusCalls).toEqual([videoId(1)]);
+  // Revalidação pela rota de status por plataforma (spec 025 CA2).
+  expect(api.statusPaths).toEqual([`/api/status/youtube/${videoId(1)}`]);
 });
 
 const blocked = [
@@ -72,4 +74,34 @@ test("incorporação desativada na lista: sem botão Assistir aqui", async ({ pa
   const card = page.getByRole("article").filter({ hasText: "Live simulada 1 de teste" });
   await expect(card.getByText("Incorporação desativada pelo canal")).toBeVisible();
   await expect(card.getByRole("button", { name: "Assistir aqui" })).toHaveCount(0);
+});
+
+test("plataforma sem player embutido: modo só-link (spec 025 CA3)", async ({ page, api }) => {
+  const twitch = liveItem(1, {
+    id: "twitch:canal_teste",
+    platform: "twitch",
+    sourceId: "canal_teste",
+    videoId: "canal_teste",
+    title: "Live simulada da Twitch",
+    thumbnailUrl: null,
+    watchUrl: "https://www.twitch.tv/canal_teste",
+    embedUrl: "",
+  });
+  api.setLives(ok(livesPayload([twitch, liveItem(2)])));
+  await page.goto("/");
+  const card = page.getByRole("article").filter({ hasText: "Live simulada da Twitch" });
+  await expect(card.getByRole("link", { name: /^Twitch/ })).toHaveAttribute("href", "https://www.twitch.tv/canal_teste");
+
+  await card.getByRole("button", { name: "Assistir aqui" }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByText("Assista na Twitch")).toBeVisible();
+  await expect(dialog.locator("iframe")).toHaveCount(0);
+  await expect(dialog.getByRole("button", { name: "Carregar player" })).toHaveCount(0);
+  const link = dialog.getByRole("link", { name: /Abrir na Twitch/ });
+  await expect(link).toHaveAttribute("href", "https://www.twitch.tv/canal_teste");
+  await link.focus();
+  await expect(link).toBeFocused();
+  expect(api.statusPaths).toEqual(["/api/status/twitch/canal_teste"]);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
 });

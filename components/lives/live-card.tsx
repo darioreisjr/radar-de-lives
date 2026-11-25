@@ -3,6 +3,7 @@ import { Badge, LiveBadge } from "@/components/ui/badge";
 import { Button, buttonBase, buttonStyles } from "@/components/ui/button";
 import { LANGUAGE_LABEL, formatRelative, formatViewers } from "@/lib/utils/format";
 import { liveDomId } from "@/lib/lives/identity";
+import { platformMeta } from "@/lib/lives/platforms";
 import type { LiveItem } from "@/lib/lives/types";
 
 /** Sem miniatura: superfície neutra com rótulo discreto (spec 007). */
@@ -37,6 +38,7 @@ export function LiveCard({
   const viewers = formatViewers(item.concurrentViewers);
   const started = formatRelative(item.liveStartedAt, now);
   const titleId = `${liveDomId(item)}-title`;
+  const platform = platformMeta(item.platform);
 
   return (
     <article
@@ -111,7 +113,7 @@ export function LiveCard({
                 className={`${buttonBase} ${buttonStyles.ghost} ${ended || item.embedAllowed === false ? "flex-1" : ""}`}
                 aria-describedby={titleId}
               >
-                {ended ? "Abrir no YouTube" : "YouTube"}
+                {ended ? `Abrir ${platform.inLabel}` : platform.label}
                 <span className="sr-only">(abre em nova aba)</span>
                 {externalIcon}
               </a>

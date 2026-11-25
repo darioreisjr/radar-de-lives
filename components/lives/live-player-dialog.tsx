@@ -4,16 +4,21 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Badge, LiveBadge } from "@/components/ui/badge";
 import { Button, buttonBase, buttonStyles } from "@/components/ui/button";
 import { embedSrc, playerBadge, resolvePlayerView, type PlayerBadge, type PlayerView, type StatusCheck } from "@/lib/lives/player-state";
+import { platformMeta, type PlatformMeta } from "@/lib/lives/platforms";
+import type { LiveItem, LivesErrorPayload, LiveStatusPayload } from "@/lib/lives/types";
 import { formatViewers } from "@/lib/utils/format";
-import type { LiveItem, LivesErrorPayload, VideoStatusPayload } from "@/lib/youtube/types";
 
-const MESSAGES: Partial<Record<PlayerView["kind"], { title: string; body: string }>> = {
-  demo: { title: "Item simulado", body: "Este card é um exemplo de desenvolvimento e não tem vídeo para reproduzir." },
-  ended: { title: "Esta live terminou", body: "A transmissão foi encerrada depois da última busca. O YouTube pode ter a gravação." },
-  upcoming: { title: "Ainda não começou", body: "O YouTube informa esta transmissão como agendada." },
-  unavailable: { title: "Vídeo indisponível", body: "O vídeo pode ter sido removido, ficado privado ou não estar disponível na sua região." },
-  embed_blocked: { title: "Player indisponível aqui", body: "O canal não permite incorporar este vídeo em outros sites. Assista direto no YouTube." },
-};
+/** Mensagens por estado. Os nomes da plataforma vêm do mapa (spec 025 D1); no YouTube, iguais às de antes. */
+function messages(p: PlatformMeta): Partial<Record<PlayerView["kind"], { title: string; body: string }>> {
+  return {
+    demo: { title: "Item simulado", body: "Este card é um exemplo de desenvolvimento e não tem vídeo para reproduzir." },
+    ended: { title: "Esta live terminou", body: `A transmissão foi encerrada depois da última busca. ${p.subjectLabel} pode ter a gravação.` },
+    upcoming: { title: "Ainda não começou", body: `${p.subjectLabel} informa esta transmissão como agendada.` },
+    unavailable: { title: "Vídeo indisponível", body: "O vídeo pode ter sido removido, ficado privado ou não estar disponível na sua região." },
+    embed_blocked: { title: "Player indisponível aqui", body: `O canal não permite incorporar este vídeo em outros sites. Assista direto ${p.inLabel}.` },
+    link_only: { title: `Assista ${p.inLabel}`, body: `O player ${p.ofLabel} ainda não pode ser exibido aqui. Abra a live direto ${p.inLabel}.` },
+  };
+}
 
 /** Selo do cabeçalho conforme o estado revalidado (spec 018). "live" usa o LiveBadge. */
 const BADGE_LABEL: Record<Exclude<PlayerBadge, "live">, string> = {
@@ -23,7 +28,7 @@ const BADGE_LABEL: Record<Exclude<PlayerBadge, "live">, string> = {
   unavailable: "Indisponível",
 };
 
-function YoutubeLink({ href, primary }: { href: string; primary?: boolean }) {
+function PlatformLink({ href, primary, platform }: { href: string; primary?: boolean; platform: PlatformMeta }) {
   return (
     <a
       href={href}
@@ -31,7 +36,7 @@ function YoutubeLink({ href, primary }: { href: string; primary?: boolean }) {
       rel="noopener noreferrer"
       className={`${buttonBase} ${primary ? buttonStyles.primary : buttonStyles.ghost}`}
     >
-      Abrir no YouTube
+      Abrir {platform.inLabel}
       <span className="sr-only">(abre em nova aba)</span>
     </a>
   );
@@ -49,7 +54,7 @@ export function LivePlayerDialog({
   demo: boolean;
   consented: boolean;
   onConsent: () => void;
-  onStatus: (status: VideoStatusPayload) => void;
+  onStatus: (status: LiveStatusPayload) => void;
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -61,14 +66,13 @@ export function LivePlayerDialog({
     if (d && !d.open) d.showModal();
   }, []);
 
-  // Revalida o vídeo ao abrir (spec 002 D5). Falha não bloqueia (D6).
+  // Revalida a live ao abrir (spec 002 D5), pela rota de status da plataforma (spec 024/025). Falha não bloqueia (D6).
   useEffect(() => {
     if (demo) return;
     const ac = new AbortController();
-    // Ainda só YouTube: a rota e o player por plataforma chegam na #36 e na #37.
-    fetch(`/api/lives/${encodeURIComponent(item.sourceId)}`, { signal: ac.signal, cache: "no-store" })
+    fetch(`/api/status/${item.platform}/${encodeURIComponent(item.sourceId)}`, { signal: ac.signal, cache: "no-store" })
       .then(async (res) => {
-        const body = (await res.json()) as VideoStatusPayload | LivesErrorPayload;
+        const body = (await res.json()) as LiveStatusPayload | LivesErrorPayload;
         if (!res.ok || "error" in body) {
           setCheck({ status: "error", code: "error" in body ? body.error.code : "upstream_unavailable" });
           return;
@@ -80,10 +84,13 @@ export function LivePlayerDialog({
         if (!ac.signal.aborted) setCheck({ status: "error", code: "network" });
       });
     return () => ac.abort();
-  }, [demo, item.sourceId]);
+  }, [demo, item.platform, item.sourceId]);
 
-  const view = resolvePlayerView({ demo, listEmbedAllowed: item.embedAllowed, check, consented });
-  const message = MESSAGES[view.kind];
+  const platform = platformMeta(item.platform);
+  const view = resolvePlayerView({ demo, platformEmbed: platform.embed, listEmbedAllowed: item.embedAllowed, check, consented });
+  const message = messages(platform)[view.kind];
+  // O diálogo só renderiza no cliente, depois do clique (spec 025 D4).
+  const src = view.kind === "player" ? embedSrc(item, { hostname: window.location.hostname }) : null;
   const titleId = "player-dialog-title";
   const badge = playerBadge({ demo, listIsLive: item.isLive, check });
   const live = badge === "live";
@@ -119,10 +126,10 @@ export function LivePlayerDialog({
 
       {/* Área do player: ≥ 200 px de altura e nada sobreposto ao iframe (RMF). */}
       <div className="relative aspect-video min-h-[200px] w-full bg-background">
-        {view.kind === "player" ? (
+        {src ? (
           <iframe
-            src={embedSrc(item.sourceId)}
-            title={`Player do YouTube: ${item.title}`}
+            src={src}
+            title={`Player ${platform.ofLabel}: ${item.title}`}
             allow="encrypted-media; picture-in-picture; fullscreen"
             allowFullScreen
             referrerPolicy="strict-origin-when-cross-origin"
@@ -138,7 +145,7 @@ export function LivePlayerDialog({
                   <p className="mt-2 text-sm leading-relaxed text-text-secondary">{message.body}</p>
                 </>
               )}
-              {view.kind === "consent" && (
+              {view.kind === "consent" && platform.consent && (
                 <>
                   {view.unverified && (
                     <p className="mb-3 text-sm text-text-secondary">
@@ -146,9 +153,9 @@ export function LivePlayerDialog({
                     </p>
                   )}
                   <p className="text-sm leading-relaxed text-text-secondary">
-                    O player é carregado do YouTube, um serviço do Google, que pode coletar dados de uso conforme a{" "}
-                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-accent-cyan underline underline-offset-2">
-                      Política de Privacidade do Google
+                    O player é carregado {platform.consent.from}, que pode coletar dados de uso conforme a{" "}
+                    <a href={platform.consent.privacyUrl} target="_blank" rel="noopener noreferrer" className="text-accent-cyan underline underline-offset-2">
+                      {platform.consent.privacyName}
                     </a>
                     . Veja também a{" "}
                     <a href="/privacy" target="_blank" className="text-accent-cyan underline underline-offset-2">
@@ -172,11 +179,11 @@ export function LivePlayerDialog({
           <p className="text-xs leading-relaxed text-text-secondary">
             {view.kind === "player"
               ? view.unverified
-                ? "Não confirmamos o estado atual. Se o player não carregar, abra no YouTube."
-                : "Se o player não carregar ou mostrar erro, abra no YouTube."
-              : "Você também pode assistir direto no YouTube."}
+                ? `Não confirmamos o estado atual. Se o player não carregar, abra ${platform.inLabel}.`
+                : `Se o player não carregar ou mostrar erro, abra ${platform.inLabel}.`
+              : `Você também pode assistir direto ${platform.inLabel}.`}
           </p>
-          <YoutubeLink href={item.watchUrl} primary={view.kind !== "consent" && view.kind !== "player"} />
+          <PlatformLink href={item.watchUrl} platform={platform} primary={view.kind !== "consent" && view.kind !== "player"} />
         </div>
       )}
     </dialog>

@@ -1,0 +1,22 @@
+# 025 — Tarefas
+
+- [x] `lib/lives/platforms.ts`: rótulos flexionados, embed, URL do iframe e consentimento por plataforma. YouTube com os valores de antes; Twitch e Kick `embed: false`. (D1, D2)
+- [x] `player-state.ts`:
+  - `embedSrc(item, { hostname })`;
+  - `resolvePlayerView` com `platformEmbed`, que leva ao estado `link_only`;
+  - `StatusCheck` com `LiveStatusPayload`. (CA1, CA3)
+- [x] `explorer-state.ts`: `item-status` casa por `liveId(platform, sourceId)`.
+- [x] Diálogo:
+  - rota `/api/status/<platform>/<id>`;
+  - textos, link e consentimento vindos do mapa;
+  - `hostname` de `window.location` (D4);
+  - tela só-link. (CA2, CA3)
+- [x] Card: texto do link externo vindo do mapa ("YouTube" e "Abrir no YouTube" iguais aos de antes). (CA4)
+- [x] Testes:
+  - unitários: URL do YouTube idêntica; plataforma sem embed sem URL; `link_only`; status de outra plataforma não altera o item;
+  - e2e: mock de `/api/status/<platform>/<id>`, rota nova conferida e modo só-link com uma live da Twitch. (CA1 a CA4)
+- [x] Verificação em 2026-11-25:
+  - lint e typecheck: ok;
+  - `npm test`: 19 arquivos, 180 testes, snapshot de caracterização inalterado;
+  - build e `npm run test:e2e`: 48 testes (2 novos);
+  - os e2e existentes do player passaram **sem mudar asserções de texto**, e não houve violação de CSP.

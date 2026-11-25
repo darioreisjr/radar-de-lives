@@ -2,7 +2,8 @@ import Image from "next/image";
 import { Badge, LiveBadge } from "@/components/ui/badge";
 import { Button, buttonBase, buttonStyles } from "@/components/ui/button";
 import { LANGUAGE_LABEL, formatRelative, formatViewers } from "@/lib/utils/format";
-import type { LiveItem } from "@/lib/youtube/types";
+import { liveDomId } from "@/lib/lives/identity";
+import type { LiveItem } from "@/lib/lives/types";
 
 /** Sem miniatura: superfície neutra com rótulo discreto (spec 007). */
 function Placeholder({ label }: { label: string }) {
@@ -35,7 +36,7 @@ export function LiveCard({
   const ended = !item.isLive;
   const viewers = formatViewers(item.concurrentViewers);
   const started = formatRelative(item.liveStartedAt, now);
-  const titleId = `live-${item.videoId}-title`;
+  const titleId = `${liveDomId(item)}-title`;
 
   return (
     <article

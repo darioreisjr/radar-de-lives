@@ -1,3 +1,4 @@
+import { liveId } from "@/lib/lives/identity";
 import { inferLanguage } from "@/lib/utils/infer-language";
 import type { LiveItem, YtSearchItem, YtThumbnails, YtVideoItem } from "./types";
 
@@ -81,6 +82,9 @@ export function normalizeLives(
     const title = d?.snippet?.title ?? s.title ?? "";
     const embeddable = d?.status?.embeddable;
     out.push({
+      id: liveId("youtube", videoId),
+      platform: "youtube",
+      sourceId: videoId,
       videoId,
       title: decodeEntities(title) || "Sem título",
       description: decodeEntities(d?.snippet?.description ?? s.description ?? ""),
@@ -99,6 +103,8 @@ export function normalizeLives(
       embedUrl: `https://www.youtube.com/embed/${videoId}`,
       isLive: true,
       embedAllowed: typeof embeddable === "boolean" ? embeddable : "unknown",
+      // A busca do YouTube não informa conteúdo adulto (spec 021 D4).
+      isMature: false,
       rank,
     });
   });

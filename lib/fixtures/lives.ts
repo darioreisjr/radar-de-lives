@@ -1,4 +1,5 @@
-import type { LiveItem } from "@/lib/youtube/types";
+import { liveId } from "@/lib/lives/identity";
+import type { LiveItem } from "@/lib/lives/types";
 
 /**
  * DADOS SIMULADOS — apenas para desenvolvimento visual (D15).
@@ -22,6 +23,9 @@ export function getDemoLives(): LiveItem[] {
   return base.map((b, i) => {
     const videoId = `demo-${String(i + 1).padStart(3, "0")}`;
     return {
+      id: liveId("youtube", videoId),
+      platform: "youtube",
+      sourceId: videoId,
       videoId,
       title: b.title,
       description: "Item simulado para desenvolvimento visual.",
@@ -36,6 +40,7 @@ export function getDemoLives(): LiveItem[] {
       embedUrl: "",
       isLive: true,
       embedAllowed: "unknown",
+      isMature: false,
       rank: i,
     };
   });

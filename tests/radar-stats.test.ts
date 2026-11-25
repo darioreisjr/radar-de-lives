@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { languageBreakdown, liveCount, topAudience } from "@/lib/lives/radar-stats";
-import type { LiveItem } from "@/lib/youtube/types";
+import type { LiveItem } from "@/lib/lives/types";
 
 const item = (videoId: string, extra: Partial<LiveItem> = {}): LiveItem => ({
+  id: `youtube:${videoId}`, platform: "youtube", sourceId: videoId,
   videoId, title: videoId, description: "", channelId: "c", channelTitle: `Canal ${videoId}`, thumbnailUrl: null,
   publishedAt: null, liveStartedAt: null, concurrentViewers: null, language: "unknown",
-  watchUrl: "", embedUrl: "", isLive: true, embedAllowed: true, rank: 0, ...extra,
+  watchUrl: "", embedUrl: "", isLive: true, embedAllowed: true, isMature: false, rank: 0, ...extra,
 });
 
 describe("painel do radar (spec 007 CA5)", () => {

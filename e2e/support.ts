@@ -1,6 +1,7 @@
 import { expect, test as base, type Route } from "@playwright/test";
 import { POLICY_STORAGE_KEY, serializeAcceptance } from "../lib/consent/policy-acceptance";
-import type { LiveItem, LiveLanguage, LivesPayload, VideoLiveState, VideoStatusPayload } from "../lib/youtube/types";
+import type { LiveItem, LiveLanguage, LivesPayload } from "../lib/lives/types";
+import type { VideoLiveState, VideoStatusPayload } from "../lib/youtube/types";
 
 /* ---------- Dados simulados ---------- */
 
@@ -12,6 +13,9 @@ export const videoId = (n: number) => `e2eVideo${String(n).padStart(3, "0")}`;
 export function liveItem(n: number, over: Partial<LiveItem> = {}): LiveItem {
   const id = videoId(n);
   return {
+    id: `youtube:${id}`,
+    platform: "youtube",
+    sourceId: id,
     videoId: id,
     title: `Live simulada ${n} de teste`,
     description: "Item simulado para testes de interface.",
@@ -26,6 +30,7 @@ export function liveItem(n: number, over: Partial<LiveItem> = {}): LiveItem {
     embedUrl: `https://www.youtube.com/embed/${id}`,
     isLive: true,
     embedAllowed: true,
+    isMature: false,
     rank: n - 1,
     ...over,
   };

@@ -65,7 +65,8 @@ export function LivePlayerDialog({
   useEffect(() => {
     if (demo) return;
     const ac = new AbortController();
-    fetch(`/api/lives/${encodeURIComponent(item.videoId)}`, { signal: ac.signal, cache: "no-store" })
+    // Ainda só YouTube: a rota e o player por plataforma chegam na #36 e na #37.
+    fetch(`/api/lives/${encodeURIComponent(item.sourceId)}`, { signal: ac.signal, cache: "no-store" })
       .then(async (res) => {
         const body = (await res.json()) as VideoStatusPayload | LivesErrorPayload;
         if (!res.ok || "error" in body) {
@@ -79,7 +80,7 @@ export function LivePlayerDialog({
         if (!ac.signal.aborted) setCheck({ status: "error", code: "network" });
       });
     return () => ac.abort();
-  }, [demo, item.videoId]);
+  }, [demo, item.sourceId]);
 
   const view = resolvePlayerView({ demo, listEmbedAllowed: item.embedAllowed, check, consented });
   const message = MESSAGES[view.kind];
@@ -120,7 +121,7 @@ export function LivePlayerDialog({
       <div className="relative aspect-video min-h-[200px] w-full bg-background">
         {view.kind === "player" ? (
           <iframe
-            src={embedSrc(item.videoId)}
+            src={embedSrc(item.sourceId)}
             title={`Player do YouTube: ${item.title}`}
             allow="encrypted-media; picture-in-picture; fullscreen"
             allowFullScreen

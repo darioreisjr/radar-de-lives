@@ -1,4 +1,4 @@
-import type { LangFilter, LiveItem, SortOption } from "@/lib/youtube/types";
+import type { LangFilter, LiveItem, SortOption } from "@/lib/lives/types";
 
 export interface LiveFilters {
   q?: string;

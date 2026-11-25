@@ -1,5 +1,6 @@
-import { dedupeByVideoId } from "@/lib/youtube/normalize";
-import type { LiveItem, LivesErrorCode, LivesPayload, VideoStatusPayload } from "@/lib/youtube/types";
+import { dedupeById } from "@/lib/lives/identity";
+import type { LiveItem, LivesErrorCode, LivesPayload } from "@/lib/lives/types";
+import type { VideoStatusPayload } from "@/lib/youtube/types";
 
 export type ApiError = { code: LivesErrorCode | "network"; message: string };
 export type Meta = Pick<LivesPayload, "updatedAt" | "cached" | "stale" | "source">;
@@ -47,7 +48,7 @@ export function explorerReducer(s: ExplorerState, a: ExplorerAction): ExplorerSt
         ...s,
         phase: "ready",
         refreshing: false,
-        items: dedupeByVideoId(a.payload.items),
+        items: dedupeById(a.payload.items),
         next: a.payload.nextPageToken,
         meta: { updatedAt: a.payload.updatedAt, cached: a.payload.cached, stale: a.payload.stale, source: a.payload.source },
         error: null,
@@ -66,7 +67,7 @@ export function explorerReducer(s: ExplorerState, a: ExplorerAction): ExplorerSt
       return {
         ...s,
         loadingMore: false,
-        items: dedupeByVideoId([...s.items, ...appended]),
+        items: dedupeById([...s.items, ...appended]),
         next: a.payload.nextPageToken,
       };
     }
@@ -77,7 +78,8 @@ export function explorerReducer(s: ExplorerState, a: ExplorerAction): ExplorerSt
       return {
         ...s,
         items: s.items.map((it) =>
-          it.videoId !== st.videoId
+          // O status ainda vem da rota do YouTube (/api/lives/[videoId]); a #36 generaliza.
+          it.platform !== "youtube" || it.sourceId !== st.videoId
             ? it
             : {
                 ...it,

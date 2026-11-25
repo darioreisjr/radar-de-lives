@@ -47,7 +47,7 @@ Funções testadas que buscam as lives na Twitch e devolvem `LiveItem[]` válido
 
 | ID | Decisão | Motivo |
 |---|---|---|
-| D1 | **Premissa, a confirmar com o responsável:** "Conteúdo adulto" = algum destes rótulos: `SexualThemes`, `DrugsIntoxication`, `ViolentGraphic`, `ProfanityVulgarity` ou `Gambling`. **Ficam de fora `MatureGame`** (automático para jogo adulto: marcaria praticamente toda live de GTA 6) e `DebatedSocialIssuesAndPolitics` (política, não conteúdo adulto). A lista fica numa constante. | Um selo em todos os cards não informa nada. |
+| D1 | **Aprovada pelo responsável em 2026-11-25:** "Conteúdo adulto" = algum destes rótulos: `SexualThemes`, `DrugsIntoxication`, `ViolentGraphic`, `ProfanityVulgarity` ou `Gambling`. **Ficam de fora `MatureGame`** (automático para jogo adulto: marcaria praticamente toda live de GTA 6) e `DebatedSocialIssuesAndPolitics` (política, não conteúdo adulto). A lista fica numa constante. | Um selo em todos os cards não informa nada. |
 | D2 | Até **3 páginas** de 100 (spec 019 I2), parando antes se não houver cursor ou a página vier vazia. | Mais de 100 lives em pt ao mesmo tempo (spec 019). |
 | D3 | Ordem = ordem da API (por espectadores); `rank` = posição depois do dedupe. | A Twitch já ordena; o agregador intercala (spec 022 D3). |
 | D4 | **Falha em `/helix/channels`:** a lista continua com `isMature: false` e um log `twitch_error` (`stage: "channels"`). | O selo é secundário; não pode derrubar a busca. |
@@ -67,5 +67,5 @@ Funções testadas que buscam as lives na Twitch e devolvem `LiveItem[]` válido
 
 ## Riscos
 
-- **A premissa D1 não agradar.** É uma constante e um teste, fácil de mudar.
+- **Mudar a regra D1 no futuro.** É uma constante e um teste, fácil de mudar.
 - **Rollback:** reverter o PR. O código ainda não está ligado ao agregador.

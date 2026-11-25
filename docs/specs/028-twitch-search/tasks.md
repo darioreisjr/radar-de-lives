@@ -10,4 +10,4 @@
   - `npm test`: 22 arquivos, 215 testes;
   - build e `npm run test:e2e`: 56 testes;
   - bundle do cliente limpo.
-- [ ] **Confirmar com o responsável a premissa D1** (quais rótulos contam como "Conteúdo adulto").
+- [x] Regra D1 aprovada pelo responsável em 2026-11-25: contam `SexualThemes`, `DrugsIntoxication`, `ViolentGraphic`, `ProfanityVulgarity` e `Gambling`; não contam `MatureGame` e `DebatedSocialIssuesAndPolitics`.

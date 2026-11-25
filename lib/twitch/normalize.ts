@@ -3,7 +3,7 @@ import type { LiveItem, LiveLanguage } from "@/lib/lives/types";
 import type { TwitchStream } from "./types";
 
 /**
- * Rótulos de classificação que contam como "Conteúdo adulto" (spec 028 D1, premissa).
+ * Rótulos de classificação que contam como "Conteúdo adulto" (spec 028 D1, aprovada em 2026-11-25).
  * MatureGame fica de fora: a Twitch aplica automaticamente a todo jogo adulto, como GTA 6.
  * DebatedSocialIssuesAndPolitics fica de fora: é política, não conteúdo adulto.
  */

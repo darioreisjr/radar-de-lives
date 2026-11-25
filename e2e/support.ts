@@ -155,6 +155,12 @@ export const test = base.extend<{ acceptPolicy: boolean; api: ApiMock }>({
         (u) => u.origin === origin && /^\/(_vercel\/insights|[0-9a-f]{16})\/(view|event|session)$/.test(u.pathname),
         (r) => r.fulfill({ status: 200, body: "" }),
       );
+      // Nada sai para a Twitch (spec 031): miniaturas e player respondidos localmente.
+      await page.route((u) => u.hostname === "static-cdn.jtvnw.net", (r) => r.fulfill({ contentType: "image/png", body: PNG }));
+      await page.route(
+        (u) => u.hostname === "player.twitch.tv",
+        (r) => r.fulfill({ contentType: "text/html", body: "<!doctype html><title>Player simulado</title><p>player</p>" }),
+      );
       // Nada sai para o Google: miniaturas e player respondidos localmente.
       await page.route((u) => u.hostname === "i.ytimg.com", (r) => r.fulfill({ contentType: "image/png", body: PNG }));
       await page.route(

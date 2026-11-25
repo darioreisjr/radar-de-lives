@@ -91,3 +91,21 @@ test("selo de conteúdo adulto aparece mesmo com uma plataforma", async ({ page,
   await expect(cardBadge(page, "Conteúdo adulto")).toHaveCount(1);
   await expect(page.getByLabel("Plataforma")).toHaveCount(0);
 });
+
+test("miniatura da Twitch carrega sem violar a CSP (spec 031)", async ({ page, api }) => {
+  const thumb = "https://static-cdn.jtvnw.net/previews-ttv/live_user_canal_twitch_1-640x360.jpg";
+  api.setLives(
+    ok(livesPayload([liveItem(1), twitchItem(2, { thumbnailUrl: thumb })], { sources: [source("youtube"), source("twitch")] })),
+  );
+  const twitchRequests: string[] = [];
+  page.on("request", (r) => {
+    if (/(^|\.)jtvnw\.net$|(^|\.)twitch\.tv$/.test(new URL(r.url()).hostname)) twitchRequests.push(r.url());
+  });
+  await page.goto("/");
+  const card = page.getByRole("article").filter({ hasText: "Live da Twitch 2" });
+  const img = card.locator("img");
+  await expect(img).toHaveAttribute("src", thumb);
+  await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
+  // A requisição é feita pelo navegador, mas respondida localmente pelo teste (nada sai para a Twitch).
+  expect(twitchRequests).toEqual([thumb]);
+});

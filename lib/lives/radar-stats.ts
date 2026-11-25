@@ -1,4 +1,4 @@
-import type { LiveItem, LiveLanguage } from "@/lib/youtube/types";
+import type { LiveItem, LiveLanguage } from "@/lib/lives/types";
 
 export interface LanguageShare {
   language: LiveLanguage;

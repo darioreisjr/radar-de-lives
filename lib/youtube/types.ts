@@ -1,37 +1,17 @@
-export type LiveLanguage = "pt" | "en" | "es" | "unknown";
-export type LangFilter = "all" | "pt" | "en" | "es";
-export type SortOption = "relevance" | "viewers" | "recent";
-
-/** Item normalizado exposto pela rota /api/lives (modelo do PRD §5). */
-export interface LiveItem {
-  videoId: string;
-  title: string;
-  description: string;
-  channelId: string;
-  channelTitle: string;
-  thumbnailUrl: string | null;
-  publishedAt: string | null;
-  liveStartedAt: string | null;
-  /** Ausente na API => null. Nunca converter para 0. */
-  concurrentViewers: number | null;
-  /** Estimado a partir de metadados/título. */
-  language: LiveLanguage;
-  watchUrl: string;
-  embedUrl: string;
-  isLive: boolean;
-  embedAllowed: boolean | "unknown";
-  /** Posição original na busca (ordenação por relevância). */
-  rank: number;
-}
-
-export interface LivesPayload {
-  items: LiveItem[];
-  updatedAt: string;
-  cached: boolean;
-  stale: boolean;
-  nextPageToken: string | null;
-  source: "youtube" | "fixture";
-}
+/**
+ * Tipos neutros movidos para lib/lives/types.ts (spec 021). Reexportados aqui durante a
+ * transição, para que módulos ainda não migrados continuem compilando.
+ */
+export type {
+  LangFilter,
+  LiveItem,
+  LiveLanguage,
+  LivesErrorCode,
+  LivesErrorPayload,
+  LivesPayload,
+  Platform,
+  SortOption,
+} from "@/lib/lives/types";
 
 export type VideoLiveState = "live" | "ended" | "upcoming" | "unavailable";
 
@@ -43,19 +23,6 @@ export interface VideoStatusPayload {
   concurrentViewers: number | null;
   checkedAt: string;
   cached: boolean;
-}
-
-export type LivesErrorCode =
-  | "missing_api_key"
-  | "quota_exceeded"
-  | "rate_limited"
-  | "upstream_unavailable"
-  | "upstream_config"
-  | "invalid_params";
-
-export interface LivesErrorPayload {
-  error: { code: LivesErrorCode; message: string };
-  retryAfterSeconds?: number;
 }
 
 /* ---------- Formas parciais das respostas do YouTube (somente campos usados) ---------- */

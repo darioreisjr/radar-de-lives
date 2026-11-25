@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { explorerReducer, initialExplorerState, type ExplorerState } from "@/lib/lives/explorer-state";
-import type { LiveItem, LivesPayload } from "@/lib/youtube/types";
+import type { LiveItem, LivesPayload } from "@/lib/lives/types";
 
 const item = (videoId: string, rank: number, extra: Partial<LiveItem> = {}): LiveItem => ({
+  id: `youtube:${videoId}`, platform: "youtube", sourceId: videoId,
   videoId, title: videoId, description: "", channelId: "c", channelTitle: "c", thumbnailUrl: null,
   publishedAt: null, liveStartedAt: null, concurrentViewers: null, language: "unknown",
-  watchUrl: `https://www.youtube.com/watch?v=${videoId}`, embedUrl: "", isLive: true, embedAllowed: true, rank, ...extra,
+  watchUrl: `https://www.youtube.com/watch?v=${videoId}`, embedUrl: "", isLive: true, embedAllowed: true, isMature: false, rank, ...extra,
 });
 const payload = (items: LiveItem[], next: string | null = null): LivesPayload => ({
   items, updatedAt: "2026-11-21T12:00:00.000Z", cached: false, stale: false, nextPageToken: next, source: "youtube",

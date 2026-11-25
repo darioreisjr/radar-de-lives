@@ -1,0 +1,274 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`caracterização do YouTube (não pode mudar na Fase 1) > dados de demonstração (sem datas, que dependem do relógio) 1`] = `
+[
+  {
+    "channelId": "demo-channel-1",
+    "channelTitle": "Canal de exemplo A",
+    "concurrentViewers": 12840,
+    "description": "Item simulado para desenvolvimento visual.",
+    "embedAllowed": "unknown",
+    "embedUrl": "",
+    "hasLiveStartedAt": true,
+    "hasPublishedAt": true,
+    "isLive": true,
+    "language": "pt",
+    "rank": 0,
+    "thumbnailUrl": null,
+    "title": "[EXEMPLO] Explorando a cidade à noite — gameplay ao vivo",
+    "videoId": "demo-001",
+    "watchUrl": "",
+  },
+  {
+    "channelId": "demo-channel-2",
+    "channelTitle": "Example Channel B",
+    "concurrentViewers": 5310,
+    "description": "Item simulado para desenvolvimento visual.",
+    "embedAllowed": "unknown",
+    "embedUrl": "",
+    "hasLiveStartedAt": true,
+    "hasPublishedAt": true,
+    "isLive": true,
+    "language": "en",
+    "rank": 1,
+    "thumbnailUrl": null,
+    "title": "[EXAMPLE] Night drive and side missions live",
+    "videoId": "demo-002",
+    "watchUrl": "",
+  },
+  {
+    "channelId": "demo-channel-3",
+    "channelTitle": "Canal de ejemplo C",
+    "concurrentViewers": null,
+    "description": "Item simulado para desenvolvimento visual.",
+    "embedAllowed": "unknown",
+    "embedUrl": "",
+    "hasLiveStartedAt": true,
+    "hasPublishedAt": true,
+    "isLive": true,
+    "language": "es",
+    "rank": 2,
+    "thumbnailUrl": null,
+    "title": "[EJEMPLO] Primeras horas en directo",
+    "videoId": "demo-003",
+    "watchUrl": "",
+  },
+  {
+    "channelId": "demo-channel-4",
+    "channelTitle": "Canal de exemplo D",
+    "concurrentViewers": 880,
+    "description": "Item simulado para desenvolvimento visual.",
+    "embedAllowed": "unknown",
+    "embedUrl": "",
+    "hasLiveStartedAt": true,
+    "hasPublishedAt": true,
+    "isLive": true,
+    "language": "pt",
+    "rank": 3,
+    "thumbnailUrl": null,
+    "title": "[EXEMPLO] Teorias e notícias do lançamento — bate-papo",
+    "videoId": "demo-004",
+    "watchUrl": "",
+  },
+  {
+    "channelId": "demo-channel-5",
+    "channelTitle": "Example Channel E",
+    "concurrentViewers": null,
+    "description": "Item simulado para desenvolvimento visual.",
+    "embedAllowed": "unknown",
+    "embedUrl": "",
+    "hasLiveStartedAt": true,
+    "hasPublishedAt": true,
+    "isLive": true,
+    "language": "unknown",
+    "rank": 4,
+    "thumbnailUrl": null,
+    "title": "[EXAMPLE] Photo mode tour of the coastline",
+    "videoId": "demo-005",
+    "watchUrl": "",
+  },
+  {
+    "channelId": "demo-channel-6",
+    "channelTitle": "Canal de exemplo F",
+    "concurrentViewers": 2405,
+    "description": "Item simulado para desenvolvimento visual.",
+    "embedAllowed": "unknown",
+    "embedUrl": "",
+    "hasLiveStartedAt": true,
+    "hasPublishedAt": true,
+    "isLive": true,
+    "language": "pt",
+    "rank": 5,
+    "thumbnailUrl": null,
+    "title": "[EXEMPLO] Speedrun de missões com a comunidade",
+    "videoId": "demo-006",
+    "watchUrl": "",
+  },
+  {
+    "channelId": "demo-channel-7",
+    "channelTitle": "Canal de ejemplo G",
+    "concurrentViewers": 1490,
+    "description": "Item simulado para desenvolvimento visual.",
+    "embedAllowed": "unknown",
+    "embedUrl": "",
+    "hasLiveStartedAt": true,
+    "hasPublishedAt": true,
+    "isLive": true,
+    "language": "es",
+    "rank": 6,
+    "thumbnailUrl": null,
+    "title": "[EJEMPLO] Persecuciones y retos de la comunidad",
+    "videoId": "demo-007",
+    "watchUrl": "",
+  },
+  {
+    "channelId": "demo-channel-8",
+    "channelTitle": "Example Channel H with a long name",
+    "concurrentViewers": 64,
+    "description": "Item simulado para desenvolvimento visual.",
+    "embedAllowed": "unknown",
+    "embedUrl": "",
+    "hasLiveStartedAt": true,
+    "hasPublishedAt": true,
+    "isLive": true,
+    "language": "en",
+    "rank": 7,
+    "thumbnailUrl": null,
+    "title": "[EXAMPLE] Long title to test wrapping in cards: chill exploration, collectibles and viewer requests all night",
+    "videoId": "demo-008",
+    "watchUrl": "",
+  },
+]
+`;
+
+exports[`caracterização do YouTube (não pode mudar na Fase 1) > filtros da rota: {"lang":"all","sort":"recent"} 1`] = `
+[
+  "eeeeeeeeeee",
+  "bbbbbbbbbbb",
+  "aaaaaaaaaaa",
+  "ccccccccccc",
+]
+`;
+
+exports[`caracterização do YouTube (não pode mudar na Fase 1) > filtros da rota: {"lang":"all","sort":"relevance","q":"gta 6"} 1`] = `
+[
+  "aaaaaaaaaaa",
+  "ccccccccccc",
+  "eeeeeeeeeee",
+]
+`;
+
+exports[`caracterização do YouTube (não pode mudar na Fase 1) > filtros da rota: {"lang":"all","sort":"relevance"} 1`] = `
+[
+  "aaaaaaaaaaa",
+  "bbbbbbbbbbb",
+  "ccccccccccc",
+  "eeeeeeeeeee",
+]
+`;
+
+exports[`caracterização do YouTube (não pode mudar na Fase 1) > filtros da rota: {"lang":"all","sort":"viewers","q":"MISSOES"} 1`] = `
+[
+  "aaaaaaaaaaa",
+]
+`;
+
+exports[`caracterização do YouTube (não pode mudar na Fase 1) > filtros da rota: {"lang":"all","sort":"viewers"} 1`] = `
+[
+  "bbbbbbbbbbb",
+  "aaaaaaaaaaa",
+  "eeeeeeeeeee",
+  "ccccccccccc",
+]
+`;
+
+exports[`caracterização do YouTube (não pode mudar na Fase 1) > filtros da rota: {"lang":"en","sort":"viewers"} 1`] = `
+[
+  "bbbbbbbbbbb",
+]
+`;
+
+exports[`caracterização do YouTube (não pode mudar na Fase 1) > filtros da rota: {"lang":"es","sort":"recent"} 1`] = `
+[
+  "ccccccccccc",
+]
+`;
+
+exports[`caracterização do YouTube (não pode mudar na Fase 1) > filtros da rota: {"lang":"pt","sort":"relevance"} 1`] = `
+[
+  "aaaaaaaaaaa",
+]
+`;
+
+exports[`caracterização do YouTube (não pode mudar na Fase 1) > itens normalizados pelo serviço 1`] = `
+[
+  {
+    "channelId": "UC_A",
+    "channelTitle": "Canal A",
+    "concurrentViewers": 1500,
+    "description": "",
+    "embedAllowed": true,
+    "embedUrl": "https://www.youtube.com/embed/aaaaaaaaaaa",
+    "isLive": true,
+    "language": "pt",
+    "liveStartedAt": "2026-11-21T10:05:00.000Z",
+    "publishedAt": "2026-11-21T10:00:00.000Z",
+    "rank": 0,
+    "thumbnailUrl": "https://i.ytimg.com/vi/aaaaaaaaaaa/hqdefault_live.jpg",
+    "title": "GTA 6 ao vivo & missões",
+    "videoId": "aaaaaaaaaaa",
+    "watchUrl": "https://www.youtube.com/watch?v=aaaaaaaaaaa",
+  },
+  {
+    "channelId": "UC_B",
+    "channelTitle": "Channel B",
+    "concurrentViewers": 9200,
+    "description": "",
+    "embedAllowed": false,
+    "embedUrl": "https://www.youtube.com/embed/bbbbbbbbbbb",
+    "isLive": true,
+    "language": "en",
+    "liveStartedAt": "2026-11-21T11:30:00.000Z",
+    "publishedAt": "2026-11-21T11:00:00.000Z",
+    "rank": 1,
+    "thumbnailUrl": "https://i.ytimg.com/vi/bbbbbbbbbbb/hqdefault_live.jpg",
+    "title": "GTA VI live night drive",
+    "videoId": "bbbbbbbbbbb",
+    "watchUrl": "https://www.youtube.com/watch?v=bbbbbbbbbbb",
+  },
+  {
+    "channelId": "UC_C",
+    "channelTitle": "Canal C",
+    "concurrentViewers": null,
+    "description": "",
+    "embedAllowed": "unknown",
+    "embedUrl": "https://www.youtube.com/embed/ccccccccccc",
+    "isLive": true,
+    "language": "es",
+    "liveStartedAt": "2026-11-21T09:10:00.000Z",
+    "publishedAt": "2026-11-21T09:00:00.000Z",
+    "rank": 2,
+    "thumbnailUrl": "https://i.ytimg.com/vi/ccccccccccc/hqdefault_live.jpg",
+    "title": "GTA 6 en vivo",
+    "videoId": "ccccccccccc",
+    "watchUrl": "https://www.youtube.com/watch?v=ccccccccccc",
+  },
+  {
+    "channelId": "UC_E",
+    "channelTitle": "Canal E",
+    "concurrentViewers": 40,
+    "description": "",
+    "embedAllowed": "unknown",
+    "embedUrl": "https://www.youtube.com/embed/eeeeeeeeeee",
+    "isLive": true,
+    "language": "unknown",
+    "liveStartedAt": "2026-11-21T11:55:00.000Z",
+    "publishedAt": "2026-11-21T11:50:00.000Z",
+    "rank": 4,
+    "thumbnailUrl": "https://i.ytimg.com/vi/eeeeeeeeeee/hqdefault_live.jpg",
+    "title": "Bate-papo GTA 6 'teorias'",
+    "videoId": "eeeeeeeeeee",
+    "watchUrl": "https://www.youtube.com/watch?v=eeeeeeeeeee",
+  },
+]
+`;

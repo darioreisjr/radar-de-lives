@@ -28,11 +28,11 @@ export function LiveExplorer() {
     () => applyLiveFilters(state.items, { q: filters.q, lang: filters.lang, sort: filters.sort }),
     [state.items, filters],
   );
-  const selected = selectedId ? state.items.find((it) => it.videoId === selectedId) : undefined;
+  const selected = selectedId ? state.items.find((it) => it.id === selectedId) : undefined;
 
-  function openPlayer(videoId: string) {
+  function openPlayer(id: string) {
     triggerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    setSelectedId(videoId);
+    setSelectedId(id);
   }
 
   function closePlayer() {
@@ -116,8 +116,8 @@ export function LiveExplorer() {
             ) : (
               <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {visible.map((item, i) => (
-                  <li key={item.videoId}>
-                    <LiveCard item={item} demo={demo} index={i} now={now} onWatchHere={() => openPlayer(item.videoId)} />
+                  <li key={item.id}>
+                    <LiveCard item={item} demo={demo} index={i} now={now} onWatchHere={() => openPlayer(item.id)} />
                   </li>
                 ))}
               </ul>
@@ -141,7 +141,7 @@ export function LiveExplorer() {
 
       {selected && (
         <LivePlayerDialog
-          key={selected.videoId}
+          key={selected.id}
           item={selected}
           demo={demo}
           consented={playerConsent}

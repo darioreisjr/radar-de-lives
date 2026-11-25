@@ -5,11 +5,14 @@ import { siteConfig } from "@/lib/config/site";
 
 export const metadata: Metadata = {
   title: `Privacidade | ${siteConfig.name}`,
-  description: "Como o Radar de Lives trata dados e usa os YouTube API Services.",
+  description: "Como o Radar de Lives trata dados e usa os YouTube API Services e a API da Twitch.",
 };
 
 const GOOGLE_PRIVACY = "https://policies.google.com/privacy";
 const YOUTUBE_TERMS = "https://www.youtube.com/t/terms";
+/** Endereços citados no Developer Agreement da Twitch; URLs finais conferidas em 2026-11-25 (spec 033). */
+const TWITCH_PRIVACY = "https://legal.twitch.com/legal/privacy-notice/";
+const TWITCH_TERMS = "https://legal.twitch.com/legal/terms-of-service/";
 
 const dateFmt = new Intl.DateTimeFormat("pt-BR", { dateStyle: "long", timeZone: "UTC" });
 
@@ -21,11 +24,12 @@ export default function PrivacyPage() {
       <LegalSection title="Resumo">
         <p>
           Esta política explica como o {siteConfig.name} trata dados quando você acessa {siteConfig.url}. O{" "}
-          {siteConfig.name} é um diretório gratuito e independente de transmissões públicas de GTA 6 no YouTube. Não tem
-          conta, login, cadastro, pagamento nem publicidade própria, e não usa cookies próprios.
+          {siteConfig.name} é um diretório gratuito e independente de transmissões públicas de GTA 6 no YouTube e na
+          Twitch. Não tem conta, login, cadastro, pagamento nem publicidade própria, e não usa cookies próprios.
         </p>
         <p>
-          Para mostrar as lives, o site usa os <strong>YouTube API Services</strong>, serviços do Google. Antes de liberar a
+          Para mostrar as lives, o site usa os <strong>YouTube API Services</strong>, serviços do Google, e a{" "}
+          <strong>API da Twitch</strong>. Antes de liberar a
           lista de lives, o site pede que você leia e concorde com esta política e com os{" "}
           <Link href="/terms" className="text-accent-cyan underline underline-offset-2">
             Termos de Uso
@@ -59,6 +63,21 @@ export default function PrivacyPage() {
         </p>
       </LegalSection>
 
+      <LegalSection title="Uso da API da Twitch">
+        <p>
+          O servidor do site consulta a API da Twitch para encontrar transmissões públicas ao vivo na categoria de GTA 6 e
+          exibe apenas metadados públicos retornados por ela: título, canal, miniatura, horário de início, idioma, número de
+          espectadores e os rótulos de classificação de conteúdo que o próprio canal informa (usados para o selo
+          &ldquo;Conteúdo adulto&rdquo;). Nessas consultas, o servidor se identifica com credenciais do próprio site e não
+          envia dados de quem visita o site.
+        </p>
+        <p>
+          O uso da Twitch está sujeito aos <ExternalLink href={TWITCH_TERMS}>Termos de Serviço da Twitch</ExternalLink>, e o
+          tratamento de dados pela Twitch segue o{" "}
+          <ExternalLink href={TWITCH_PRIVACY}>Aviso de Privacidade da Twitch</ExternalLink>.
+        </p>
+      </LegalSection>
+
       <LegalSection title="Dados tratados, finalidades e bases legais">
         <ul className="list-disc space-y-3 pl-5">
           <li>
@@ -71,12 +90,13 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Busca e cache das transmissões.</strong> Os metadados públicos das lives ficam em cache no Upstash Redis
-            por 15 minutos e, como dado antigo, por até cerca de 25 minutos no total, para reduzir consultas ao YouTube.
-            Esse cache não contém dados de quem visita o site.
+            para reduzir consultas: os do YouTube por 15 minutos e, como dado antigo, por até cerca de 25 minutos no
+            total; os da Twitch por 3 minutos e, como dado antigo, por até cerca de 13 minutos no total. Esse cache não
+            contém dados de quem visita o site.
           </li>
           <li>
             <strong>Registros técnicos.</strong> O site registra eventos de funcionamento (por exemplo, consultas ao YouTube
-            e falhas) sem IP nem dados pessoais. A Vercel, que hospeda o site, recebe o IP de cada requisição e pode
+            e à Twitch e falhas) sem IP nem dados pessoais. A Vercel, que hospeda o site, recebe o IP de cada requisição e pode
             manter registros de acesso próprios, conforme os serviços e prazos dela.
           </li>
           <li>
@@ -110,19 +130,23 @@ export default function PrivacyPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="Conteúdo carregado do Google">
+      <LegalSection title="Conteúdo carregado do YouTube e da Twitch">
         <ul className="list-disc space-y-2 pl-5">
           <li>
             <strong>Miniaturas:</strong> depois do aceite, as imagens das lives são carregadas diretamente dos servidores do
-            YouTube (i.ytimg.com). Nessa conexão, o Google recebe o seu IP e dados técnicos da requisição.
+            YouTube (i.ytimg.com) ou da Twitch (static-cdn.jtvnw.net), conforme a origem da live. Nessa conexão, o Google
+            ou a Twitch recebe o seu IP e dados técnicos da requisição.
           </li>
           <li>
-            <strong>Player incorporado:</strong> o player do YouTube não é carregado automaticamente. Ele só abre depois
-            que você seleciona &ldquo;Carregar player&rdquo;. A partir daí, o YouTube pode usar cookies e tratar dados
-            conforme os termos e a política do Google.
+            <strong>Player incorporado:</strong> o player do YouTube ou da Twitch não é carregado automaticamente. Ele só
+            abre depois que você seleciona &ldquo;Carregar player&rdquo;. A partir daí, a plataforma pode usar cookies e
+            tratar dados conforme os próprios termos e políticas: a{" "}
+            <ExternalLink href={GOOGLE_PRIVACY}>Política de Privacidade do Google</ExternalLink>, no YouTube, e o{" "}
+            <ExternalLink href={TWITCH_PRIVACY}>Aviso de Privacidade da Twitch</ExternalLink>, na Twitch.
           </li>
           <li>
-            <strong>Links para o YouTube:</strong> &ldquo;Assistir no YouTube&rdquo; abre o site do YouTube em nova aba.
+            <strong>Links para as plataformas:</strong> &ldquo;Abrir no YouTube&rdquo; e &ldquo;Abrir na Twitch&rdquo;
+            abrem o site da plataforma em nova aba.
           </li>
         </ul>
       </LegalSection>
@@ -143,6 +167,12 @@ export default function PrivacyPage() {
             player, o Google recebe dados diretamente de você e os trata como controlador, conforme a{" "}
             <ExternalLink href={GOOGLE_PRIVACY}>Política de Privacidade do Google</ExternalLink>.
           </li>
+          <li>
+            <strong>Twitch:</strong> fornece os dados públicos das lives pela API (o servidor do site não envia dados de
+            visitantes nessa consulta), as miniaturas e o player. Quando seu navegador carrega miniaturas ou o player, a
+            Twitch recebe dados diretamente de você e os trata conforme o{" "}
+            <ExternalLink href={TWITCH_PRIVACY}>Aviso de Privacidade da Twitch</ExternalLink>.
+          </li>
         </ul>
         <p>
           Esses fornecedores tratam dados conforme seus contratos e políticas. O site não vende dados pessoais nem os
@@ -155,7 +185,7 @@ export default function PrivacyPage() {
         <p>
           As funções do site na Vercel e o banco Upstash Redis estão configurados na região de Washington, D.C., nos
           Estados Unidos. Por isso o IP, o código derivado dele e os registros técnicos são tratados nos Estados Unidos. O
-          Google trata os dados das miniaturas e do player na infraestrutura global dele. Essas transferências ocorrem
+          Google e a Twitch tratam os dados das miniaturas e do player nas infraestruturas globais deles. Essas transferências ocorrem
           sob os contratos e as garantias de proteção de dados oferecidos por cada fornecedor, indicados acima.
         </p>
       </LegalSection>
@@ -163,7 +193,10 @@ export default function PrivacyPage() {
       <LegalSection title="Retenção">
         <ul className="list-disc space-y-2 pl-5">
           <li>Código do limite de requisições: até 60 segundos.</li>
-          <li>Cache de metadados públicos das lives: 15 minutos, mais até cerca de 10 minutos como dado antigo.</li>
+          <li>
+            Cache de metadados públicos das lives: YouTube, 15 minutos, mais até cerca de 10 minutos como dado antigo;
+            Twitch, 3 minutos, mais até cerca de 10 minutos como dado antigo.
+          </li>
           <li>
             Estatísticas de visitas: a identificação da visita é descartada em 24 horas; os relatórios agregados ficam
             disponíveis pelo período do plano da Vercel.
@@ -194,7 +227,8 @@ export default function PrivacyPage() {
 
       <LegalSection title="Seus controles">
         <p>
-          Você pode assistir sem carregar o player incorporado, usando os links para o YouTube. Para apagar o aceite, limpe
+          Você pode assistir sem carregar o player incorporado, usando os links para o YouTube ou para a Twitch. Para
+          apagar o aceite, limpe
           os dados deste site no seu navegador. Para gerenciar dados que o Google associa à sua conta, use as configurações
           de segurança da sua Conta do Google (
           <ExternalLink href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</ExternalLink>
@@ -213,7 +247,9 @@ export default function PrivacyPage() {
 
       <LegalSection title="Crianças e adolescentes">
         <p>
-          O site não pede cadastro nem dados pessoais de crianças ou adolescentes. Se você acredita que dados de uma
+          O site não é direcionado a crianças menores de 13 anos e não pede cadastro nem dados pessoais de crianças ou
+          adolescentes. As transmissões listadas são de um jogo com classificação para adultos e podem ter conteúdo
+          impróprio para menores. Se você acredita que dados de uma
           criança ou adolescente foram tratados de forma inadequada, escreva para {contact}.
         </p>
       </LegalSection>

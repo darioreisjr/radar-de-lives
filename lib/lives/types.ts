@@ -42,6 +42,17 @@ export interface LiveItem {
   rank: number;
 }
 
+/** Estado de cada plataforma na última resposta do agregador (spec 022 D6). */
+export interface SourceStatus {
+  platform: Platform;
+  ok: boolean;
+  cached: boolean;
+  stale: boolean;
+  /** Null quando a plataforma falhou. */
+  updatedAt: string | null;
+  errorCode?: LivesErrorCode;
+}
+
 export interface LivesPayload {
   items: LiveItem[];
   updatedAt: string;
@@ -49,6 +60,8 @@ export interface LivesPayload {
   stale: boolean;
   nextPageToken: string | null;
   source: "youtube" | "fixture";
+  /** Enviado sempre pelo servidor; ausente = só YouTube (spec 022 D9). */
+  sources?: SourceStatus[];
 }
 
 export type LivesErrorCode =

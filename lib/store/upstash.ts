@@ -8,6 +8,27 @@ export interface RedisLike {
   incr(key: string): Promise<number>;
 }
 
+/**
+ * Prefixo das chaves por ambiente (spec 036): Production usa as chaves de sempre;
+ * Preview e Development ganham um prefixo próprio para não ler nem gravar
+ * o cache, os contadores e as travas da produção no mesmo Redis.
+ */
+export function storeKeyPrefix(vercelEnv: string | undefined): string {
+  const env = vercelEnv?.trim().toLowerCase();
+  if (!env || env === "production") return "";
+  return /^[a-z]{1,20}$/.test(env) ? `${env}:` : "preview:";
+}
+
+/** Aplica o prefixo a toda chave lida ou gravada. Sem prefixo, devolve o mesmo cliente. */
+export function withKeyPrefix(redis: RedisLike, prefix: string): RedisLike {
+  if (!prefix) return redis;
+  return {
+    get: (key) => redis.get(prefix + key),
+    set: (key, value, opts) => redis.set(prefix + key, value, opts),
+    incr: (key) => redis.incr(prefix + key),
+  };
+}
+
 /** Prefixo versionado das chaves (spec 005 D9). */
 export const KEY_PREFIX = "radar:v1:";
 

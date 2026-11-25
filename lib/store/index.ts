@@ -4,7 +4,7 @@ import { MemoryCache } from "@/lib/cache/memory-cache";
 import { logEvent } from "@/lib/telemetry";
 import { MemoryCounter, MemoryLock } from "./memory";
 import type { CacheStore, Counter, Lock } from "./types";
-import { UpstashCache, UpstashCounter, UpstashLock, type RedisLike } from "./upstash";
+import { storeKeyPrefix, UpstashCache, UpstashCounter, UpstashLock, withKeyPrefix, type RedisLike } from "./upstash";
 
 export interface Stores {
   kind: "upstash" | "memory";
@@ -27,15 +27,20 @@ function fromUpstash(redis: Redis): RedisLike {
  */
 export function createStores(env: { upstashUrl: string | null; upstashToken: string | null }): Stores {
   if (env.upstashUrl && env.upstashToken) {
-    const redis = fromUpstash(
-      new Redis({
-        url: env.upstashUrl,
-        token: env.upstashToken,
-        // D7: falhar rápido para não segurar a requisição; sem telemetria do SDK.
-        retry: { retries: 2, backoff: (n) => 50 * 2 ** n },
-        signal: () => AbortSignal.timeout(2000),
-        enableTelemetry: false,
-      }),
+    // Spec 036: Preview e Development não compartilham chaves com a produção.
+    const prefix = storeKeyPrefix(process.env.VERCEL_ENV);
+    const redis = withKeyPrefix(
+      fromUpstash(
+        new Redis({
+          url: env.upstashUrl,
+          token: env.upstashToken,
+          // D7: falhar rápido para não segurar a requisição; sem telemetria do SDK.
+          retry: { retries: 2, backoff: (n) => 50 * 2 ** n },
+          signal: () => AbortSignal.timeout(2000),
+          enableTelemetry: false,
+        }),
+      ),
+      prefix,
     );
     return {
       kind: "upstash",

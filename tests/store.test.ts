@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createRateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { MemoryCounter } from "@/lib/store/memory";
 import { StoreError } from "@/lib/store/types";
-import { UpstashCache, UpstashCounter, UpstashLock, type RedisLike } from "@/lib/store/upstash";
+import { storeKeyPrefix, UpstashCache, UpstashCounter, UpstashLock, withKeyPrefix, type RedisLike } from "@/lib/store/upstash";
 import { createYoutubeClient } from "@/lib/youtube/client";
 import { createLivesService, type PageData } from "@/lib/youtube/service";
 
@@ -164,5 +164,41 @@ describe("serviço com estado compartilhado", () => {
     const f = youtubeFetch();
     await expect(instance(failing, f).getLives()).rejects.toMatchObject({ code: "upstream_unavailable" });
     expect(f).not.toHaveBeenCalled();
+  });
+});
+
+describe("chaves separadas por ambiente (spec 036)", () => {
+  it("Production e local sem VERCEL_ENV usam as chaves de sempre; Preview e Development ganham prefixo", () => {
+    expect(storeKeyPrefix("production")).toBe("");
+    expect(storeKeyPrefix(undefined)).toBe("");
+    expect(storeKeyPrefix("")).toBe("");
+    expect(storeKeyPrefix("preview")).toBe("preview:");
+    expect(storeKeyPrefix("development")).toBe("development:");
+    expect(storeKeyPrefix("x y!")).toBe("preview:");
+  });
+
+  it("cache, contador e trava do Preview não tocam as chaves da produção", async () => {
+    const redis = new FakeRedis(() => 0);
+    const prod = new UpstashCache<string>(redis, "lives:twitch");
+    const preview = new UpstashCache<string>(withKeyPrefix(redis, "preview:"), "lives:twitch");
+    await prod.set("k", { value: "produção", storedAt: 0 }, 60_000);
+    await preview.set("k", { value: "preview", storedAt: 0 }, 60_000);
+    expect((await prod.get("k"))?.value).toBe("produção");
+    expect((await preview.get("k"))?.value).toBe("preview");
+
+    const prodKeys = redis.calls.filter((c) => !c.key.startsWith("preview:")).map((c) => c.key);
+    const previewKeys = redis.calls.filter((c) => c.key.startsWith("preview:")).map((c) => c.key.slice("preview:".length));
+    expect(previewKeys).toEqual(prodKeys);
+
+    // Contador e trava: o Preview conta e trava à parte.
+    expect(await new UpstashCounter(withKeyPrefix(redis, "preview:")).incr("c", 1000)).toBe(1);
+    expect(await new UpstashCounter(redis).incr("c", 1000)).toBe(1);
+    expect(await new UpstashLock(withKeyPrefix(redis, "preview:")).acquire("l", 1000)).toBe(true);
+    expect(await new UpstashLock(redis).acquire("l", 1000)).toBe(true);
+  });
+
+  it("sem prefixo, o cliente é o mesmo (produção intacta)", () => {
+    const redis = new FakeRedis(() => 0);
+    expect(withKeyPrefix(redis, "")).toBe(redis);
   });
 });

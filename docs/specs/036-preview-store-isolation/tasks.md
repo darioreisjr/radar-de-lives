@@ -9,4 +9,4 @@
   - `npm test`: 26 arquivos, 258 testes (caracterização do YouTube passando, CA3);
   - `npm run build`: ok;
   - `npm run test:e2e`: 64 testes.
-- [ ] Depois do deploy: abrir o Preview do PR e conferir a produção com até 100 lives da Twitch. (CA4)
+- [x] Depois do deploy (2026-11-25): o Preview novo buscou a Twitch às 20:30:40 UTC (100 itens); a produção, 24 s depois, não leu esse valor e fez a própria busca (`cached: false`), ficando com 98 lives da Twitch e 50 do YouTube. (CA4)

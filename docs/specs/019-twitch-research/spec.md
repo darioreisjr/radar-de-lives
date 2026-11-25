@@ -124,7 +124,7 @@ Antes de escrever o código da Twitch (issues #39 a #47), o projeto precisa de *
 
 | Issue | Ajuste |
 |---|---|
-| #32 PRD / D6 | Para a Twitch, o selo "Conteúdo adulto" depende de 1 chamada extra a `/helix/channels` (I1). **Decisão necessária:** aceitar a chamada extra (recomendado; custo baixo), ou tratar toda live da Twitch como `isMature: false`. |
+| #32 PRD / D6 | Para a Twitch, o selo "Conteúdo adulto" usa 1 chamada extra a `/helix/channels` (I1). **Decidido em 2026-11-25: aceitar a chamada extra.** |
 | #39 cliente | Token em `id.twitch.tv/oauth2/token`. Validar com `/validate` ao iniciar e a cada hora, conforme F2. Em `401`, pedir um token novo e repetir uma vez. |
 | #40 busca | `language` repetido para pt, en e es; até 3 páginas; deduplicar por `id`; ignorar `tag_ids` e `is_mature`; `tags` pode ser `null`. Configurar `TWITCH_GAME_ID=1867279146`. |
 | #41 serviço | Ler `Ratelimit-Remaining` e `Ratelimit-Reset`; em `429`, esperar até o reset; em `503`, tentar de novo uma vez. |

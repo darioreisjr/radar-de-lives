@@ -54,6 +54,7 @@ function build(): Runtime {
     env.twitchGameId,
     env.twitchCacheTtlSeconds,
     env.twitchStaleTtlSeconds,
+    env.twitchMaxPages,
   ].join("|");
   if (g.__radarRuntime?.signature === signature) return g.__radarRuntime;
 
@@ -97,7 +98,7 @@ function build(): Runtime {
   const twitchClient = createTwitchClientFromEnv(env);
   const twitch = twitchClient
     ? createTwitchLivesService({
-        search: () => searchTwitchLives(twitchClient, { gameId: env.twitchGameId }),
+        search: () => searchTwitchLives(twitchClient, { gameId: env.twitchGameId, maxPages: env.twitchMaxPages }),
         cache: stores.cache<TwitchPage>("lives:twitch", 5),
         lock: stores.lock,
         config: {

@@ -4,7 +4,7 @@ import type { z } from "zod";
 import { LivesError } from "@/lib/youtube/errors";
 import type { TwitchClient } from "@/lib/twitch/client";
 import { isAdult, normalizeStream, twitchLanguage, twitchThumbnail, twitchViewers } from "@/lib/twitch/normalize";
-import { searchTwitchLives } from "@/lib/twitch/search";
+import { searchTwitchLives, TWITCH_DEFAULT_MAX_PAGES } from "@/lib/twitch/search";
 import { TwitchStreamSchema, TwitchStreamsPageSchema } from "@/lib/twitch/types";
 
 /** Resposta real de GET /helix/streams, anonimizada (spec 019). */
@@ -115,7 +115,7 @@ describe("busca na Twitch (spec 028)", () => {
     expect(helix.mock.calls[0][1]).toEqual({ game_id: "1867279146", language: ["pt", "en", "es"], type: "live", first: "100" });
   });
 
-  it("CA6: até 3 páginas, sem duplicatas entre páginas, para sem cursor", async () => {
+  it("CA6: com maxPages 3, até 3 páginas, sem duplicatas entre páginas, para sem cursor", async () => {
     const pages = [
       { data: [stream(1), stream(2)], pagination: { cursor: "c1" } },
       { data: [stream(2), stream(3)], pagination: { cursor: "c2" } }, // stream 2 repetido
@@ -128,7 +128,7 @@ describe("busca na Twitch (spec 028)", () => {
       if (n > 0) expect(params.after).toBe(`c${n}`);
       return pages[n++];
     });
-    const items = await searchTwitchLives(client, { gameId: "1", log: () => {} });
+    const items = await searchTwitchLives(client, { gameId: "1", maxPages: 3, log: () => {} });
     expect(items.map((i) => i.sourceId)).toEqual(["canal_1", "canal_2", "canal_3", "canal_4"]);
     expect(items.map((i) => i.rank)).toEqual([0, 1, 2, 3]);
     expect(helix.mock.calls.filter((c) => c[0] === "streams")).toHaveLength(3);
@@ -194,9 +194,19 @@ describe("busca na Twitch (spec 028)", () => {
       if (n++ === 0) return { data: [stream(1)], pagination: { cursor: "c1" } };
       throw new LivesError("upstream_unavailable");
     });
-    const items = await searchTwitchLives(later.client, { gameId: "1", log });
+    const items = await searchTwitchLives(later.client, { gameId: "1", maxPages: 3, log });
     expect(items.map((i) => i.sourceId)).toEqual(["canal_1"]);
     expect(log).toHaveBeenCalledWith("twitch_error", { stage: "streams_page", page: 1 });
+  });
+
+  it("spec 035 CA1: por padrão, só a 1ª página (até 100 lives), mesmo com cursor", async () => {
+    const { client, helix } = fakeClient((path) =>
+      path === "channels" ? { data: [] } : { data: Array.from({ length: 100 }, (_, i) => stream(i)), pagination: { cursor: "c1" } },
+    );
+    const items = await searchTwitchLives(client, { gameId: "1", log: () => {} });
+    expect(items).toHaveLength(100);
+    expect(helix.mock.calls.filter((c) => c[0] === "streams")).toHaveLength(1);
+    expect(TWITCH_DEFAULT_MAX_PAGES).toBe(1);
   });
 
   it("sem streams, não chama /helix/channels", async () => {

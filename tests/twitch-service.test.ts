@@ -179,6 +179,22 @@ describe("Twitch no agregador (spec 029)", () => {
   });
 });
 
+describe("páginas da busca na Twitch (spec 035)", () => {
+  it("CA1 e CA3: padrão 1; 3 é aceito; fora da faixa é cortado; texto inválido volta ao padrão", () => {
+    const pages = (v: string) => {
+      vi.stubEnv("TWITCH_MAX_PAGES", v);
+      return getServerEnv().twitchMaxPages;
+    };
+    expect(pages("")).toBe(1);
+    expect(pages("2")).toBe(2);
+    expect(pages("3")).toBe(3);
+    expect(pages("0")).toBe(1);
+    expect(pages("4")).toBe(3);
+    expect(pages("abc")).toBe(1);
+    vi.unstubAllEnvs();
+  });
+});
+
 describe("limites do cache da Twitch (spec 029 D1, CA7)", () => {
   it("padrões 180 s e 600 s; valores fora dos limites são cortados (máx. 2 h no total)", () => {
     vi.stubEnv("TWITCH_CACHE_TTL_SECONDS", "");

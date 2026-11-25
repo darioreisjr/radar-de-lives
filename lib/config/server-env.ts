@@ -40,6 +40,8 @@ export function getServerEnv() {
      */
     twitchCacheTtlSeconds: int("TWITCH_CACHE_TTL_SECONDS", 180, 30, 3_600),
     twitchStaleTtlSeconds: int("TWITCH_STALE_TTL_SECONDS", 600, 0, 3_600),
+    /** Páginas de 100 lives buscadas na Twitch (spec 035): padrão 1, de 1 a 3. */
+    twitchMaxPages: int("TWITCH_MAX_PAGES", 1, 1, 3),
     cacheTtlSeconds: int("LIVE_CACHE_TTL_SECONDS", 900, 30, 86_400),
     staleTtlSeconds: int("LIVE_STALE_TTL_SECONDS", 600, 0, 86_400),
     rateLimitSeconds: int("LIVE_RATE_LIMIT_SECONDS", 30, 5, 3_600),

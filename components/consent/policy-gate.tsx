@@ -5,6 +5,8 @@ import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } fro
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/lib/config/site";
 import { readAcceptance, writeAcceptance } from "@/lib/consent/policy-acceptance";
+import { thumbnailsSource } from "@/lib/lives/copy";
+import type { Platform } from "@/lib/lives/types";
 
 function subscribe(onChange: () => void) {
   window.addEventListener("storage", onChange);
@@ -25,7 +27,14 @@ const linkClass = "text-accent-cyan underline underline-offset-2";
  * Pede a concordância com a Política de Privacidade e os Termos antes de liberar a lista de lives
  * (spec 016). Até o aceite, nada é buscado na API e nenhuma miniatura do YouTube é carregada.
  */
-export function PolicyGate({ children }: { children: ReactNode }) {
+export function PolicyGate({
+  children,
+  platforms = ["youtube"],
+}: {
+  children: ReactNode;
+  /** Plataformas ativas, calculadas no servidor (spec 034). */
+  platforms?: readonly Platform[];
+}) {
   // null no servidor e na hidratação: ainda não sabemos o que o navegador guardou.
   const stored = useSyncExternalStore(subscribe, storedAcceptance, () => null);
   const [choice, setChoice] = useState<"accepted" | "refused" | null>(null);
@@ -71,7 +80,8 @@ export function PolicyGate({ children }: { children: ReactNode }) {
           </h2>
           <div className="mt-3 space-y-3 text-[15px] leading-relaxed text-text-secondary">
             <p>
-              O {siteConfig.name} usa os YouTube API Services. Para continuar, leia e concorde com a{" "}
+              O {siteConfig.name} usa os YouTube API Services{platforms.includes("twitch") ? " e a API da Twitch" : ""}.
+              Para continuar, leia e concorde com a{" "}
               <Link href="/privacy" className={linkClass}>
                 Política de Privacidade
               </Link>{" "}
@@ -86,8 +96,8 @@ export function PolicyGate({ children }: { children: ReactNode }) {
               .
             </p>
             <p>
-              Depois disso, seu navegador carrega as miniaturas direto do YouTube. O player só abre quando você pedir. A
-              escolha fica guardada só neste navegador.
+              Depois disso, seu navegador carrega as miniaturas direto {thumbnailsSource(platforms)}. O player só abre
+              quando você pedir. A escolha fica guardada só neste navegador.
             </p>
           </div>
           <div className="mt-6 flex flex-wrap gap-3">

@@ -13,6 +13,7 @@ import { createStores, type Stores } from "@/lib/store";
 import { createTwitchClientFromEnv } from "@/lib/twitch/client";
 import { searchTwitchLives } from "@/lib/twitch/search";
 import { createTwitchLivesService, type TwitchPage } from "@/lib/twitch/service";
+import { createTwitchStatusService, type TwitchStatusData } from "@/lib/twitch/status";
 import { createYoutubeClient } from "@/lib/youtube/client";
 import { buildCombinedQuery } from "@/lib/youtube/searches";
 import { createLivesService, type LivesService, type PageData } from "@/lib/youtube/service";
@@ -106,10 +107,18 @@ function build(): Runtime {
         },
       })
     : null;
+  // Revalidação ao abrir o player (spec 030): cache de 60 s, como no YouTube.
+  const twitchStatus = twitchClient
+    ? createTwitchStatusService({
+        client: twitchClient,
+        cache: stores.cache<TwitchStatusData>("status:twitch", 500),
+        ttlMs: 60_000,
+      })
+    : null;
 
   const providers = activeProviders(env.livesProviders, {
     youtube: createYoutubeProvider(lives, client !== null, status),
-    twitch: createTwitchProvider(twitch),
+    twitch: createTwitchProvider(twitch, twitchStatus),
   });
 
   g.__radarRuntime = {

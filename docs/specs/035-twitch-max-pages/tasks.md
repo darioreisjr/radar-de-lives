@@ -10,4 +10,4 @@
   - `npm test`: 26 arquivos, 255 testes (caracterização do YouTube passando, CA4);
   - `npm run build`: ok;
   - `npm run test:e2e`: 64 testes.
-- [ ] Depois do deploy: `/api/lives` com no máximo 100 lives da Twitch, intercaladas. (CA5)
+- [x] Depois do deploy (2026-11-25): `/api/lives` com 149 lives (50 do YouTube + 99 da Twitch), intercaladas; YouTube ✓ e Twitch ✓. (CA5)

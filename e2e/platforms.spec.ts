@@ -109,3 +109,27 @@ test("miniatura da Twitch carrega sem violar a CSP (spec 031)", async ({ page, a
   // A requisição é feita pelo navegador, mas respondida localmente pelo teste (nada sai para a Twitch).
   expect(twitchRequests).toEqual([thumb]);
 });
+
+test.describe("aceite antes da Twitch (spec 033)", () => {
+  test.use({ acceptPolicy: false });
+
+  test("nenhuma requisição à Twitch antes do aceite; miniatura só depois", async ({ page, api }) => {
+    const thumb = "https://static-cdn.jtvnw.net/previews-ttv/live_user_canal_twitch_2-640x360.jpg";
+    api.setLives(
+      ok(livesPayload([liveItem(1), twitchItem(2, { thumbnailUrl: thumb })], { sources: [source("youtube"), source("twitch")] })),
+    );
+    const twitch: string[] = [];
+    page.on("request", (r) => {
+      if (/(^|\.)jtvnw\.net$|(^|\.)twitch\.tv$/.test(new URL(r.url()).hostname)) twitch.push(r.url());
+    });
+
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "Antes de ver as lives" })).toBeVisible();
+    expect(api.livesCalls).toHaveLength(0);
+    expect(twitch).toEqual([]);
+
+    await page.getByRole("button", { name: "Li e concordo. Continuar" }).click();
+    await expect(summary(page)).toHaveText("2 lives encontradas");
+    await expect.poll(() => twitch).toEqual([thumb]);
+  });
+});

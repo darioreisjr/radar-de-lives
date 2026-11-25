@@ -29,6 +29,11 @@ export function getServerEnv() {
     rateLimitSecret: process.env.RATE_LIMIT_SECRET?.trim() || upstashToken || PROCESS_SECRET,
     /** Texto bruto de LIVES_PROVIDERS; interpretado por parseProviderList (spec 023). */
     livesProviders: process.env.LIVES_PROVIDERS ?? null,
+    /** Twitch (spec 027): segredo só no servidor. Sem as duas, a Twitch fica "não configurada". */
+    twitchClientId: process.env.TWITCH_CLIENT_ID?.trim() || null,
+    twitchClientSecret: process.env.TWITCH_CLIENT_SECRET?.trim() || null,
+    /** Categoria "Grand Theft Auto VI" na Twitch (spec 019, consultada em 2026-11-25). */
+    twitchGameId: code("TWITCH_GAME_ID", "1867279146", /^\d{1,20}$/),
     cacheTtlSeconds: int("LIVE_CACHE_TTL_SECONDS", 900, 30, 86_400),
     staleTtlSeconds: int("LIVE_STALE_TTL_SECONDS", 600, 0, 86_400),
     rateLimitSeconds: int("LIVE_RATE_LIMIT_SECONDS", 30, 5, 3_600),

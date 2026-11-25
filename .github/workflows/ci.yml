@@ -51,6 +51,15 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Segredos só no servidor (plano multiplataforma §5.5, spec 027 CA6): o bundle do navegador
+      # não pode conter o endpoint de token nem os nomes das credenciais da Twitch e da Kick.
+      - name: Bundle do cliente sem credenciais
+        run: |
+          if grep -rlE "id\.twitch\.tv/oauth2|TWITCH_CLIENT_SECRET|id\.kick\.com/oauth|KICK_CLIENT_SECRET" .next/static; then
+            echo "::error::Credencial ou endpoint de token no bundle do cliente"
+            exit 1
+          fi
+
   e2e:
     name: Testes de interface (Playwright)
     needs: verify

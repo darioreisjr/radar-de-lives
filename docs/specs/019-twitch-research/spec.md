@@ -17,7 +17,7 @@ Antes de escrever o código da Twitch (issues #39 a #47), o projeto precisa de *
 | F2 | [Getting OAuth Access Tokens — Client credentials grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#client-credentials-grant-flow) |
 | F3 | [API Guide — Twitch Rate Limits](https://dev.twitch.tv/docs/api/guide/#twitch-rate-limits) |
 | F4 | [Embed — Video & Clips](https://dev.twitch.tv/docs/embed/video-and-clips/) |
-| F5 | [Twitch Developer Services Agreement](https://legal.twitch.com/en/legal/developer-agreement/). **O texto não pôde ser lido por automação** (ver P1). |
+| F5 | [Twitch Developer Services Agreement](https://legal.twitch.com/en/legal/developer-agreement/), última modificação em 12/04/2024. Texto colado pelo responsável em 2026-11-25. |
 | F6 | Chamadas reais feitas pelo responsável em 2026-11-25, por volta das 8h de Brasília, com um app próprio de testes |
 
 ## Fatos confirmados
@@ -85,6 +85,23 @@ Antes de escrever o código da Twitch (issues #39 a #47), o projeto precisa de *
 - ⚠️ **Tamanho mínimo: 400×300 px** ("Embedded video windows must be at least 400x300 pixels").
 - A documentação **não diz** se `localhost` é aceito, se HTTPS é exigido ou se porta e protocolo podem ir no `parent`.
 
+### Developer Services Agreement (F5, resolve P1)
+
+| Cláusula | O que exige | Efeito no Radar |
+|---|---|---|
+| Schedule 1 §C (armazenamento) | Não guardar cópias de dados da Twitch, salvo cache de **até 24 h** sem repasse a terceiros. A **redistribuição** dos dados da API é proibida. | O TTL do cache e o stale ficam bem abaixo de 24 h (#41). `/api/lives` só alimenta o próprio site: não documentar a rota como API pública e manter o rate limit. |
+| Schedule 1 §C | Atualizar o cache e respeitar dados apagados ou expirados. | O TTL curto cumpre a regra. |
+| VII.B e VII.C | Atualizar com frequência; deixar um **caminho claro até a fonte**; atribuir o conteúdo. | Selo "Twitch" no card e link "Assistir na Twitch" sempre visível (#38, #44). |
+| Schedule 1 §D.1 (embed) | Usar **o player oficial** para todo vídeo da Twitch. Não modificar, bloquear nem cobrir o player, os anúncios dele ou as marcas da Twitch. | Nada de overlay sobre o iframe (#44). O autoplay é opcional; manter `autoplay=false`. |
+| Schedule 1 §D.1 (proibido) | Sites voltados a **menores de 13 anos**; sites que **replicam a Twitch sem conteúdo de valor adicional**; repassar o embed a redes de anúncio; receber pagamento de criadores para embutir o canal deles. | O Radar agrega várias plataformas (valor adicional) e não tem anúncios nem patrocínio de criadores. Registrar a idade mínima nos termos (#45). |
+| II.B.2.ii e II.B.4 (marcas) | Usar as marcas só para atribuir a fonte, seguindo as Trademark Guidelines. | Selo só com o texto "Twitch", sem logo (regra do projeto). Aviso de marca nos termos (#45). |
+| Schedule 1 (introdução) | Ser honesto sobre a relação com a Twitch e oferecer contato fácil. | Aviso "sem afiliação" e o contato que já existe em `/terms` (#45). |
+| Schedule 1 §A | Política de privacidade pública e acessível. Se usar cookies: same-site, HTTP-only, secure e validade de até 13 meses. | `/privacy` já existe e cita os terceiros (#45). O Radar não grava cookies próprios. O player da Twitch grava os cookies dele, o que precisa constar da política. |
+| VI (dados) e Schedule 1 §B | Dados da Twitch não podem ser vendidos, compartilhados nem usados para marketing ou perfis. | O Radar só exibe. O Vercel Analytics não recebe dados da Twitch. |
+| IV.B e IV.D | As chaves são secretas e de responsabilidade do desenvolvedor. Incidentes de segurança devem ser comunicados a `legal@twitch.tv`. | Credenciais só no servidor (#39). Registrar o contato no plano de rollback. |
+| XI.I | Usar só endpoints documentados no Twitch Developer Site. | `/helix/streams`, `/helix/games` e `/helix/channels` são documentados. |
+| VIII | O acordo pode mudar a qualquer momento; cabe ao desenvolvedor acompanhar. | Revisar o acordo na revisão anual de LGPD (#29). |
+
 ## Inferências (não confirmadas)
 
 - **I1:** como `is_mature` sempre volta `false`, a única forma de cumprir a decisão D6 na Twitch é o campo `content_classification_labels` de `GET /helix/channels?broadcaster_id=…` (até 100 ids por chamada). Isso custa **1 chamada extra por atualização**. Confirmar o nome e o formato do campo na referência de Channels antes de #40.
@@ -95,7 +112,7 @@ Antes de escrever o código da Twitch (issues #39 a #47), o projeto precisa de *
 
 | # | Pendência | Quem |
 |---|---|---|
-| P1 | **Ler o Developer Services Agreement** (F5) e anotar as cláusulas sobre cache e armazenamento de dados, exibição e atribuição, uso do nome e das marcas, exigência de política de privacidade e conteúdo adulto. A página só carrega no navegador. | Você (o agente resume o que você colar) |
+| ~~P1~~ | ✅ Resolvida em 2026-11-25. Ver "Developer Services Agreement" abaixo. | — |
 | P2 | Confirmar `content_classification_labels` em Get Channel Information (I1) | Agente, na #40 |
 | P3 | Validar `parent` e tamanho mínimo num Preview | Agente, na #44 |
 
@@ -131,7 +148,7 @@ Antes de escrever o código da Twitch (issues #39 a #47), o projeto precisa de *
 | #42 status | `GET /helix/streams?user_login=<login>`; lista vazia significa offline. |
 | #43 CSP | `img-src https://static-cdn.jtvnw.net`; `frame-src https://player.twitch.tv`. |
 | #44 player | `parent` obrigatório. **Com menos de 400 px de largura** (o perfil `mobile-375` do e2e), o player não atinge o mínimo: mostrar só o link "Assistir na Twitch". Passar `autoplay=false` explicitamente, porque o padrão é `true`. |
-| #45 legal | Depende de P1. |
+| #45 legal | Citar a Twitch e os cookies do player em `/privacy`; nos termos, aviso de marca, ausência de afiliação e público a partir de 13 anos. Ver o quadro do Developer Services Agreement. |
 
 ## Recomendação
 
@@ -140,12 +157,12 @@ Antes de escrever o código da Twitch (issues #39 a #47), o projeto precisa de *
 Pontos de atenção:
 - **D6:** o selo adulto custa 1 chamada extra (I1).
 - **Celular estreito:** abaixo de 400 px, só o link.
-- **Termos:** P1 precisa ser lido antes da #45.
+- **Termos:** lidos (P1). Cache de até 24 h, player oficial sem sobreposição, atribuição e link para a fonte.
 
 ## Critérios de aceite do spike
 
 1. **CA1:** cada item da #30 tem resposta com fonte, ou aparece como pendência com responsável. ✅
 2. **CA2:** o `game_id` de GTA 6 está registrado com data: `1867279146`, em 2026-11-25. ✅
 3. **CA3:** a tabela de mapeamento existe, indicando os campos opcionais ou obsoletos. ✅
-4. **CA4:** as exigências do Developer Agreement estão listadas. ⏳ P1
+4. **CA4:** as exigências do Developer Agreement estão listadas. ✅
 5. **CA5:** há recomendação: **seguir**. ✅

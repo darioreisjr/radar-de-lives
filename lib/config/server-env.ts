@@ -34,6 +34,12 @@ export function getServerEnv() {
     twitchClientSecret: process.env.TWITCH_CLIENT_SECRET?.trim() || null,
     /** Categoria "Grand Theft Auto VI" na Twitch (spec 019, consultada em 2026-11-25). */
     twitchGameId: code("TWITCH_GAME_ID", "1867279146", /^\d{1,20}$/),
+    /**
+     * Cache da Twitch (spec 029 D1). No máximo 1 h + 1 h: bem abaixo das 24 h
+     * permitidas pelo Developer Agreement da Twitch (Schedule 1 §C).
+     */
+    twitchCacheTtlSeconds: int("TWITCH_CACHE_TTL_SECONDS", 180, 30, 3_600),
+    twitchStaleTtlSeconds: int("TWITCH_STALE_TTL_SECONDS", 600, 0, 3_600),
     cacheTtlSeconds: int("LIVE_CACHE_TTL_SECONDS", 900, 30, 86_400),
     staleTtlSeconds: int("LIVE_STALE_TTL_SECONDS", 600, 0, 86_400),
     rateLimitSeconds: int("LIVE_RATE_LIMIT_SECONDS", 30, 5, 3_600),

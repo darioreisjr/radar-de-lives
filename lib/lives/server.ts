@@ -3,12 +3,16 @@ import { getServerEnv } from "@/lib/config/server-env";
 import { createLivesAggregator, type LivesAggregator } from "@/lib/lives/aggregator";
 import { parseProviderList, selectProviders } from "@/lib/lives/providers/select";
 import type { LivesProvider } from "@/lib/lives/providers/types";
+import { createTwitchProvider } from "@/lib/lives/providers/twitch";
 import { createYoutubeProvider } from "@/lib/lives/providers/youtube";
 import { createStatusHandler, type StatusHandler } from "@/lib/lives/status-handler";
 import type { Platform } from "@/lib/lives/types";
 import { logEvent } from "@/lib/telemetry";
 import { createRateLimiter, type RateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { createStores, type Stores } from "@/lib/store";
+import { createTwitchClientFromEnv } from "@/lib/twitch/client";
+import { searchTwitchLives } from "@/lib/twitch/search";
+import { createTwitchLivesService, type TwitchPage } from "@/lib/twitch/service";
 import { createYoutubeClient } from "@/lib/youtube/client";
 import { buildCombinedQuery } from "@/lib/youtube/searches";
 import { createLivesService, type LivesService, type PageData } from "@/lib/youtube/service";
@@ -39,7 +43,17 @@ const g = globalThis as unknown as { __radarRuntime?: Runtime };
 
 function build(): Runtime {
   const env = getServerEnv();
-  const signature = [env.apiKey, env.upstashUrl, env.upstashToken, env.livesProviders].join("|");
+  const signature = [
+    env.apiKey,
+    env.upstashUrl,
+    env.upstashToken,
+    env.livesProviders,
+    env.twitchClientId,
+    env.twitchClientSecret,
+    env.twitchGameId,
+    env.twitchCacheTtlSeconds,
+    env.twitchStaleTtlSeconds,
+  ].join("|");
   if (g.__radarRuntime?.signature === signature) return g.__radarRuntime;
 
   const stores = createStores(env);
@@ -78,8 +92,24 @@ function build(): Runtime {
     secret: env.rateLimitSecret,
   });
 
+  // Twitch (spec 029): só existe com credenciais; só fica ativa com `twitch` em LIVES_PROVIDERS.
+  const twitchClient = createTwitchClientFromEnv(env);
+  const twitch = twitchClient
+    ? createTwitchLivesService({
+        search: () => searchTwitchLives(twitchClient, { gameId: env.twitchGameId }),
+        cache: stores.cache<TwitchPage>("lives:twitch", 5),
+        lock: stores.lock,
+        config: {
+          ttlMs: env.twitchCacheTtlSeconds * 1000,
+          staleMs: env.twitchStaleTtlSeconds * 1000,
+          minUpstreamIntervalMs: env.rateLimitSeconds * 1000,
+        },
+      })
+    : null;
+
   const providers = activeProviders(env.livesProviders, {
     youtube: createYoutubeProvider(lives, client !== null, status),
+    twitch: createTwitchProvider(twitch),
   });
 
   g.__radarRuntime = {

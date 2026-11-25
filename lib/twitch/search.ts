@@ -9,10 +9,13 @@ export interface TwitchSearchOptions {
   gameId: string;
   /** Idiomas pedidos à API (PRD D7). */
   languages?: readonly string[];
-  /** Máximo de páginas de 100 (spec 028 D2). */
+  /** Máximo de páginas de 100 (spec 028 D2; padrão 1 desde a spec 035). */
   maxPages?: number;
   log?: Logger;
 }
+
+/** Padrão de páginas (spec 035): só as 100 lives de maior público. */
+export const TWITCH_DEFAULT_MAX_PAGES = 1;
 
 const CHANNELS_BATCH = 100;
 
@@ -23,7 +26,7 @@ const CHANNELS_BATCH = 100;
 export async function searchTwitchLives(client: TwitchClient, opts: TwitchSearchOptions): Promise<LiveItem[]> {
   const log = opts.log ?? logEvent;
   const languages = opts.languages ?? ["pt", "en", "es"];
-  const maxPages = opts.maxPages ?? 3;
+  const maxPages = opts.maxPages ?? TWITCH_DEFAULT_MAX_PAGES;
 
   const streams: TwitchStream[] = [];
   const seen = new Set<string>();

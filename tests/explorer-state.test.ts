@@ -42,7 +42,7 @@ describe("explorerReducer", () => {
   it("revalidação encerrada marca o item e limpa audiência (CA9)", () => {
     const s = explorerReducer(loaded([item("a", 0, { concurrentViewers: 50 })]), {
       type: "item-status",
-      status: { videoId: "a", state: "ended", embedAllowed: "unknown", concurrentViewers: null, checkedAt: "", cached: false },
+      status: { platform: "youtube", sourceId: "a", videoId: "a", state: "ended", embedAllowed: "unknown", concurrentViewers: null, checkedAt: "", cached: false },
     });
     expect(s.items[0].isLive).toBe(false);
     expect(s.items[0].concurrentViewers).toBeNull();
@@ -52,9 +52,18 @@ describe("explorerReducer", () => {
   it("revalidação ao vivo sem contagem não apaga a anterior nem vira zero", () => {
     const s = explorerReducer(loaded([item("a", 0, { concurrentViewers: 50 })]), {
       type: "item-status",
-      status: { videoId: "a", state: "live", embedAllowed: false, concurrentViewers: null, checkedAt: "", cached: false },
+      status: { platform: "youtube", sourceId: "a", videoId: "a", state: "live", embedAllowed: false, concurrentViewers: null, checkedAt: "", cached: false },
     });
     expect(s.items[0].concurrentViewers).toBe(50);
     expect(s.items[0].embedAllowed).toBe(false);
+  });
+
+  it("status de outra plataforma com o mesmo id não altera o item do YouTube (spec 025)", () => {
+    const s = explorerReducer(loaded([item("a", 0, { concurrentViewers: 50 })]), {
+      type: "item-status",
+      status: { platform: "twitch", sourceId: "a", videoId: "a", state: "ended", embedAllowed: true, concurrentViewers: null, checkedAt: "", cached: false },
+    });
+    expect(s.items[0].isLive).toBe(true);
+    expect(s.items[0].concurrentViewers).toBe(50);
   });
 });

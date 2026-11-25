@@ -1,8 +1,9 @@
-import type { VideoStatusPayload } from "@/lib/youtube/types";
+import { platformMeta } from "@/lib/lives/platforms";
+import type { LiveItem, LiveStatusPayload } from "@/lib/lives/types";
 
 export type StatusCheck =
   | { status: "pending" }
-  | { status: "ok"; data: VideoStatusPayload }
+  | { status: "ok"; data: LiveStatusPayload }
   | { status: "error"; code: string };
 
 export type PlayerView =
@@ -12,18 +13,23 @@ export type PlayerView =
   | { kind: "upcoming" }
   | { kind: "unavailable" }
   | { kind: "embed_blocked" }
+  /** A plataforma não tem player embutido neste site: só o link (spec 025). */
+  | { kind: "link_only" }
   /** unverified: não foi possível confirmar o estado atual (spec 002 D6). */
   | { kind: "consent"; unverified: boolean }
   | { kind: "player"; unverified: boolean };
 
 export function resolvePlayerView(input: {
   demo: boolean;
+  /** A plataforma aceita player embutido (PLATFORMS[platform].embed). Padrão: true. */
+  platformEmbed?: boolean;
   listEmbedAllowed: boolean | "unknown";
   check: StatusCheck;
   consented: boolean;
 }): PlayerView {
   const { demo, listEmbedAllowed, check, consented } = input;
   if (demo) return { kind: "demo" };
+  if (input.platformEmbed === false) return { kind: "link_only" };
   if (listEmbedAllowed === false) return { kind: "embed_blocked" };
   if (check.status === "pending") return { kind: "checking" };
   if (check.status === "error") return consented ? { kind: "player", unverified: true } : { kind: "consent", unverified: true };
@@ -49,7 +55,11 @@ export function playerBadge(input: { demo: boolean; listIsLive: boolean; check: 
   return listIsLive ? "live" : "ended";
 }
 
-/** URL oficial do player (player_parameters), sem autoplay (spec 002 D1/D2). */
-export function embedSrc(videoId: string): string {
-  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?playsinline=1&rel=0`;
+/**
+ * URL do iframe oficial da plataforma do item (spec 025). Null se a plataforma não tem embed.
+ * YouTube: igual à de antes (spec 002 D1/D2). `hostname` é exigido pela Twitch (#44).
+ */
+export function embedSrc(item: Pick<LiveItem, "platform" | "sourceId">, opts: { hostname: string }): string | null {
+  const meta = platformMeta(item.platform);
+  return meta.embed && meta.embedSrc ? meta.embedSrc(item.sourceId, opts) : null;
 }

@@ -1,6 +1,5 @@
-import { dedupeById, withIdentity } from "@/lib/lives/identity";
-import type { LiveItem, LivesErrorCode, LivesPayload } from "@/lib/lives/types";
-import type { VideoStatusPayload } from "@/lib/youtube/types";
+import { dedupeById, liveId, withIdentity } from "@/lib/lives/identity";
+import type { LiveItem, LivesErrorCode, LivesPayload, LiveStatusPayload } from "@/lib/lives/types";
 
 export type ApiError = { code: LivesErrorCode | "network"; message: string };
 export type Meta = Pick<LivesPayload, "updatedAt" | "cached" | "stale" | "source">;
@@ -25,7 +24,7 @@ export type ExplorerAction =
   | { type: "more-loaded"; payload: LivesPayload }
   | { type: "more-failed"; message: string }
   /** Resultado da revalidação ao abrir o player (spec 002 RF8). */
-  | { type: "item-status"; status: VideoStatusPayload };
+  | { type: "item-status"; status: LiveStatusPayload };
 
 export const initialExplorerState: ExplorerState = {
   phase: "loading",
@@ -78,8 +77,8 @@ export function explorerReducer(s: ExplorerState, a: ExplorerAction): ExplorerSt
       return {
         ...s,
         items: s.items.map((it) =>
-          // O status ainda vem da rota do YouTube (/api/lives/[videoId]); a #36 generaliza.
-          it.platform !== "youtube" || it.sourceId !== st.videoId
+          // Status de /api/status/[platform]/[id] (spec 025): casa pela plataforma e pelo id de origem.
+          it.id !== liveId(st.platform, st.sourceId)
             ? it
             : {
                 ...it,

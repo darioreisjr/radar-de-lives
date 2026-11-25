@@ -1,0 +1,39 @@
+{
+  "data": [
+    {
+      "id": "300000000001",
+      "user_id": "10000001",
+      "user_login": "canal_teste_de",
+      "user_name": "Canal_Teste_DE",
+      "game_id": "1867279146",
+      "game_name": "Grand Theft Auto VI",
+      "type": "live",
+      "title": "[DROPS] GTA6 Story & Easter Eggs | Drops aktiv",
+      "viewer_count": 21449,
+      "started_at": "2026-11-25T07:56:24Z",
+      "language": "de",
+      "thumbnail_url": "https://static-cdn.jtvnw.net/previews-ttv/live_user_canal_teste_de-{width}x{height}.jpg",
+      "tag_ids": [],
+      "tags": ["Deutsch", "DropsAktiviert"],
+      "is_mature": false
+    },
+    {
+      "id": "300000000002",
+      "user_id": "10000002",
+      "user_login": "canal_teste_ja",
+      "user_name": "canal_teste_ja",
+      "game_id": "1867279146",
+      "game_name": "Grand Theft Auto VI",
+      "type": "live",
+      "title": "GTA6 デカい強盗をやるんだな！？ 今ここで ネタバレ禁",
+      "viewer_count": 9625,
+      "started_at": "2026-11-25T04:46:53Z",
+      "language": "ja",
+      "thumbnail_url": "https://static-cdn.jtvnw.net/previews-ttv/live_user_canal_teste_ja-{width}x{height}.jpg",
+      "tag_ids": [],
+      "tags": ["ネタバレなし", "アドバイスなし", "日本語", "Drops有効"],
+      "is_mature": false
+    }
+  ],
+  "pagination": { "cursor": "cursor-de-teste" }
+}

@@ -4,10 +4,13 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { LiveExplorer } from "@/components/lives/live-explorer";
 import { LivesProvider } from "@/components/lives/lives-provider";
+import { getActivePlatforms } from "@/lib/lives/active-platforms";
 
 export default function Home() {
   // Dados simulados só fora de produção (001 D15).
   const demoAllowed = process.env.NODE_ENV !== "production";
+  // Plataformas ativas no servidor (spec 034): textos certos mesmo antes da API responder.
+  const platforms = getActivePlatforms();
 
   return (
     <>
@@ -21,8 +24,8 @@ export default function Home() {
       <main className="flex-1">
         {/* Estado das lives compartilhado entre o painel do radar e a grade (spec 007 D4). */}
         {/* Concordância com a política antes de buscar lives e carregar miniaturas (spec 016). */}
-        <PolicyGate>
-          <LivesProvider demoAllowed={demoAllowed}>
+        <PolicyGate platforms={platforms}>
+          <LivesProvider demoAllowed={demoAllowed} platforms={platforms}>
             <HeroSection />
             <LiveExplorer />
           </LivesProvider>

@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Oswald } from "next/font/google";
 import { SiteAnalytics } from "@/components/analytics/site-analytics";
 import { siteConfig } from "@/lib/config/site";
+import { getActivePlatforms } from "@/lib/lives/active-platforms";
+import { siteDescription } from "@/lib/lives/copy";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -22,10 +24,10 @@ function siteUrl(): URL | undefined {
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
   title: siteConfig.title,
-  description: siteConfig.description,
+  description: siteDescription(getActivePlatforms()),
   openGraph: {
     title: siteConfig.title,
-    description: siteConfig.description,
+    description: siteDescription(getActivePlatforms()),
     siteName: siteConfig.name,
     locale: "pt_BR",
     type: "website",

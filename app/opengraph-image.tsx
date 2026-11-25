@@ -1,11 +1,15 @@
 import { ImageResponse } from "next/og";
 import { colors } from "@/lib/config/design-tokens";
+import { getActivePlatforms } from "@/lib/lives/active-platforms";
+import { formatPlatformList, heroLead } from "@/lib/lives/copy";
 
 // Alinhada ao visual da home (spec 007): fundo neutro, tipografia sem caixa alta, uma cor de ação,
 // o ponto vermelho "ao vivo" como assinatura e a marca do radar plana. Sem números: a imagem é
 // gerada no build e dados ao vivo ficariam congelados.
-export const alt =
-  "Radar de Lives: lives de GTA 6 no ar agora, encontradas no YouTube. Marca de radar com ponto vermelho de ao vivo.";
+/** Plataformas ativas no build (spec 034): a imagem é gerada no build, como o restante do texto. */
+const platforms = getActivePlatforms();
+
+export const alt = `Radar de Lives: lives de GTA 6 no ar agora, encontradas ${formatPlatformList(platforms)}. Marca de radar com ponto vermelho de ao vivo.`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -66,7 +70,7 @@ export default function OpengraphImage() {
           </div>
 
           <div style={{ display: "flex", marginTop: 28, fontSize: 30, lineHeight: 1.4, color: colors["text-secondary"] }}>
-            Transmissões públicas encontradas no YouTube, reunidas em um só lugar
+            {heroLead(platforms)}
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 40, fontSize: 26 }}>

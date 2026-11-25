@@ -52,10 +52,24 @@ describe("CSP completa (spec 017)", () => {
 
   it("libera só o necessário para miniaturas, player e Analytics", () => {
     expect(csp["default-src"]).toEqual(["'self'"]);
-    expect(csp["img-src"]).toEqual(["'self'", "data:", "blob:", "https://i.ytimg.com"]);
-    expect(csp["frame-src"]).toEqual(["https://www.youtube.com"]);
+    expect(csp["img-src"]).toEqual(["'self'", "data:", "blob:", "https://i.ytimg.com", "https://static-cdn.jtvnw.net"]);
+    expect(csp["frame-src"]).toEqual(["https://www.youtube.com", "https://player.twitch.tv"]);
     expect(csp["connect-src"]).toEqual(["'self'"]);
     expect(csp["font-src"]).toEqual(["'self'"]);
+  });
+
+  it("Twitch (spec 031): só as origens exatas, sem curinga, e YouTube sem mudança", () => {
+    expect(csp["img-src"]).toContain("https://static-cdn.jtvnw.net");
+    expect(csp["frame-src"]).toContain("https://player.twitch.tv");
+    // YouTube continua liberado como antes (CA3).
+    expect(csp["img-src"]).toContain("https://i.ytimg.com");
+    expect(csp["frame-src"]).toContain("https://www.youtube.com");
+    // Nenhum curinga de subdomínio nem esquema solto (CA1).
+    for (const values of Object.values(csp)) {
+      for (const v of values) expect(v).not.toMatch(/\*|^https?:$/);
+    }
+    // Chamadas à Twitch são do servidor: o navegador só fala com a nossa API (D2).
+    expect(csp["connect-src"]).toEqual(["'self'"]);
   });
 
   it("fecha object, base, form e embutimento", () => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useLives } from "@/components/lives/lives-provider";
+import { searchSubject } from "@/lib/lives/copy";
 import { platformMeta } from "@/lib/lives/platforms";
 import { languageBreakdown, liveCount, platformBreakdown, topAudience } from "@/lib/lives/radar-stats";
 import { activePlatforms } from "@/lib/lives/sources";
@@ -14,7 +15,7 @@ const LANG: Record<LiveLanguage, string> = { pt: "Português", en: "Inglês", es
  * Mostra o total encontrado, mesmo com filtros aplicados na grade.
  */
 export function RadarPanel() {
-  const { state, demo } = useLives();
+  const { state, demo, platforms: configured } = useLives();
   const loading = state.phase === "loading";
   const unavailable = state.phase === "error";
   const total = liveCount(state.items);
@@ -53,7 +54,7 @@ export function RadarPanel() {
         </div>
       ) : unavailable ? (
         <p className="mt-6 text-sm leading-relaxed text-text-secondary">
-          Busca indisponível no momento. Os números voltam quando a consulta ao YouTube responder.
+          Busca indisponível no momento. Os números voltam quando {searchSubject(configured)} responder.
         </p>
       ) : (
         <>

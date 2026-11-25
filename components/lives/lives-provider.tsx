@@ -10,6 +10,7 @@ import {
   type ExplorerState,
 } from "@/lib/lives/explorer-state";
 import type { LivesErrorPayload, LivesPayload } from "@/lib/youtube/types";
+import type { Platform } from "@/lib/lives/types";
 
 export async function requestLives(
   pageToken?: string,
@@ -60,12 +61,23 @@ interface LivesContextValue {
   cooldownLeft: number;
   refresh: () => void;
   loadMore: () => Promise<void>;
+  /** Plataformas ativas no servidor (spec 034). */
+  platforms: readonly Platform[];
 }
 
 const LivesContext = createContext<LivesContextValue | null>(null);
 
 /** Estado das lives compartilhado entre o hero (painel do radar) e a grade (spec 007 D4). */
-export function LivesProvider({ demoAllowed, children }: { demoAllowed: boolean; children: ReactNode }) {
+export function LivesProvider({
+  demoAllowed,
+  platforms = ["youtube"],
+  children,
+}: {
+  demoAllowed: boolean;
+  /** Plataformas ativas, calculadas no servidor (spec 034). Valem mesmo antes de a API responder. */
+  platforms?: readonly Platform[];
+  children: ReactNode;
+}) {
   const [state, dispatch] = useReducer(explorerReducer, initialExplorerState);
   const [cooldownUntil, setCooldownUntil] = useState(0);
   // 0 até o primeiro carregamento: Date.now() não pode rodar no prerender (Cache Components).
@@ -113,6 +125,7 @@ export function LivesProvider({ demoAllowed, children }: { demoAllowed: boolean;
     state,
     dispatch,
     demoAllowed,
+    platforms,
     demo: state.meta?.source === "fixture",
     now,
     cooldownLeft: Math.max(0, Math.ceil((cooldownUntil - now) / 1000)),

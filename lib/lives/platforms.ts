@@ -23,6 +23,8 @@ export interface PlatformMeta {
   ofLabel: string;
   /** Sujeito no começo da frase: "O YouTube" / "A Twitch". */
   subjectLabel: string;
+  /** Nome da API com a preposição: "da YouTube Data API" / "da API da Twitch" (spec 034). */
+  apiLabel: string;
   /** Aceita player embutido neste site. */
   embed: boolean;
   /** URL do iframe oficial. `hostname` é exigido pela Twitch (parâmetro parent). */
@@ -39,6 +41,7 @@ export const PLATFORMS: Record<Platform, PlatformMeta> = {
     inLabel: "no YouTube",
     ofLabel: "do YouTube",
     subjectLabel: "O YouTube",
+    apiLabel: "da YouTube Data API",
     embed: true,
     // URL oficial (player_parameters), sem autoplay (spec 002 D1/D2).
     embedSrc: (id) => `https://www.youtube.com/embed/${encodeURIComponent(id)}?playsinline=1&rel=0`,
@@ -54,6 +57,7 @@ export const PLATFORMS: Record<Platform, PlatformMeta> = {
     inLabel: "na Twitch",
     ofLabel: "da Twitch",
     subjectLabel: "A Twitch",
+    apiLabel: "da API da Twitch",
     embed: true,
     // Player oficial (spec 032): parent obrigatório; sem autoplay e sem som até a pessoa agir (D1, D2).
     embedSrc: (login, { hostname }) =>
@@ -69,7 +73,7 @@ export const PLATFORMS: Record<Platform, PlatformMeta> = {
     minPlayer: { width: 400, height: 300 },
   },
   // Player embutido da Kick entra na #53; até lá, só link.
-  kick: { label: "Kick", inLabel: "na Kick", ofLabel: "da Kick", subjectLabel: "A Kick", embed: false },
+  kick: { label: "Kick", inLabel: "na Kick", ofLabel: "da Kick", subjectLabel: "A Kick", apiLabel: "da API da Kick", embed: false },
 };
 
 export const platformMeta = (p: Platform): PlatformMeta => PLATFORMS[p];

@@ -9,8 +9,8 @@ import { useLives } from "@/components/lives/lives-provider";
 import { RefreshStatus } from "@/components/lives/refresh-status";
 import { EmptyState, ErrorState, QuotaState, SetupState } from "@/components/lives/states";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/lib/config/site";
 import { applyLiveFilters } from "@/lib/lives/filter";
+import { coverageNote } from "@/lib/lives/copy";
 import { activePlatforms, hasPartialFailure } from "@/lib/lives/sources";
 
 const EMPTY_FILTERS: FilterValue = { q: "", lang: "all", sort: "relevance", platform: "all" };
@@ -18,7 +18,7 @@ const EMPTY_FILTERS: FilterValue = { q: "", lang: "all", sort: "relevance", plat
 const notice = "rounded-lg bg-surface px-4 py-3 text-sm text-text-secondary ring-1 ring-border";
 
 export function LiveExplorer() {
-  const { state, dispatch, demoAllowed, demo, now, cooldownLeft, refresh, loadMore } = useLives();
+  const { state, dispatch, demoAllowed, demo, now, cooldownLeft, refresh, loadMore, platforms: configured } = useLives();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   // Consentimento para carregar o player do YouTube: só nesta visita (spec 002 D3).
   const [playerConsent, setPlayerConsent] = useState(false);
@@ -80,7 +80,7 @@ export function LiveExplorer() {
           <LiveFilters value={filters} onChange={setFilters} disabled={state.phase !== "ready"} platforms={platforms} />
 
           <p className="text-xs leading-relaxed text-text-secondary">
-            {siteConfig.coverageNote} Idioma estimado a partir de metadados e título.
+            {coverageNote(configured)} Idioma estimado a partir de metadados e título.
           </p>
 
           {state.meta?.stale && !err && (

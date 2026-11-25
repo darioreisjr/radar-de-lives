@@ -1,7 +1,9 @@
 import "server-only";
 import { getServerEnv } from "@/lib/config/server-env";
 import { createLivesAggregator, type LivesAggregator } from "@/lib/lives/aggregator";
+import { parseProviderList, selectProviders } from "@/lib/lives/providers/select";
 import { createYoutubeProvider } from "@/lib/lives/providers/youtube";
+import { logEvent } from "@/lib/telemetry";
 import { createRateLimiter, type RateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { createStores, type Stores } from "@/lib/store";
 import { createYoutubeClient } from "@/lib/youtube/client";
@@ -30,7 +32,7 @@ const g = globalThis as unknown as { __radarRuntime?: Runtime };
 
 function build(): Runtime {
   const env = getServerEnv();
-  const signature = [env.apiKey, env.upstashUrl, env.upstashToken].join("|");
+  const signature = [env.apiKey, env.upstashUrl, env.upstashToken, env.livesProviders].join("|");
   if (g.__radarRuntime?.signature === signature) return g.__radarRuntime;
 
   const stores = createStores(env);
@@ -56,7 +58,7 @@ function build(): Runtime {
     signature,
     stores,
     lives,
-    aggregator: createLivesAggregator({ providers: [createYoutubeProvider(lives, client !== null)] }),
+    aggregator: createLivesAggregator({ providers: activeProviders(env.livesProviders, lives, client !== null) }),
     // Revalidação ao abrir o player (002 D5): cache de 60 s.
     status: createVideoStatusService({
       client,
@@ -80,3 +82,18 @@ export const getLivesService = () => build().lives;
 export const getLivesAggregator = () => build().aggregator;
 export const getVideoStatusService = () => build().status;
 export const getRouteRateLimit = () => build().rateLimit;
+
+/**
+ * Provedores ativos conforme LIVES_PROVIDERS (spec 023). Roda uma vez por instância
+ * (por assinatura do runtime), então os logs também saem uma vez.
+ */
+function activeProviders(raw: string | null, lives: LivesService, youtubeConfigured: boolean) {
+  const { platforms, ignored } = parseProviderList(raw);
+  if (ignored > 0) logEvent("config_warning", { variable: "LIVES_PROVIDERS", ignored });
+  // Twitch e Kick entram aqui nas Fases 2 e 3.
+  const { providers, disabled } = selectProviders(platforms, {
+    youtube: createYoutubeProvider(lives, youtubeConfigured),
+  });
+  for (const d of disabled) logEvent("provider_disabled", { platform: d.platform, reason: d.reason });
+  return providers;
+}

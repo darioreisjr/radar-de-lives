@@ -1,0 +1,21 @@
+# 046 — Tarefas
+
+- [x] `server-env`: `kickClientId`, `kickClientSecret`, `kickCategoryId` (padrão `13155`, só dígitos). (D6)
+- [x] `telemetry`: `kick_token` e `kick_error` (este como aviso). (D5)
+- [x] `lib/kick/client.ts` (`server-only`): token em memória com single-flight e margem de 5 min; `api(path, params, schema)` com timeout de 8 s, 1 nova tentativa para rede/`5xx`, `401` → token novo uma vez, `429` → `rate_limited` (`Retry-After` ou 60 s), `4xx` → `upstream_config`, Zod na resposta. (D1 a D4, D7)
+- [x] `tests/kick-client.test.ts` (13 testes, com `fetch` falso, relógio controlado e a fixture real anonimizada do spike):
+  - CA1: sem credenciais, sem cliente e sem rede;
+  - variáveis e categoria padrão;
+  - token por client credentials, Bearer, parâmetros repetidos, schema;
+  - CA2: 3 chamadas simultâneas → 1 token;
+  - CA3: `401` → token novo; segundo `401` → `upstream_config`;
+  - CA4: renovação na margem de 5 min de um token de 60 dias;
+  - `429`, `5xx`, rede, `4xx`, resposta fora do schema, erros do endpoint de token;
+  - CA5: logs sem secret, token, URL, parâmetros ou "Bearer";
+  - CA6: `import "server-only"`.
+- [x] Verificação em 2026-11-27:
+  - lint e typecheck: ok;
+  - `npm test`: 28 arquivos, 279 testes;
+  - `npm run build`: ok;
+  - bundle do cliente (`.next/static`) sem `id.kick.com/oauth` nem `KICK_CLIENT_SECRET` (mesma checagem do CI).
+- Fora do escopo: `.env.example` com as variáveis da Kick fica para a issue que liga a Kick no agregador (#50) ou para a liberação (#55).

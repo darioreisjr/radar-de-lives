@@ -18,4 +18,4 @@
   - `npm run build`: ok (dentro do e2e);
   - `npm run test:e2e`: 72 testes;
   - build local (`next start`): `GET /api/lives/aaaaaaaaaaa` → **404**; `GET /api/status/youtube/aaaaaaaaaaa` → 200 (CA4). Observação: o `.env.local` tem a chave real do YouTube, então essa checagem gastou 1 unidade de `videos.list`; sem Upstash no `.env.local`, nada foi gravado no Redis.
-- [ ] Depois do deploy: em produção, `/api/lives` sem `videoId` e `source`; `/api/lives/<id>` → 404.
+- [x] Depois do deploy (2026-11-27), com o cache que já existia: `/api/lives` sem `source`; 149 lives (50 YouTube + 99 Twitch), 0 com `videoId`, todas com `id` e únicas; `/api/lives/aaaaaaaaaaa` → 404; `/api/status/twitch/<login>` → `live`, sem `videoId`. Registrado na [#90](https://github.com/darioreisjr/radar-de-lives/issues/90#issuecomment-7212697069).

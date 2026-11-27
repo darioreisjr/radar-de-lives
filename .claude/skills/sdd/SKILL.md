@@ -27,7 +27,7 @@ Para cada mudança significativa, crie uma pasta:
       plan.md
       tasks.md
 
-Use IDs sequenciais de três dígitos quando possível, por exemplo 001-foundation, 002-youtube-search, 003-filters. Antes de escolher o ID, verifique os diretórios existentes. Em correções simples e localizadas, atualize a spec da funcionalidade relacionada em vez de criar uma pasta desnecessária.
+Use IDs sequenciais de três dígitos quando possível, por exemplo 001-foundation, 002-youtube-search, 003-filters. Antes de escolher o ID, verifique os diretórios existentes **e os IDs reservados nas issues abertas** (o corpo de cada issue indica a pasta `docs/specs/<id>-<slug>/`). Em correções simples e localizadas, atualize a spec da funcionalidade relacionada em vez de criar uma pasta desnecessária.
 
 ## Fluxo obrigatório
 
@@ -100,16 +100,21 @@ Se o usuário pedir uma construção maior, complete a fatia atual antes de inic
 
 ## Regras específicas para Radar de Lives
 
-- Nunca prometer todas as lives do YouTube. Usar “Lives encontradas”.
-- Usar a YouTube Data API oficial; não fazer scraping.
-- Confirmar na documentação vigente os parâmetros e campos de search.list, videos.list e channels.list.
+Valem para todas as plataformas (hoje YouTube e Twitch; Kick só se o spike #31 aprovar):
+
+- Nunca prometer todas as lives. Usar “Lives encontradas”.
+- Usar só a API oficial de cada plataforma (YouTube Data API, Twitch Helix); não fazer scraping.
+- Confirmar na documentação e nos termos vigentes da plataforma os parâmetros, campos, limites de uso e o tempo máximo de cache permitido (ex.: Developer Agreement da Twitch, até 24 h).
 - Tratar concurrentViewers como opcional e ausente como null.
-- Deduplicar por videoId.
-- Manter a YOUTUBE_API_KEY exclusivamente no servidor.
-- Cachear para controlar quota e exibir timestamp/stale state.
-- Não assumir que uma live continua ativa depois da busca.
-- Só incorporar com player oficial e manter fallback para youtube.com.
-- Identidade visual deve ser própria, sem assets oficiais não licenciados.
+- Deduplicar por `id` (`<plataforma>:<sourceId>`). `videoId` é obsoleto.
+- Manter chaves, client secrets e tokens exclusivamente no servidor, sem `NEXT_PUBLIC_` e sem logar.
+- Cada plataforma é um `LivesProvider` com cache e single-flight próprios; uma falha não derruba as outras (`sources` no payload).
+- Cachear para controlar quota e limites e exibir timestamp/stale state.
+- Não assumir que uma live continua ativa depois da busca: revalidar em `/api/status/[platform]/[id]` antes de abrir o player.
+- Só incorporar com o player oficial da plataforma, sem autoplay, depois do consentimento, e manter sempre o link para a plataforma. Respeitar requisitos do player (ex.: `parent` e 400×300 na Twitch).
+- Nova plataforma: ligar e desligar por `LIVES_PROVIDERS`, nova origem na CSP, textos pelo mapa de plataformas e `/privacy` e `/terms` atualizados antes da ativação.
+- Mudança no formato de dados em cache: testar com cache no formato antigo.
+- Identidade visual deve ser própria, sem assets oficiais não licenciados; selo de plataforma só com texto.
 - Respeitar acessibilidade e prefers-reduced-motion.
 
 ## Checklist de revisão SDD

@@ -6,6 +6,8 @@ Cada tarefa abaixo é **independente**: pode ser feita sozinha, em qualquer orde
 - Estado de partida: commit `73e7a3e` em `main`, site em produção em https://radardelives.darioreis.dev
 - Documento criado em 2026-11-22.
 
+> **Sprint concluído em 2026-11-23.** O contexto abaixo descreve o projeto só com o YouTube. Desde 2026-11-25 a Twitch também está ativa: o trabalho multiplataforma (Twitch e Kick) está nas issues do épico [#28](https://github.com/darioreisjr/radar-de-lives/issues/28) e no plano [`docs/plans/multiplataforma.md`](docs/plans/multiplataforma.md). Para o estado atual do código, leia [README.md](README.md) e [CLAUDE.md](CLAUDE.md).
+
 ---
 
 ## Sumário

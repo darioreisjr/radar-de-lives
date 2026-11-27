@@ -47,6 +47,9 @@ export function getServerEnv() {
     kickClientSecret: process.env.KICK_CLIENT_SECRET?.trim() || null,
     /** Categoria "Grand Theft Auto VI (GTA)" na Kick (spec 020, consultada em 2026-11-27). */
     kickCategoryId: code("KICK_CATEGORY_ID", "13155", /^\d{1,20}$/),
+    /** Cache da Kick (spec 048 D2): bem abaixo das 24 h dos Developer Terms (spec 020, P4). */
+    kickCacheTtlSeconds: int("KICK_CACHE_TTL_SECONDS", 180, 30, 3_600),
+    kickStaleTtlSeconds: int("KICK_STALE_TTL_SECONDS", 600, 0, 3_600),
     cacheTtlSeconds: int("LIVE_CACHE_TTL_SECONDS", 900, 30, 86_400),
     staleTtlSeconds: int("LIVE_STALE_TTL_SECONDS", 600, 0, 86_400),
     rateLimitSeconds: int("LIVE_RATE_LIMIT_SECONDS", 30, 5, 3_600),

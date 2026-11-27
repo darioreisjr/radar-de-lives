@@ -3,6 +3,7 @@ import { getServerEnv } from "@/lib/config/server-env";
 import { parseProviderList, selectProviders } from "@/lib/lives/providers/select";
 import type { LivesProvider } from "@/lib/lives/providers/types";
 import type { Platform } from "@/lib/lives/types";
+import { isKickConfigured } from "@/lib/kick/client";
 import { isTwitchConfigured } from "@/lib/twitch/client";
 
 /** Candidato só para a seleção: os textos não buscam lives. */
@@ -23,6 +24,7 @@ export function getActivePlatforms(): Platform[] {
   const { providers } = selectProviders(platforms, {
     youtube: stub("youtube", true),
     twitch: stub("twitch", isTwitchConfigured(env)),
+    kick: stub("kick", isKickConfigured(env)),
   });
   return providers.map((p) => p.platform);
 }

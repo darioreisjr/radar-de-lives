@@ -3,6 +3,7 @@ import { getServerEnv } from "@/lib/config/server-env";
 import { createLivesAggregator, type LivesAggregator } from "@/lib/lives/aggregator";
 import { parseProviderList, selectProviders } from "@/lib/lives/providers/select";
 import type { LivesProvider } from "@/lib/lives/providers/types";
+import { createKickProvider } from "@/lib/lives/providers/kick";
 import { createTwitchProvider } from "@/lib/lives/providers/twitch";
 import { createYoutubeProvider } from "@/lib/lives/providers/youtube";
 import { createStatusHandler, type StatusHandler } from "@/lib/lives/status-handler";
@@ -10,6 +11,9 @@ import type { Platform } from "@/lib/lives/types";
 import { logEvent } from "@/lib/telemetry";
 import { createRateLimiter, type RateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { createStores, type Stores } from "@/lib/store";
+import { createKickClientFromEnv } from "@/lib/kick/client";
+import { searchKickLives } from "@/lib/kick/search";
+import { createKickLivesService, type KickPage } from "@/lib/kick/service";
 import { createTwitchClientFromEnv } from "@/lib/twitch/client";
 import { searchTwitchLives } from "@/lib/twitch/search";
 import { createTwitchLivesService, type TwitchPage } from "@/lib/twitch/service";
@@ -55,6 +59,11 @@ function build(): Runtime {
     env.twitchCacheTtlSeconds,
     env.twitchStaleTtlSeconds,
     env.twitchMaxPages,
+    env.kickClientId,
+    env.kickClientSecret,
+    env.kickCategoryId,
+    env.kickCacheTtlSeconds,
+    env.kickStaleTtlSeconds,
   ].join("|");
   if (g.__radarRuntime?.signature === signature) return g.__radarRuntime;
 
@@ -117,9 +126,25 @@ function build(): Runtime {
       })
     : null;
 
+  // Kick (spec 048): só existe com credenciais; só fica ativa com `kick` em LIVES_PROVIDERS.
+  const kickClient = createKickClientFromEnv(env);
+  const kick = kickClient
+    ? createKickLivesService({
+        search: () => searchKickLives(kickClient, { categoryId: env.kickCategoryId }),
+        cache: stores.cache<KickPage>("lives:kick", 5),
+        lock: stores.lock,
+        config: {
+          ttlMs: env.kickCacheTtlSeconds * 1000,
+          staleMs: env.kickStaleTtlSeconds * 1000,
+          minUpstreamIntervalMs: env.rateLimitSeconds * 1000,
+        },
+      })
+    : null;
+
   const providers = activeProviders(env.livesProviders, {
     youtube: createYoutubeProvider(lives, client !== null, status),
     twitch: createTwitchProvider(twitch, twitchStatus),
+    kick: createKickProvider(kick),
   });
 
   g.__radarRuntime = {
@@ -148,7 +173,6 @@ export const getStatusHandler = () => build().statusHandler;
 function activeProviders(raw: string | null, candidates: Partial<Record<Platform, LivesProvider>>) {
   const { platforms, ignored } = parseProviderList(raw);
   if (ignored > 0) logEvent("config_warning", { variable: "LIVES_PROVIDERS", ignored });
-  // Twitch e Kick entram nos candidatos nas Fases 2 e 3.
   const { providers, disabled } = selectProviders(platforms, candidates);
   for (const d of disabled) logEvent("provider_disabled", { platform: d.platform, reason: d.reason });
   return providers;

@@ -155,6 +155,22 @@ Trechos literais relevantes (o restante não muda o projeto):
 
 Não lidos: Community Guidelines, Privacy Policy e Advertising Policy da Kick. Não é análise jurídica: entra na revisão jurídica (S-01).
 
+### P3 — teste a partir de um datacenter (Vercel Preview, 2026-11-27)
+
+Branch descartável `spike/kick-network` (rota `/api/spike-kick` e página `/spike-kick`), com `KICK_CLIENT_ID` e `KICK_CLIENT_SECRET` só em Preview. Resultado:
+
+| Etapa | Resultado |
+|---|---|
+| Região | `iad1` (a mesma das funções de produção) |
+| Token (`id.kick.com/oauth/token`) | `200` em 159 ms, JSON, via Cloudflare, `expires_in` 5184000 |
+| Página 1 (`limit=1000`) | `200` em 289 ms, 1000 lives |
+| Página 2 (cursor) | `200` em 744 ms, 699 lives |
+| Total | **1699 lives**; nenhum bloqueio nem desafio do Cloudflare |
+| Maiores em pt/en/es | 9729 (en), 6957 (en), 6891 (es) |
+| Player embutido | `player.kick.com/<slug>?autoplay=false&muted=true` carregou no iframe com a CSP liberando `player.kick.com`, mostrando o canal, a categoria e "LIVE · 9.7K watching", **sem tela de idade ou login** (ao contrário da Twitch) |
+
+**I3 confirmada:** o `slug` abre o player. A branch, os Previews dela e as variáveis foram removidos depois do teste.
+
 ### Decisão do responsável (2026-11-27)
 
 | ID | Decisão | Motivo |
@@ -209,25 +225,25 @@ Elas dependem de credenciais da Kick ou de um deploy de Preview:
 | #50 serviço | Sem rate limit documentado: TTL de cache conservador (sugestão: 180 s, como a Twitch), backoff em `429` e `5xx`. Token de 60 dias em memória. |
 | #51 status | Usar `GET /public/v1/users/livestreams?user_id=<broadcaster_user.id>`. A rota `/api/status/kick/[id]` recebe o **id numérico**, não o `slug`. **Isso também afeta #36:** o id da rota de status pode ser diferente de `sourceId`. |
 | #52 CSP | `frame-src https://player.kick.com`; `img-src https://images.kick.com https://web.kick.com` (P2). |
-| #53 player | `https://player.kick.com/<slug>?autoplay=false&muted=true`. Sem `parent`. Ver no P3 se o player pede login para conteúdo adulto, como o da Twitch (spec 044). |
+| #53 player | `https://player.kick.com/<slug>?autoplay=false&muted=true`. Sem `parent`. No P3, o player carregou sem pedir login: sem aviso como o da spec 044. |
 | #54 legal | Termos da Kick (P4): atribuição, re-distribuição, **site não voltado a menores de 16**, privacidade. |
 
 ## Recomendação
 
-**Seguir com ressalvas** (atualizada em 2026-11-27, com P1, P2 e P4; falta só P3). A API oficial cobre tudo que precisamos (token de app, lives por categoria e idioma, viewers, status por usuário e player embutido), com um contrato bem definido em OpenAPI.
+**Seguir com ressalvas — recomendação final** (2026-11-27, com P1 a P4). A API oficial cobre tudo que precisamos (token de app, lives por categoria e idioma, viewers, status por usuário e player embutido), com um contrato bem definido em OpenAPI.
 
 As ressalvas:
 1. **Ordenação:** a ordem por espectadores é calculada por nós.
 2. **API recente e em mudança:** exige validação Zod e atenção ao changelog.
 3. **Volume e ordem:** 1815 lives em 2 páginas, da mais antiga para a mais nova; é preciso paginar e cortar nas 100 maiores.
 4. **Termos:** atendíveis (P4), com o cuidado de re-distribuição e da idade mínima de 16 anos.
-5. **Pendência:** P3 (bloqueio em datacenter e login no player) pode mudar a recomendação para **adiar**.
+5. **P3 sem bloqueio:** a API responde da Vercel (`iad1`) em ~1,2 s para as 2 páginas, e o player embute sem pedir login.
 
 A decisão final de seguir (portão da onda 6 no plano) fica para depois de P1 a P4.
 
 ## Critérios de aceite do spike
 
 1. **CA1:** cada pergunta da #31 tem resposta com fonte, ou aparece como pendência com responsável. ✅
-2. **CA2:** o resultado do teste a partir da Vercel está registrado. ⏳ P3
+2. **CA2:** o resultado do teste a partir da Vercel está registrado. ✅ P3
 3. **CA3:** a tabela de mapeamento Kick → `LiveItem` existe. ✅
-4. **CA4:** há recomendação com motivo. ✅ (provisória até P3)
+4. **CA4:** há recomendação com motivo. ✅ (final)

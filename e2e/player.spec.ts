@@ -16,7 +16,11 @@ test("live confirmada: consentimento e iframe oficial sem autoplay", async ({ pa
   await expect(dialog.locator("p", { hasText: "conforme a Política de Privacidade do Google" })).toBeVisible();
   await expect(dialog.locator("iframe")).toHaveCount(0);
 
+  // Spec 044 (CA2): o YouTube não tem aviso de login.
+  await expect(dialog.getByText(/entre na sua conta|pedir login/)).toHaveCount(0);
+
   await dialog.getByRole("button", { name: "Carregar player" }).click();
+  await expect(dialog.getByText("Se o player não carregar ou mostrar erro, abra no YouTube.")).toBeVisible();
   const iframe = dialog.locator("iframe");
   await expect(iframe).toHaveAttribute("src", `https://www.youtube.com/embed/${videoId(1)}?playsinline=1&rel=0`);
   await expect(iframe).toHaveAttribute("referrerpolicy", "strict-origin-when-cross-origin");
@@ -144,6 +148,14 @@ test("Twitch: consentimento e player oficial; tela estreita mostra só o link (s
     );
     // Concordância: "o Aviso", não "a Aviso" (spec 032).
     await expect(dialog.locator("p", { hasText: "conforme o Aviso de Privacidade da Twitch" })).toBeVisible();
+    // Spec 044: aviso de login antes do botão, como texto do diálogo (CA1, CA3).
+    const aviso = dialog.locator("p", { hasText: "pode pedir que você entre na sua conta" });
+    await expect(aviso).toBeVisible();
+    const [avisoY, botaoY] = await Promise.all([
+      aviso.boundingBox().then((b) => b!.y),
+      dialog.getByRole("button", { name: "Carregar player" }).boundingBox().then((b) => b!.y),
+    ]);
+    expect(avisoY).toBeLessThan(botaoY);
     await expect(dialog.locator("iframe")).toHaveCount(0);
     await dialog.getByRole("button", { name: "Carregar player" }).click();
     const iframe = dialog.locator("iframe");
@@ -156,6 +168,8 @@ test("Twitch: consentimento e player oficial; tela estreita mostra só o link (s
     const box = await iframe.boundingBox();
     expect(box!.width).toBeGreaterThanOrEqual(400);
     expect(box!.height).toBeGreaterThanOrEqual(300);
+    // Rodapé com o player carregado cita o login (CA4).
+    await expect(dialog.getByText("Se a Twitch pedir login ou o player não carregar, abra na Twitch.")).toBeVisible();
   }
   // Acessibilidade do diálogo (CA4): Esc fecha e o foco volta ao card.
   await page.keyboard.press("Escape");

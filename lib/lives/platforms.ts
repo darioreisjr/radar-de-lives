@@ -11,6 +11,17 @@ export interface PlayerConsent {
 }
 
 /**
+ * Aviso de que a plataforma pode exigir login no player embutido (spec 044).
+ * Na Twitch, GTA 6 tem o rótulo MatureGame, e o player pede conta logada.
+ */
+export interface LoginNotice {
+  /** No consentimento, antes de "Carregar player". */
+  beforeLoad: string;
+  /** No rodapé, com o player carregado. */
+  withPlayer: string;
+}
+
+/**
  * Dados de cada plataforma para a interface (spec 025).
  * Português tem gênero ("no YouTube" × "na Twitch"), então as formas vêm prontas (D1).
  */
@@ -33,6 +44,8 @@ export interface PlatformMeta {
   consent?: PlayerConsent;
   /** Tamanho mínimo exigido pelo player da plataforma, em px (spec 032 D3). */
   minPlayer?: { width: number; height: number };
+  /** Aviso de login exigido pelo player (spec 044). Ausente = não há aviso. */
+  loginNotice?: LoginNotice;
 }
 
 export const PLATFORMS: Record<Platform, PlatformMeta> = {
@@ -71,6 +84,12 @@ export const PLATFORMS: Record<Platform, PlatformMeta> = {
     },
     // A Twitch exige no mínimo 400×300 px (spec 019, doc oficial de embed).
     minPlayer: { width: 400, height: 300 },
+    // GTA 6 é MatureGame na Twitch: o player embutido pede login (QA da spec 042, falha B2).
+    loginNotice: {
+      beforeLoad:
+        "A Twitch classifica GTA 6 como jogo para adultos e pode pedir que você entre na sua conta para assistir. Se pedir, use “Abrir na Twitch”.",
+      withPlayer: "Se a Twitch pedir login ou o player não carregar, abra na Twitch.",
+    },
   },
   // Player embutido da Kick entra na #53; até lá, só link.
   kick: { label: "Kick", inLabel: "na Kick", ofLabel: "da Kick", subjectLabel: "A Kick", apiLabel: "da API da Kick", embed: false },

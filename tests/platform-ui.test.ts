@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { applyLiveFilters } from "@/lib/lives/filter";
 import { liveId } from "@/lib/lives/identity";
+import { PLATFORMS } from "@/lib/lives/platforms";
 import { platformBreakdown } from "@/lib/lives/radar-stats";
 import { activePlatforms, hasPartialFailure, isMultiPlatform } from "@/lib/lives/sources";
 import type { LiveItem, Platform, SourceStatus } from "@/lib/lives/types";
@@ -66,5 +67,16 @@ describe("contagem por plataforma no radar (spec 026)", () => {
       { platform: "twitch", count: 1 },
       { platform: "kick", count: 0 },
     ]);
+  });
+});
+
+describe("aviso de login no player (spec 044)", () => {
+  it("só a Twitch tem o aviso, e ele aponta para o link da plataforma", () => {
+    expect(PLATFORMS.youtube.loginNotice).toBeUndefined();
+    expect(PLATFORMS.kick.loginNotice).toBeUndefined();
+    const n = PLATFORMS.twitch.loginNotice!;
+    expect(n.beforeLoad).toContain("entre na sua conta");
+    expect(n.beforeLoad).toContain("“Abrir na Twitch”");
+    expect(n.withPlayer).toBe("Se a Twitch pedir login ou o player não carregar, abra na Twitch.");
   });
 });

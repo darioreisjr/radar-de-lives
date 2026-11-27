@@ -188,3 +188,23 @@ test("Twitch: live encerrada na revalidação não carrega o player e mantém o 
   await expect(dialog.locator("iframe")).toHaveCount(0);
   await expect(dialog.getByRole("link", { name: /Abrir na Twitch/ })).toBeVisible();
 });
+
+/* Spec 045: foco ao fechar o player de uma live encerrada ou indisponível (CA1, CA3). */
+for (const state of ["ended", "unavailable"] as const) {
+  for (const platform of ["youtube", "twitch"] as const) {
+    test(`foco volta ao card ao fechar: ${platform} ${state}`, async ({ page, api }) => {
+      const item = platform === "twitch" ? twitchLive() : liveItem(1);
+      api.setLives(ok(livesPayload([item, liveItem(2)])));
+      api.status = (id, p) => ok(statusPayload(id, state, { platform: p }));
+      await page.goto("/");
+      const card = page.getByRole("article").filter({ hasText: item.title });
+      await card.getByRole("button", { name: "Assistir aqui" }).click();
+      const dialog = page.getByRole("dialog");
+      await expect(dialog.getByRole("link", { name: /Abrir (no YouTube|na Twitch)/ })).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(dialog).toBeHidden();
+      const label = platform === "twitch" ? /Abrir na Twitch/ : /Abrir no YouTube/;
+      await expect(card.getByRole("link", { name: label })).toBeFocused();
+    });
+  }
+}

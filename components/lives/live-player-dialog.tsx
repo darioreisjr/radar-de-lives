@@ -180,6 +180,10 @@ export function LivePlayerDialog({
                     </a>
                     .
                   </p>
+                  {/* Spec 044: a plataforma pode pedir login no player (Twitch, GTA 6 = MatureGame). */}
+                  {platform.loginNotice && (
+                    <p className="mt-3 text-sm leading-relaxed text-text-primary">{platform.loginNotice.beforeLoad}</p>
+                  )}
                   <Button variant="primary" onClick={onConsent} className="mt-4">
                     Carregar player
                   </Button>
@@ -196,7 +200,7 @@ export function LivePlayerDialog({
             {view.kind === "player"
               ? view.unverified
                 ? `Não confirmamos o estado atual. Se o player não carregar, abra ${platform.inLabel}.`
-                : `Se o player não carregar ou mostrar erro, abra ${platform.inLabel}.`
+                : (platform.loginNotice?.withPlayer ?? `Se o player não carregar ou mostrar erro, abra ${platform.inLabel}.`)
               : `Você também pode assistir direto ${platform.inLabel}.`}
           </p>
           <PlatformLink href={item.watchUrl} platform={platform} primary={view.kind !== "consent" && view.kind !== "player"} />

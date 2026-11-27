@@ -111,11 +111,61 @@ Pela skill SDD, **não inventamos comportamento de serviço externo**. Por isso 
   - o endpoint de introspecção de token mudou de lugar.
 - **Conclusão:** a API está ativa, mas os contratos mudam. É preciso validação forte na fronteira (Zod) e acompanhar o changelog.
 
+## Resultados com o app criado (P1, P2, P4), 2026-11-27
+
+Obtidos pelo responsável, de um IP residencial no Brasil, com o token de app. Nenhuma credencial foi compartilhada.
+
+### P1 — categoria
+
+- `GET /public/v2/categories?name=Grand Theft Auto VI` → **`13155`**, nome `Grand Theft Auto VI (GTA)`.
+
+### P2 — resposta real
+
+| Item | Resultado |
+|---|---|
+| Token de app | Aceito; `expires_in` = **5184000** (60 dias). |
+| Volume | **1815 lives** na categoria, em **2 páginas** de `limit=1000` (cursor em `pagination.next_cursor`), em ~4 s no total. |
+| Ordem | Da mais antiga para a mais nova, como diz a especificação: as primeiras tinham 7, 2 e 2 espectadores. |
+| Público | 236 com 0 espectadores; 357 com ≥ 10; 117 com ≥ 100; 24 com ≥ 1000. Maior: 26.508 (`ar`). |
+| Idiomas (`language_code`) | en 1016, es 422, pt 119, **en-IN 64**, tr 31, ar 27, outros. Há variantes regionais (BCP 47). |
+| `has_mature_content` | **1781 de 1815 (98%)** `true`. |
+| Miniaturas (`thumbnail`) | `https://images.kick.com/...` e `https://web.kick.com/...` (`.webp`). Foto de perfil e capa da categoria em `files.kick.com` (não usadas no card). |
+| `channel.slug` | Igual ao `broadcaster_user.username` em minúsculas (ex.: `itsfrostysinn`). |
+| Campos | Todos os do `LivestreamV2` documentado, com os mesmos nomes. |
+
+- A fixture `tests/fixtures/kick/livestreams-v2.json` tem 3 itens no formato real, **anonimizados** (ids, slugs, usuários e caminhos trocados). `message` e o `next_cursor` vazio da última página são suposições: a resposta real não foi impressa inteira.
+- O filtro `language_code=pt&language_code=en&language_code=es` da própria API não teve o resultado registrado. Como a busca completa custa 2 chamadas, o filtro de idioma pode ser feito no nosso código.
+
+### P4 — Developer Terms ([dev.kick.com/terms-of-service](https://dev.kick.com/terms-of-service), sem data de versão na página; lido em 2026-11-27)
+
+Trechos literais relevantes (o restante não muda o projeto):
+
+| Tema | Texto | Consequência para o site |
+|---|---|---|
+| Cache (Schedule 1, C) | "Do not store copies of Kick Content or Program Materials, unless you: … (c) cache such information for only a twenty-four hour time period without further sharing it with third parties." | Cache de minutos permitido. |
+| Atualização (6; Schedule 1, C) | "You must update Program Materials used in Your Services frequently"; "delete Program Materials and Kick Content when Kick reports them as deleted or expired". | TTL curto; revalidar a live antes do player. |
+| Re-distribuição (Schedule 1, C) | "Re-syndication and re-distribution of Program Materials or data as available from a Kick API is prohibited." | Exibir no próprio site é o uso previsto (seção 6). O `/api/lives` deve ser tratado e documentado como uso interno do site, com o rate limit atual. |
+| Atribuição (3.1, 6) | "Use and display Kick Marks solely to attribute Kick's offerings as the source"; "there is a clear path to the source". | Selo de texto "Kick" e link "Abrir na Kick". Não usar logo. |
+| Player (Schedule 1, D) | "You must adopt and integrate our embeddable player for all Kick video content." "Do not modify, replace, interfere with, limit, block, cover, or obscure: (a) the functionality of embeddable experiences, including advertisements; or (b) the Kick Marks." | Só o player oficial, sem nada por cima. |
+| Sites proibidos para embed (Schedule 1, D.1) | "(a) have a primary purpose to share or host content that would violate Kick's Terms of Service or Community Guidelines; (b) attempt to replicate the Kick experience without offering additional content or data of substantial value on the same page; or (c) target children under 16." | O site agrega valor (várias plataformas, filtros, radar). **A #54 deve deixar claro que o site não é voltado a menores de 16.** |
+| Valor (3.5) | "The App must be designed to provide meaningful and demonstrable value to Kick Streamers and/or viewers." | A Kick pode revogar o app; desligar a plataforma leva ~1 min. |
+| Dados e comércio (5.2; Schedule 1, B) | Proíbe vender, licenciar, monetizar ou compartilhar os dados, e usar para segmentar anúncios. | O site não faz nada disso. |
+| Privacidade (Schedule 1, A) | Política de privacidade pública; "set persistent cookies to expire within 13 months". | Já atendido; a #54 inclui a Kick em `/privacy`. |
+| Mudanças e término (3.6, 7, 8.2) | A Kick pode mudar os termos e revogar chaves "for any reason or no reason at all". | Mesmo risco aceito para a Twitch. |
+
+Não lidos: Community Guidelines, Privacy Policy e Advertising Policy da Kick. Não é análise jurídica: entra na revisão jurídica (S-01).
+
+### Decisão do responsável (2026-11-27)
+
+| ID | Decisão | Motivo |
+|---|---|---|
+| D-K1 | **Sem o selo "Conteúdo adulto" na Kick.** `isMature` = `false` para itens da Kick. | `has_mature_content` vem `true` em 98% da categoria: equivale ao rótulo do jogo (`MatureGame` na Twitch), que o PRD D6 já não conta. |
+
 ## Inferências (não confirmadas)
 
 - **I1:** como o v2 ordena das lives mais antigas para as mais novas, a "relevância" precisa ser calculada por nós. **Proposta:** ordenar por `viewer_count` decrescente e usar essa posição como `rank`.
-- **I2:** a categoria de GTA 6 deve ter bem menos de 1000 lives ao mesmo tempo. Se for assim, **uma chamada** com `limit=1000` traz todas, sem paginar. A pendência P2 confirma.
-- **I3:** o `slug` do canal deve coincidir com o usuário usado em `player.kick.com/<usuário>` e em `kick.com/<slug>`. A pendência P2 confirma.
+- **I2 (refutada por P2):** eram 1815 lives, em 2 páginas. A busca precisa seguir o cursor (com um teto de páginas) antes de ordenar.
+- **I3 (confirmada por P2):** `channel.slug` = `broadcaster_user.username` em minúsculas. Falta ver o player abrir (P3).
 - **I4:** a falta de `429` documentado **não** quer dizer que não existe limite. O cliente deve tratar `429` com backoff e cache.
 
 ## Pendências
@@ -142,34 +192,36 @@ Elas dependem de credenciais da Kick ou de um deploy de Preview:
 | `thumbnail` | `thumbnailUrl` | Validar HTTPS e o domínio de P2 |
 | `started_at` | `liveStartedAt` e `publishedAt` | |
 | `viewer_count` | `concurrentViewers` | Obrigatório na especificação; se faltar, `null` |
-| `language_code` (BCP 47) | `language` | Prefixo `pt`, `en` ou `es`; o resto vira `unknown` (D7) |
+| `language_code` (BCP 47) | `language` | Prefixo `pt`, `en` ou `es` (inclui `en-IN` e afins); o resto vira `unknown` (D7) |
 | `https://kick.com/<slug>` | `watchUrl` | |
 | `https://player.kick.com/<slug>?autoplay=false&muted=true` | `embedUrl` | D3 |
 | — | `isLive` | `true` (o endpoint só devolve lives ativas) |
 | — | `embedAllowed` | `true` |
 | posição depois de ordenar por `viewer_count` | `rank` | I1 |
-| `has_mature_content` | `isMature` | D6: aparece com o selo |
+| `has_mature_content` | `isMature` | **Ignorado: sempre `false`** (D-K1) |
 
 ## Impacto nas issues da Fase 3
 
 | Issue | Ajuste |
 |---|---|
 | #48 cliente | Token em `id.kick.com/oauth/token`, com corpo form-urlencoded. Sem refresh token: pedir outro token quando o atual vencer. |
-| #49 busca | Usar **v2** (não v1); `limit=1000`; ordenar por `viewer_count` no nosso código (I1); filtro de idioma `language_code=pt&language_code=en&language_code=es`. |
-| #50 serviço | Sem rate limit documentado: TTL de cache conservador (sugestão: 120 s), backoff em `429` e `5xx`. |
+| #49 busca | Usar **v2**; `category_id=13155`; `limit=1000`; **seguir `next_cursor`** (teto sugerido: 5 páginas); filtrar pt/en/es pelo prefixo do idioma; ordenar por `viewer_count` (I1) e ficar com as **100 maiores**, como na Twitch. |
+| #50 serviço | Sem rate limit documentado: TTL de cache conservador (sugestão: 180 s, como a Twitch), backoff em `429` e `5xx`. Token de 60 dias em memória. |
 | #51 status | Usar `GET /public/v1/users/livestreams?user_id=<broadcaster_user.id>`. A rota `/api/status/kick/[id]` recebe o **id numérico**, não o `slug`. **Isso também afeta #36:** o id da rota de status pode ser diferente de `sourceId`. |
-| #52 CSP | `frame-src https://player.kick.com`. `img-src` depende do domínio de P2. |
-| #53 player | `https://player.kick.com/<slug>?autoplay=false&muted=true`. Sem `parent`, porque não há restrição de domínio documentada. |
-| #54 legal | Depende de P4. |
+| #52 CSP | `frame-src https://player.kick.com`; `img-src https://images.kick.com https://web.kick.com` (P2). |
+| #53 player | `https://player.kick.com/<slug>?autoplay=false&muted=true`. Sem `parent`. Ver no P3 se o player pede login para conteúdo adulto, como o da Twitch (spec 044). |
+| #54 legal | Termos da Kick (P4): atribuição, re-distribuição, **site não voltado a menores de 16**, privacidade. |
 
 ## Recomendação
 
-**Seguir com ressalvas, por enquanto.** A API oficial cobre tudo que precisamos (token de app, lives por categoria e idioma, viewers, status por usuário e player embutido), com um contrato bem definido em OpenAPI.
+**Seguir com ressalvas** (atualizada em 2026-11-27, com P1, P2 e P4; falta só P3). A API oficial cobre tudo que precisamos (token de app, lives por categoria e idioma, viewers, status por usuário e player embutido), com um contrato bem definido em OpenAPI.
 
 As ressalvas:
 1. **Ordenação:** a ordem por espectadores é calculada por nós.
 2. **API recente e em mudança:** exige validação Zod e atenção ao changelog.
-3. **Pendências:** P3 (bloqueio em datacenter) e P4 (termos) podem mudar a recomendação para **adiar**.
+3. **Volume e ordem:** 1815 lives em 2 páginas, da mais antiga para a mais nova; é preciso paginar e cortar nas 100 maiores.
+4. **Termos:** atendíveis (P4), com o cuidado de re-distribuição e da idade mínima de 16 anos.
+5. **Pendência:** P3 (bloqueio em datacenter e login no player) pode mudar a recomendação para **adiar**.
 
 A decisão final de seguir (portão da onda 6 no plano) fica para depois de P1 a P4.
 
@@ -178,4 +230,4 @@ A decisão final de seguir (portão da onda 6 no plano) fica para depois de P1 a
 1. **CA1:** cada pergunta da #31 tem resposta com fonte, ou aparece como pendência com responsável. ✅
 2. **CA2:** o resultado do teste a partir da Vercel está registrado. ⏳ P3
 3. **CA3:** a tabela de mapeamento Kick → `LiveItem` existe. ✅
-4. **CA4:** há recomendação com motivo. ✅ (provisória até P1 a P4)
+4. **CA4:** há recomendação com motivo. ✅ (provisória até P3)

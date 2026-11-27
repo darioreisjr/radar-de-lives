@@ -6,8 +6,9 @@
 - [x] Testar a rede sem credenciais: `401` JSON via Cloudflare, sem desafio; player sem `X-Frame-Options`. Feito em 2026-11-25. (CA1)
 - [x] Montar a tabela de mapeamento Kick → `LiveItem`. (CA3)
 - [x] Registrar a recomendação provisória: seguir com ressalvas. (CA4)
-- [ ] **P1:** `category_id` de GTA 6. Precisa do app da Kick criado por você.
-- [ ] **P2:** resposta real: volume, `slug` igual ao usuário, domínio das miniaturas, `expires_in`; e a fixture anonimizada em `tests/fixtures/kick/`.
+- [x] **P1:** `category_id` de GTA 6 = `13155` (2026-11-27).
+- [x] **P2:** 1815 lives em 2 páginas; ordem do mais antigo; `slug` = usuário; miniaturas em `images.kick.com` e `web.kick.com`; `expires_in` 60 dias; fixture anonimizada em `tests/fixtures/kick/livestreams-v2.json` (2026-11-27).
 - [ ] **P3:** teste a partir de um Preview da Vercel. Precisa da sua autorização para o deploy e das credenciais em Preview. (CA2)
-- [ ] **P4:** link ou texto dos Developer Terms da Kick.
-- [ ] Recomendação final (seguir, adiar ou não seguir) depois de P1 a P4.
+- [x] **P4:** Developer Terms lidos (dev.kick.com/terms-of-service), com as condições registradas na spec (2026-11-27).
+- [x] Decisão D-K1: sem selo "Conteúdo adulto" na Kick (98% da categoria vem marcada).
+- [ ] Recomendação final (seguir, adiar ou não seguir) depois de P3.

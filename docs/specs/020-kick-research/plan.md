@@ -13,14 +13,15 @@
 ## Arquivos
 
 - `docs/specs/020-kick-research/spec.md`, `plan.md` e `tasks.md`.
-- Depois de P2: `tests/fixtures/kick/livestreams-v2.json`, com a resposta real anonimizada (nomes e ids trocados, sem token).
+- `tests/fixtures/kick/livestreams-v2.json`: 3 itens no formato real, anonimizados (nomes e ids trocados, sem token). Feito em 2026-11-27.
 
 ## Teste de datacenter (P3), quando for autorizado
 
 - Branch descartável `spike/kick-network` (nunca vai para `main`), com a rota `app/api/_spike/kick/route.ts`. A rota:
   - pede o token;
-  - chama `GET /public/v2/livestreams?limit=1`;
-  - devolve **só** o status HTTP, a latência e se o corpo é JSON. Nada de token nem de dados.
+  - chama `GET /public/v2/livestreams?category_id=13155&limit=1000` e segue o cursor;
+  - devolve **só** números: status HTTP, latência, páginas, total de lives e se o corpo é JSON. Nada de token nem de dados pessoais.
+- Uma página temporária no mesmo Preview embute `player.kick.com/<slug>` da maior live, para ver se o player pede login (como o da Twitch). Nessa branch, a CSP libera `player.kick.com` e `images.kick.com`.
 - Credenciais da Kick cadastradas **só em Preview**, pelo painel da Vercel. Depois do teste, apagar a branch e as variáveis.
 
 ## Riscos

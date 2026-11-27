@@ -1,0 +1,69 @@
+{
+  "data": [
+    {
+      "id": "01a20820-1128-7ecf-8288-000000000001",
+      "title": "GTA VI  Live 24/7 | Nature & Ambience",
+      "language_code": "en",
+      "tags": [],
+      "has_mature_content": true,
+      "viewer_count": 7,
+      "thumbnail": "https://images.kick.com/video_thumbnails/AAAAAAAAAAAA/BBBBBBBBBBBB/720.webp",
+      "started_at": "2026-11-23T11:17:29Z",
+      "category": {
+        "id": 13155,
+        "name": "Grand Theft Auto VI (GTA)",
+        "thumbnail": "https://files.kick.com/images/subcategories/13155/banner/00000000-0000-0000-0000-000000000000"
+      },
+      "channel": { "slug": "canal_teste_kick_1" },
+      "broadcaster_user": {
+        "id": 1000001,
+        "username": "Canal_Teste_Kick_1",
+        "profile_picture": "https://files.kick.com/images/user/1000001/profile_image/conversion/00000000-0000-0000-0000-000000000001-medium.webp"
+      }
+    },
+    {
+      "id": "01a20820-1128-7ecf-8288-000000000002",
+      "title": "GTA 6 RP | modo história",
+      "language_code": "pt",
+      "tags": ["gta6", "rp"],
+      "has_mature_content": true,
+      "viewer_count": 12114,
+      "thumbnail": "https://images.kick.com/video_thumbnails/CCCCCCCCCCCC/DDDDDDDDDDDD/720.webp",
+      "started_at": "2026-11-27T05:10:00Z",
+      "category": {
+        "id": 13155,
+        "name": "Grand Theft Auto VI (GTA)",
+        "thumbnail": "https://files.kick.com/images/subcategories/13155/banner/00000000-0000-0000-0000-000000000000"
+      },
+      "channel": { "slug": "canal-teste-kick-2" },
+      "broadcaster_user": {
+        "id": 1000002,
+        "username": "canal-teste-kick-2",
+        "profile_picture": "https://files.kick.com/images/user/1000002/profile_image/conversion/00000000-0000-0000-0000-000000000002-medium.webp"
+      }
+    },
+    {
+      "id": "01a20820-1128-7ecf-8288-000000000003",
+      "title": "GTA 6 en vivo",
+      "language_code": "en-IN",
+      "tags": [],
+      "has_mature_content": false,
+      "viewer_count": 0,
+      "thumbnail": "https://web.kick.com/video_thumbnails/EEEEEEEEEEEE/FFFFFFFFFFFF/720.webp",
+      "started_at": "2026-11-27T06:40:00Z",
+      "category": {
+        "id": 13155,
+        "name": "Grand Theft Auto VI (GTA)",
+        "thumbnail": "https://files.kick.com/images/subcategories/13155/banner/00000000-0000-0000-0000-000000000000"
+      },
+      "channel": { "slug": "canalteste3" },
+      "broadcaster_user": {
+        "id": 1000003,
+        "username": "CanalTeste3",
+        "profile_picture": "https://files.kick.com/images/user/1000003/profile_image/conversion/00000000-0000-0000-0000-000000000003-medium.webp"
+      }
+    }
+  ],
+  "message": "OK",
+  "pagination": { "next_cursor": "" }
+}

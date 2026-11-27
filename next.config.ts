@@ -15,19 +15,21 @@ const isDev = process.env.NODE_ENV === "development";
  * CSP completa (spec 017 / sprint S-12). Sem nonce: nonce obriga renderização dinâmica e é
  * incompatível com o prerender parcial (doc do Next 16, guia content-security-policy), então
  * os scripts inline do Next exigem 'unsafe-inline'. 'unsafe-eval' só no next dev (React).
- * - img-src: miniaturas oficiais em i.ytimg.com (YouTube) e static-cdn.jtvnw.net (Twitch, spec 031).
- * - frame-src: players oficiais em www.youtube.com e player.twitch.tv (spec 031). Origens exatas, sem curinga.
- * - connect-src fica 'self': o navegador só fala com a nossa API; Twitch e YouTube são chamados no servidor.
+ * - img-src: miniaturas oficiais em i.ytimg.com (YouTube), static-cdn.jtvnw.net (Twitch, spec 031)
+ *   e images.kick.com e web.kick.com (Kick, spec 050; os dois CDNs vistos no spike, spec 020).
+ * - frame-src: players oficiais em www.youtube.com, player.twitch.tv (spec 031) e player.kick.com (spec 050).
+ *   Origens exatas, sem curinga.
+ * - connect-src fica 'self': o navegador só fala com a nossa API; YouTube, Twitch e Kick são chamados no servidor.
  * - O Vercel Web Analytics é servido no próprio domínio, coberto por 'self'.
  */
 export const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://i.ytimg.com https://static-cdn.jtvnw.net",
+  "img-src 'self' data: blob: https://i.ytimg.com https://static-cdn.jtvnw.net https://images.kick.com https://web.kick.com",
   "font-src 'self'",
   "connect-src 'self'",
-  "frame-src https://www.youtube.com https://player.twitch.tv",
+  "frame-src https://www.youtube.com https://player.twitch.tv https://player.kick.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

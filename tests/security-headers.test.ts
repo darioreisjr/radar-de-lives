@@ -52,8 +52,16 @@ describe("CSP completa (spec 017)", () => {
 
   it("libera só o necessário para miniaturas, player e Analytics", () => {
     expect(csp["default-src"]).toEqual(["'self'"]);
-    expect(csp["img-src"]).toEqual(["'self'", "data:", "blob:", "https://i.ytimg.com", "https://static-cdn.jtvnw.net"]);
-    expect(csp["frame-src"]).toEqual(["https://www.youtube.com", "https://player.twitch.tv"]);
+    expect(csp["img-src"]).toEqual([
+      "'self'",
+      "data:",
+      "blob:",
+      "https://i.ytimg.com",
+      "https://static-cdn.jtvnw.net",
+      "https://images.kick.com",
+      "https://web.kick.com",
+    ]);
+    expect(csp["frame-src"]).toEqual(["https://www.youtube.com", "https://player.twitch.tv", "https://player.kick.com"]);
     expect(csp["connect-src"]).toEqual(["'self'"]);
     expect(csp["font-src"]).toEqual(["'self'"]);
   });
@@ -69,6 +77,21 @@ describe("CSP completa (spec 017)", () => {
       for (const v of values) expect(v).not.toMatch(/\*|^https?:$/);
     }
     // Chamadas à Twitch são do servidor: o navegador só fala com a nossa API (D2).
+    expect(csp["connect-src"]).toEqual(["'self'"]);
+  });
+
+  it("Kick (spec 050): só as origens exatas, sem curinga; YouTube e Twitch sem mudança", () => {
+    expect(csp["img-src"]).toEqual(expect.arrayContaining(["https://images.kick.com", "https://web.kick.com"]));
+    expect(csp["frame-src"]).toContain("https://player.kick.com");
+    // Foto de perfil e capa da categoria não aparecem no card (D1).
+    expect(csp["img-src"]).not.toContain("https://files.kick.com");
+    // YouTube e Twitch continuam liberados como antes (CA3).
+    expect(csp["img-src"]).toEqual(expect.arrayContaining(["https://i.ytimg.com", "https://static-cdn.jtvnw.net"]));
+    expect(csp["frame-src"]).toEqual(expect.arrayContaining(["https://www.youtube.com", "https://player.twitch.tv"]));
+    for (const values of Object.values(csp)) {
+      for (const v of values) expect(v).not.toMatch(/\*|^https?:$/);
+    }
+    // API e token da Kick são chamados no servidor (D3).
     expect(csp["connect-src"]).toEqual(["'self'"]);
   });
 

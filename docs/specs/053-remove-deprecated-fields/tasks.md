@@ -1,0 +1,21 @@
+# 053 — Tarefas
+
+- [x] Tipos sem `videoId`; `LivesPayload.source` → `demo?: true`. (D1, D4)
+- [x] `withIdentity(CachedLiveItem)`: preenche `id` de itens antigos e sempre remove `videoId`. (D2)
+- [x] Normalização do YouTube e da Twitch e fixtures sem `videoId`; `dedupeByVideoId` removido. (D1, D7)
+- [x] Provedor do YouTube monta o status sem `videoId`; provedor da Twitch passa os itens por `withIdentity`; status da Twitch sem `videoId` ao gravar e ao ler do cache. (D2, D3)
+- [x] `app/api/lives/[videoId]` apagada; `/api/lives` sem `source`; `status-handler` sem `idLabel`. (D5)
+- [x] Cliente: `lives-provider.tsx` com `demo: true`; `explorer-state.ts` com `Meta.demo`. (D4)
+- [x] Testes:
+  - unitários e e2e sem `videoId`/`source`; o mock do e2e não aceita mais `/api/lives/<id>`;
+  - caracterização com a coluna `videoId` lida de `sourceId`: **snapshot sem nenhuma mudança** (D6, CA5);
+  - `tests/remove-deprecated.test.ts` (6 testes): cache do YouTube antes da 021 e da Fase 1 pelo agregador, itens e status da Twitch com `videoId` no cache, fixtures, marcação `demo`, rota antiga inexistente (CA1 a CA4);
+  - `tests/identity.test.ts`: item da Fase 1 sai igual, só sem `videoId`.
+- [x] README (API, contagens, tabela de specs) e CLAUDE.md (identidade, rotas).
+- [x] Verificação em 2026-11-27:
+  - lint e typecheck: ok;
+  - `npm test`: 27 arquivos, 266 testes;
+  - `npm run build`: ok (dentro do e2e);
+  - `npm run test:e2e`: 72 testes;
+  - build local (`next start`): `GET /api/lives/aaaaaaaaaaa` → **404**; `GET /api/status/youtube/aaaaaaaaaaa` → 200 (CA4). Observação: o `.env.local` tem a chave real do YouTube, então essa checagem gastou 1 unidade de `videos.list`; sem Upstash no `.env.local`, nada foi gravado no Redis.
+- [ ] Depois do deploy: em produção, `/api/lives` sem `videoId` e `source`; `/api/lives/<id>` → 404.

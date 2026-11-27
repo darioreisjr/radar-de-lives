@@ -1,3 +1,4 @@
+import { withIdentity } from "@/lib/lives/identity";
 import type { TwitchLivesService } from "@/lib/twitch/service";
 import { TWITCH_LOGIN, type TwitchStatusService } from "@/lib/twitch/status";
 import type { LivesProvider } from "./types";
@@ -16,7 +17,9 @@ export function createTwitchProvider(service: TwitchLivesService | null, statusS
     isConfigured: () => service !== null,
     async getLives() {
       if (!service) throw new Error("Twitch não configurada");
-      return service.getLives();
+      const r = await service.getLives();
+      // Itens gravados antes da spec 053 ainda trazem `videoId` (D2).
+      return { ...r, items: r.items.map(withIdentity) };
     },
     status: statusService
       ? {

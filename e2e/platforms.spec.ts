@@ -18,7 +18,6 @@ function twitchItem(n: number, over: Partial<LiveItem> = {}): LiveItem {
     id: `twitch:${login}`,
     platform: "twitch",
     sourceId: login,
-    videoId: login,
     title: `Live da Twitch ${n}`,
     thumbnailUrl: null,
     watchUrl: `https://www.twitch.tv/${login}`,

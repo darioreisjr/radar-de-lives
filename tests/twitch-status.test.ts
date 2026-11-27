@@ -34,10 +34,10 @@ describe("revalidação da Twitch (spec 030)", () => {
   it("CA1: canal ao vivo → live com espectadores atualizados", async () => {
     const { service, helix } = setup(liveReply);
     const r = await service.getStatus("Canal_X");
+    expect(r).not.toHaveProperty("videoId"); // spec 053
     expect(r).toMatchObject({
       platform: "twitch",
       sourceId: "canal_x",
-      videoId: "canal_x",
       state: "live",
       embedAllowed: true,
       concurrentViewers: 777,

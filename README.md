@@ -118,7 +118,7 @@ Modelo completo em [.env.example](.env.example).
 | `npm run dev` | Servidor de desenvolvimento |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Gera tipos de rota e roda `tsc --noEmit` |
-| `npm test` | Testes unitários (Vitest, 259 testes em 26 arquivos), sem chamadas reais às APIs |
+| `npm test` | Testes unitários (Vitest, 266 testes em 27 arquivos), sem chamadas reais às APIs |
 | `npm run test:e2e` | Testes de interface (Playwright, 72 testes: 36 em desktop e 36 em 375 px), sem chave, sem quota e sem chamadas à Twitch. Antes, uma vez: `npx playwright install chromium`. Com `E2E_BASE_URL=<url>`, roda contra um deploy |
 | `npm run build` / `npm start` | Build e servidor de produção |
 
@@ -128,14 +128,14 @@ Modelo completo em [.env.example](.env.example).
 
 - `q` ≤ 80 caracteres; `pageToken` `[A-Za-z0-9_-]{1,128}`; outros parâmetros → `400`.
 - `q`, `lang` e `sort` filtram resultados já buscados (sem gastar quota).
-- Resposta: `items`, `updatedAt`, `cached`, `stale`, `nextPageToken`, `sources` e `source`.
-  - Cada item tem `id` (`<plataforma>:<sourceId>`), `platform`, `sourceId`, `isMature` e `rank`. `videoId` é **obsoleto** (igual a `sourceId`).
+- Resposta: `items`, `updatedAt`, `cached`, `stale`, `nextPageToken` e `sources`.
+  - Cada item tem `id` (`<plataforma>:<sourceId>`), `platform`, `sourceId` (id do vídeo no YouTube, login do canal na Twitch), `isMature` e `rank`. O antigo `videoId` saiu em 2026-11-27 ([spec 053](docs/specs/053-remove-deprecated-fields/)).
   - `sources`: um status por plataforma ativa (`platform`, `ok`, `cached`, `stale`, `updatedAt`, `errorCode`). Se uma falhar, as outras continuam e a página mostra o aviso de resultado parcial.
-  - `stale` é `true` se alguma plataforma serviu dados antigos. `source` só distingue dados reais de dados simulados de desenvolvimento.
+  - `stale` é `true` se alguma plataforma serviu dados antigos.
 
 `GET /api/status/{platform}/{id}` — revalida uma live ao abrir o player (`platform` = `youtube` ou `twitch`; na Twitch, `id` é o login do canal): `platform`, `sourceId`, `state` (`live|ended|upcoming|unavailable`), `embedAllowed`, `concurrentViewers`, `checkedAt`, `cached`. Cache de 60 s. Plataforma inativa ou id inválido → `400`.
 
-`GET /api/lives/{videoId}` — **obsoleta**; mesma resposta de `/api/status/youtube/{videoId}`.
+A antiga `GET /api/lives/{videoId}` foi removida (responde `404`); use `/api/status/youtube/{id}`.
 
 Erros: `missing_api_key`, `quota_exceeded`, `rate_limited`, `upstream_unavailable`, `upstream_config`, `invalid_params`. Rate limit: 30 requisições/minuto por cliente.
 
@@ -236,6 +236,7 @@ O projeto segue **Spec-Driven Development** ([skill](.claude/skills/sdd/SKILL.md
 | [043-multiplatform-docs](docs/specs/043-multiplatform-docs/) | Documentação multiplataforma | ✅ |
 | [044-twitch-login-notice](docs/specs/044-twitch-login-notice/) | Aviso de login antes do player da Twitch | ✅ |
 | [045-player-focus-return](docs/specs/045-player-focus-return/) | Foco volta ao card ao fechar o player de live encerrada | ✅ |
+| [053-remove-deprecated-fields](docs/specs/053-remove-deprecated-fields/) | Remoção de `videoId`, da rota `/api/lives/[videoId]` e de `source` | ✅ |
 
 **Commits:** [Conventional Commits](https://www.conventionalcommits.org/pt-br/) em pt-BR, sem linha de coautor (ex.: `feat(store): ...`, `docs(specs): ...`).
 

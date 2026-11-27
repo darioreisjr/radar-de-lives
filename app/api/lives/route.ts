@@ -25,7 +25,6 @@ export async function GET(request: NextRequest) {
       cached: result.cached,
       stale: result.stale,
       nextPageToken: result.nextPageToken,
-      source: "youtube",
       sources: result.sources,
     };
     return Response.json(body, { headers: { "Cache-Control": "no-store" } });

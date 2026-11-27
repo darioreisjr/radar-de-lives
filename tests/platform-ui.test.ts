@@ -7,7 +7,7 @@ import { activePlatforms, hasPartialFailure, isMultiPlatform } from "@/lib/lives
 import type { LiveItem, Platform, SourceStatus } from "@/lib/lives/types";
 
 const item = (platform: Platform, id: string, extra: Partial<LiveItem> = {}): LiveItem => ({
-  id: liveId(platform, id), platform, sourceId: id, videoId: id,
+  id: liveId(platform, id), platform, sourceId: id,
   title: `Live ${id}`, description: "", channelId: "c", channelTitle: "c", thumbnailUrl: null,
   publishedAt: null, liveStartedAt: null, concurrentViewers: null, language: "pt",
   watchUrl: "", embedUrl: "", isLive: true, embedAllowed: true, isMature: false, rank: 0, ...extra,

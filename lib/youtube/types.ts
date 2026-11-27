@@ -15,7 +15,7 @@ export type {
 
 export type VideoLiveState = "live" | "ended" | "upcoming" | "unavailable";
 
-/** Resposta de GET /api/lives/[videoId] (spec 002 RF2). */
+/** Resultado interno da revalidação de um vídeo (spec 002 RF2); a rota pública é /api/status/youtube/[id]. */
 export interface VideoStatusPayload {
   videoId: string;
   state: VideoLiveState;

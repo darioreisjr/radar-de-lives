@@ -4,7 +4,7 @@ import type { LiveStatusPayload } from "@/lib/lives/types";
 
 const ok = (p: Partial<LiveStatusPayload>): StatusCheck => ({
   status: "ok",
-  data: { platform: "youtube", sourceId: "x", videoId: "x", state: "live", embedAllowed: true, concurrentViewers: null, checkedAt: "", cached: false, ...p },
+  data: { platform: "youtube", sourceId: "x", state: "live", embedAllowed: true, concurrentViewers: null, checkedAt: "", cached: false, ...p },
 });
 const base = { demo: false, listEmbedAllowed: true as boolean | "unknown", consented: false };
 

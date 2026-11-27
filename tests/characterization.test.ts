@@ -5,6 +5,9 @@
  * Durante a Fase 1, o snapshot só pode mudar para ACRESCENTAR campos; nenhum valor
  * dos campos da v1.0 pode mudar. Por isso o snapshot guarda só os campos da v1.0
  * (V1_KEYS), e os campos novos são verificados por testes próprios.
+ *
+ * Spec 053: `videoId` saiu do payload. A coluna `videoId` da v1.0 passa a ser lida de
+ * `sourceId` (mesmo valor), e o snapshot continua idêntico (D6).
  */
 import { describe, expect, it, vi } from "vitest";
 import { MemoryCache } from "@/lib/cache/memory-cache";
@@ -36,7 +39,7 @@ const V1_KEYS = [
 function v1(items: readonly object[]) {
   return items.map((it) => {
     const rec = it as Record<string, unknown>;
-    return Object.fromEntries(V1_KEYS.map((k) => [k, rec[k]]));
+    return Object.fromEntries(V1_KEYS.map((k) => [k, k === "videoId" ? rec.sourceId : rec[k]]));
   });
 }
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { applyLiveFilters } from "@/lib/lives/filter";
 import { inferLanguage } from "@/lib/utils/infer-language";
-import { dedupeByVideoId, normalizeLives, parseViewers } from "@/lib/youtube/normalize";
+import { normalizeLives, parseViewers } from "@/lib/youtube/normalize";
 import { buildCombinedQuery } from "@/lib/youtube/searches";
 import type { YtSearchItem, YtVideoItem } from "@/lib/youtube/types";
 
@@ -27,8 +27,7 @@ const d = (id: string, extra: Partial<YtVideoItem> = {}): YtVideoItem => ({
 describe("dedupe", () => {
   it("remove videoIds repetidos mantendo a primeira ocorrência (CA5)", () => {
     const items = normalizeLives([s("aaaaaaaaaaa"), s("bbbbbbbbbbb"), s("aaaaaaaaaaa", "dup")], [d("aaaaaaaaaaa"), d("bbbbbbbbbbb")]);
-    expect(items.map((i) => i.videoId)).toEqual(["aaaaaaaaaaa", "bbbbbbbbbbb"]);
-    expect(dedupeByVideoId([{ videoId: "x" }, { videoId: "x" }, { videoId: "y" }])).toHaveLength(2);
+    expect(items.map((i) => i.sourceId)).toEqual(["aaaaaaaaaaa", "bbbbbbbbbbb"]);
   });
 
   it("ignora resultados sem videoId válido", () => {
@@ -65,7 +64,7 @@ describe("revalidação de lives (D10)", () => {
         d("ccccccccccc", { snippet: { liveBroadcastContent: "none" } }),
       ],
     );
-    expect(items.map((i) => i.videoId)).toEqual(["aaaaaaaaaaa"]);
+    expect(items.map((i) => i.sourceId)).toEqual(["aaaaaaaaaaa"]);
   });
   it("decodifica entidades HTML e monta URLs oficiais", () => {
     const [item] = normalizeLives([s("aaaaaaaaaaa", "GTA 6 &amp; amigos &#39;ao vivo&#39;")], null);
@@ -127,18 +126,18 @@ describe("filtros e ordenação", () => {
     ],
   );
   it("viewers: maior primeiro e sem contagem no fim", () => {
-    expect(applyLiveFilters(base, { lang: "all", sort: "viewers" }).map((i) => i.videoId)).toEqual([
+    expect(applyLiveFilters(base, { lang: "all", sort: "viewers" }).map((i) => i.sourceId)).toEqual([
       "ccccccccccc",
       "aaaaaaaaaaa",
       "bbbbbbbbbbb",
     ]);
   });
   it("recent: início mais recente primeiro", () => {
-    expect(applyLiveFilters(base, { lang: "all", sort: "recent" })[0].videoId).toBe("bbbbbbbbbbb");
+    expect(applyLiveFilters(base, { lang: "all", sort: "recent" })[0].sourceId).toBe("bbbbbbbbbbb");
   });
   it("texto ignora acentos/caixa; idioma filtra estimado", () => {
     expect(applyLiveFilters(base, { q: "HEÍST", lang: "all", sort: "relevance" })).toHaveLength(1);
-    expect(applyLiveFilters(base, { lang: "es", sort: "relevance" }).map((i) => i.videoId)).toEqual(["bbbbbbbbbbb"]);
+    expect(applyLiveFilters(base, { lang: "es", sort: "relevance" }).map((i) => i.sourceId)).toEqual(["bbbbbbbbbbb"]);
   });
 });
 

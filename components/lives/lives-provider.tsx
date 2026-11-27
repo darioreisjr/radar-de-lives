@@ -44,7 +44,7 @@ async function loadFirstPage(demoAllowed: boolean): Promise<ExplorerAction> {
         cached: false,
         stale: false,
         nextPageToken: null,
-        source: "fixture",
+        demo: true,
       },
     };
   }
@@ -126,7 +126,7 @@ export function LivesProvider({
     dispatch,
     demoAllowed,
     platforms,
-    demo: state.meta?.source === "fixture",
+    demo: state.meta?.demo === true,
     now,
     cooldownLeft: Math.max(0, Math.ceil((cooldownUntil - now) / 1000)),
     refresh,

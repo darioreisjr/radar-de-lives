@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it, vi } from "vitest";
-import { GET as legacyGET } from "@/app/api/lives/[videoId]/route";
 import { GET as statusGET } from "@/app/api/status/[platform]/[id]/route";
 import { MemoryCache } from "@/lib/cache/memory-cache";
 import type { LivesProvider } from "@/lib/lives/providers/types";
@@ -43,19 +42,16 @@ function setup(opts: { limit?: number; extra?: LivesProvider[] } = {}) {
 }
 
 const NEW = { route: "/api/status/[platform]/[id]" };
-const OLD = { idLabel: "videoId", route: "/api/lives/[videoId]" };
 
 describe("rota de status por plataforma (spec 024)", () => {
-  it("CA1: /api/status/youtube/<id> devolve o mesmo que a rota antiga, com platform e sourceId a mais", async () => {
+  it("CA1: /api/status/youtube/<id> devolve o estado do vídeo com platform e sourceId, sem videoId (spec 053)", async () => {
     const a = setup();
     const novo = await a.handle(a.req(), "youtube", ID, NEW);
-    const b = setup();
-    const antigo = await b.handle(b.req(), "youtube", ID, OLD);
-    const direto = await setup().statusService.getStatus(ID); // o que a rota antiga devolvia antes da 024
+    const { videoId, ...direto } = await setup().statusService.getStatus(ID); // resultado interno do YouTube
     const bodyNovo = await novo.json();
     expect(novo.status).toBe(200);
-    expect(bodyNovo).toEqual(await antigo.json());
-    expect(bodyNovo).toEqual({ ...direto, platform: "youtube", sourceId: ID });
+    expect(bodyNovo).toEqual({ ...direto, platform: "youtube", sourceId: videoId });
+    expect(bodyNovo).not.toHaveProperty("videoId");
     expect(novo.headers.get("cache-control")).toBe("no-store");
   });
 
@@ -70,20 +66,18 @@ describe("rota de status por plataforma (spec 024)", () => {
     expect(s.fetchImpl).not.toHaveBeenCalled();
   });
 
-  it("CA3: id inválido → 400 sem chamar provedor; a rota antiga mantém a mensagem de antes", async () => {
+  it("CA3: id inválido → 400 sem chamar provedor", async () => {
     const s = setup();
     const novo = await s.handle(s.req(), "youtube", "x!", NEW);
     expect(novo.status).toBe(400);
-    expect(await novo.json()).toMatchObject({ error: { message: "Parâmetros inválidos: id inválido" } });
-    const antigo = await s.handle(s.req(), "youtube", "x!", OLD);
-    expect(await antigo.json()).toMatchObject({ error: { code: "invalid_params", message: "Parâmetros inválidos: videoId inválido" } });
+    expect(await novo.json()).toMatchObject({ error: { code: "invalid_params", message: "Parâmetros inválidos: id inválido" } });
     expect(s.fetchImpl).not.toHaveBeenCalled();
   });
 
   it("CA4: rate limit compartilhado com 429, Retry-After e no-store", async () => {
     const s = setup({ limit: 2 });
     expect((await s.handle(s.req(), "youtube", ID, NEW)).status).toBe(200);
-    expect((await s.handle(s.req(), "youtube", ID, OLD)).status).toBe(200);
+    expect((await s.handle(s.req(), "youtube", ID, NEW)).status).toBe(200);
     const res = await s.handle(s.req(), "youtube", ID, NEW);
     expect(res.status).toBe(429);
     expect(Number(res.headers.get("retry-after"))).toBeGreaterThan(0);
@@ -114,16 +108,14 @@ describe("rota de status por plataforma (spec 024)", () => {
     expect(s.log).toHaveBeenCalledWith("route_error", { route: "/api/status/[platform]/[id]" });
   });
 
-  it("rotas reais (sem chave do YouTube): as duas respondem igual e a nova recusa plataforma inativa", async () => {
+  it("rota real (sem chave do YouTube): 503 no YouTube e 400 em plataforma inativa", async () => {
     vi.stubEnv("YOUTUBE_API_KEY", "");
     vi.stubEnv("LIVES_PROVIDERS", "");
     try {
       const ctxNew = { params: Promise.resolve({ platform: "youtube", id: ID }) };
-      const ctxOld = { params: Promise.resolve({ videoId: ID }) };
       const rNew = await statusGET(new NextRequest(`http://localhost/api/status/youtube/${ID}`), ctxNew);
-      const rOld = await legacyGET(new NextRequest(`http://localhost/api/lives/${ID}`), ctxOld);
       expect(rNew.status).toBe(503);
-      expect(await rNew.json()).toEqual(await rOld.json());
+      expect(await rNew.json()).toMatchObject({ error: { code: "missing_api_key" } });
       const inativa = await statusGET(new NextRequest(`http://localhost/api/status/twitch/x`), {
         params: Promise.resolve({ platform: "twitch", id: "x" }),
       });

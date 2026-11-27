@@ -49,7 +49,6 @@ export function normalizeStream(s: TwitchStream, rank: number, mature: boolean):
     id: liveId("twitch", login),
     platform: "twitch",
     sourceId: login,
-    videoId: login,
     title: s.title.trim() || "Sem título",
     description: "",
     channelId: s.user_id,

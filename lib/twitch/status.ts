@@ -42,7 +42,10 @@ export function createTwitchStatusService(deps: TwitchStatusDeps) {
     const login = id.toLowerCase();
     const hit = await store("cache.get", () => deps.cache.get(login));
     if (hit && now() - hit.storedAt < deps.ttlMs) {
-      return { ...hit.value, checkedAt: new Date(hit.storedAt).toISOString(), cached: true };
+      // Entradas gravadas antes da spec 053 ainda trazem `videoId` (D3).
+      const value: TwitchStatusData & { videoId?: string } = { ...hit.value };
+      delete value.videoId;
+      return { ...value, checkedAt: new Date(hit.storedAt).toISOString(), cached: true };
     }
     const running = inflight.get(login);
     if (running) return running;
@@ -54,7 +57,6 @@ export function createTwitchStatusService(deps: TwitchStatusDeps) {
         const value: TwitchStatusData = {
           platform: "twitch",
           sourceId: login,
-          videoId: login,
           state: live ? "live" : "ended",
           embedAllowed: true,
           concurrentViewers: live ? twitchViewers(live.viewer_count) : null,

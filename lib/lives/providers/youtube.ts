@@ -19,14 +19,15 @@ export function createYoutubeProvider(
     isConfigured: () => configured,
     async getLives({ pageToken }) {
       const r = await service.getLives(pageToken);
-      // Itens gravados no cache antes da spec 021 não têm id/platform (D8, incidente do #64).
+      // Itens do cache em formatos antigos (specs 021 e 053; incidente do #64).
       return { ...r, items: r.items.map(withIdentity) };
     },
     status: statusService && {
       isValidId: (id) => VIDEO_ID.test(id),
       async getStatus(id) {
-        const s = await statusService.getStatus(id);
-        return { ...s, platform: "youtube", sourceId: s.videoId };
+        // Payload público sem `videoId` (spec 053 D3).
+        const { videoId, ...s } = await statusService.getStatus(id);
+        return { ...s, platform: "youtube", sourceId: videoId };
       },
     },
   };

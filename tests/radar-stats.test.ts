@@ -4,7 +4,7 @@ import type { LiveItem } from "@/lib/lives/types";
 
 const item = (videoId: string, extra: Partial<LiveItem> = {}): LiveItem => ({
   id: `youtube:${videoId}`, platform: "youtube", sourceId: videoId,
-  videoId, title: videoId, description: "", channelId: "c", channelTitle: `Canal ${videoId}`, thumbnailUrl: null,
+  title: videoId, description: "", channelId: "c", channelTitle: `Canal ${videoId}`, thumbnailUrl: null,
   publishedAt: null, liveStartedAt: null, concurrentViewers: null, language: "unknown",
   watchUrl: "", embedUrl: "", isLive: true, embedAllowed: true, isMature: false, rank: 0, ...extra,
 });
@@ -30,7 +30,7 @@ describe("painel do radar (spec 007 CA5)", () => {
   });
 
   it("maior público informado ignora encerradas e não trata ausência como zero", () => {
-    expect(topAudience(items)?.videoId).toBe("c");
+    expect(topAudience(items)?.sourceId).toBe("c");
     expect(topAudience([item("x"), item("y")])).toBeNull();
   });
 

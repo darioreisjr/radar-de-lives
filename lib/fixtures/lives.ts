@@ -26,7 +26,6 @@ export function getDemoLives(): LiveItem[] {
       id: liveId("youtube", videoId),
       platform: "youtube",
       sourceId: videoId,
-      videoId,
       title: b.title,
       description: "Item simulado para desenvolvimento visual.",
       channelId: `demo-channel-${i + 1}`,

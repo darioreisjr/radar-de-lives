@@ -1,25 +1,25 @@
 # Radar de Lives
 
-Diretório independente para encontrar transmissões **públicas** de GTA 6 que estejam ao vivo no **YouTube** e na **Twitch**.
-Mostra **lives encontradas** pelas buscas oficiais (YouTube Data API v3 e API Helix da Twitch). As buscas **não garantem cobertura completa**.
+Diretório independente para encontrar transmissões **públicas** de GTA 6 que estejam ao vivo no **YouTube**, na **Twitch** e na **Kick**.
+Mostra **lives encontradas** pelas buscas oficiais (YouTube Data API v3, API Helix da Twitch e API pública da Kick). As buscas **não garantem cobertura completa**.
 
-> Projeto independente de fãs. Não afiliado à Rockstar Games, Take-Two Interactive, YouTube ou Twitch. GTA e Grand Theft Auto são marcas de seus respectivos proprietários.
+> Projeto independente de fãs. Não afiliado à Rockstar Games, Take-Two Interactive, YouTube, Twitch ou Kick. GTA e Grand Theft Auto são marcas de seus respectivos proprietários.
 
 ## Status
 
 **Em produção:** https://radardelives.darioreis.dev — Vercel + Upstash Redis + Vercel Web Analytics.
 
-MVP do [PRD](docs/product/PRD_Radar_de_Lives_GTA6.md) concluído e verificado em produção (fatias 001–007). A **Twitch** está ativa desde 2026-11-25 (adendo do PRD, seção 12; plano em [`docs/plans/multiplataforma.md`](docs/plans/multiplataforma.md)). A **Kick** depende do spike [#31](https://github.com/darioreisjr/radar-de-lives/issues/31). Veja [Pendências](#pendências).
+MVP do [PRD](docs/product/PRD_Radar_de_Lives_GTA6.md) concluído e verificado em produção (fatias 001–007). A **Twitch** está ativa desde 2026-11-25 e a **Kick** desde 2026-11-27 (adendo do PRD, seção 12; plano em [`docs/plans/multiplataforma.md`](docs/plans/multiplataforma.md)). Veja [Pendências](#pendências).
 
 ## Funcionalidades
 
 - Aceite da política na primeira visita ("Li e concordo. Continuar"), exigido pelas políticas do YouTube. Antes dele, o site não busca lives nem carrega miniaturas de nenhuma plataforma; a escolha fica só no navegador ([spec 016](docs/specs/016-consent-notice/)).
-- **Uma lista só**, com as lives das plataformas ativas intercaladas por posição. Com mais de uma plataforma: selo de texto em cada card ("YouTube", "Twitch"), filtro "Plataforma" e contagem por plataforma no radar ([spec 026](docs/specs/026-platform-badge-filter/)).
+- **Uma lista só**, com as lives das plataformas ativas intercaladas por posição. Com mais de uma plataforma: selo de texto em cada card ("YouTube", "Twitch", "Kick"), filtro "Plataforma" e contagem por plataforma no radar ([spec 026](docs/specs/026-platform-badge-filter/)).
 - Painel do radar no topo da página: lives no ar, por plataforma, distribuição por idioma estimado e maior público informado, calculados da mesma consulta da grade (sem quota extra e sem números inventados).
-- Grade de lives com miniatura, título, canal, horário de início, idioma estimado e espectadores (ou "Não informado", nunca zero). Selo "Conteúdo adulto" quando a plataforma marca o canal (na Twitch, pelos rótulos de classificação; o rótulo do jogo sozinho não conta).
+- Grade de lives com miniatura, título, canal, horário de início, idioma estimado e espectadores (ou "Não informado", nunca zero). Selo "Conteúdo adulto" quando a plataforma marca o canal (na Twitch, pelos rótulos de classificação; o rótulo do jogo sozinho não conta). Na Kick, o selo não aparece: a Kick marca quase toda a categoria de GTA 6 como adulta.
 - Busca por texto, filtros de plataforma e de idioma estimado (pt/en/es/outro), ordenação por relevância, espectadores ou mais recentes.
 - Botão "Atualizar" com cooldown de 30 s e "Carregar mais" por clique (sem rolagem infinita).
-- Link para a plataforma (nova aba) e "Assistir aqui": diálogo que confere se a live continua, pede consentimento e só então carrega o **player oficial** da plataforma, sem autoplay, sempre com "Abrir no YouTube"/"Abrir na Twitch" como alternativa. Na Twitch, o diálogo avisa que a plataforma pode pedir login ([spec 044](docs/specs/044-twitch-login-notice/)).
+- Link para a plataforma (nova aba) e "Assistir aqui": diálogo que confere se a live continua, pede consentimento e só então carrega o **player oficial** da plataforma, sem autoplay, sempre com "Abrir no YouTube"/"Abrir na Twitch"/"Abrir na Kick" como alternativa. Na Twitch, o diálogo avisa que a plataforma pode pedir login ([spec 044](docs/specs/044-twitch-login-notice/)); o player da Kick toca sem login.
 - Estados de carregamento, vazio, erro, quota esgotada, dados antigos (stale), resultado parcial (uma plataforma fora do ar), live encerrada, incorporação desativada e tela estreita para o player.
 - Páginas de [privacidade](https://radardelives.darioreis.dev/privacy) e [termos](https://radardelives.darioreis.dev/terms) e imagem de compartilhamento (Open Graph) no mesmo visual da home.
 - Acessível por teclado, contraste WCAG verificado por teste, respeita `prefers-reduced-motion`.
@@ -38,14 +38,15 @@ Cores e contraste ficam em `lib/config/design-tokens.ts` e são verificados por 
 
 ## Limitações conhecidas
 
-- **Cobertura:** no YouTube, a busca depende de títulos, idioma e região; na Twitch, da categoria "Grand Theft Auto VI" e dos idiomas pt/en/es, até 100 lives (as de maior público) por padrão. Lives fora disso não aparecem.
+- **Cobertura:** no YouTube, a busca depende de títulos, idioma e região; na Twitch e na Kick, da categoria de GTA 6 e dos idiomas pt/en/es, até 100 lives de cada (as de maior público). Lives fora disso não aparecem.
 - **Quota do YouTube:** 100 buscas/dia por padrão. Quando acaba, o site mostra resultados salvos (sinalizados) ou o aviso de limite até a renovação (meia-noite do Pacífico); com outra plataforma ativa, as lives dela continuam aparecendo.
 - **Idioma e relação com o jogo são estimados** a partir de metadados e título.
 - **Lives podem terminar** depois da última atualização; o player confere antes de abrir.
 - O app não detecta erros dentro do player incorporado (direitos autorais, região); o link para a plataforma fica sempre visível.
 - **Twitch pede login no player:** GTA 6 é classificado como jogo para adultos na Twitch, e o player embutido exige conta logada (e cookies de terceiros liberados). Quem não estiver logado usa "Abrir na Twitch".
 - **Twitch em telas estreitas:** o player exige 400×300 px; abaixo disso, o diálogo mostra só o link.
-- **Lista intercalada:** com mais lives da Twitch que do YouTube, o fim da lista tem só lives da Twitch.
+- **Kick: qualidade do embed:** o player embutido da Kick mostra "Visit KICK for HD quality"; a qualidade máxima fica no site da Kick.
+- **Lista intercalada:** com mais lives da Twitch e da Kick que do YouTube, o fim da lista tem só lives delas.
 
 ## Stack
 
@@ -65,7 +66,7 @@ Sem `YOUTUBE_API_KEY`, `GET /api/lives` responde `503 missing_api_key`. Em desen
 
 Sem as variáveis do Upstash, cache, quota e rate limit ficam em memória — adequado para desenvolvimento.
 
-Por padrão (`LIVES_PROVIDERS` vazia ou `youtube`), só o YouTube fica ativo. Para ligar a Twitch, veja [Ligar a Twitch](#ligar-a-twitch).
+Por padrão (`LIVES_PROVIDERS` vazia ou `youtube`), só o YouTube fica ativo. Para ligar a Twitch e a Kick, veja [Ligar a Twitch](#ligar-a-twitch) e [Ligar a Kick](#ligar-a-kick).
 
 ### Obter a chave do YouTube
 
@@ -88,23 +89,41 @@ Por padrão (`LIVES_PROVIDERS` vazia ou `youtube`), só o YouTube fica ativo. Pa
 
 Sem `TWITCH_CLIENT_ID` e `TWITCH_CLIENT_SECRET`, a Twitch fica de fora mesmo listada em `LIVES_PROVIDERS` (com o aviso `provider_disabled` no log), e o site segue só com o YouTube. Sem `YOUTUBE_API_KEY`, o YouTube aparece como indisponível e a Twitch continua.
 
+### Ligar a Kick
+
+1. Ative a verificação em duas etapas (2FA) na sua conta da Kick e crie um app em https://kick.com/settings/developer: nome livre, Redirect URL `http://localhost` (o site não usa login de usuário), **nenhuma permissão (scope)** e webhooks desligados. Copie o **Client ID** e o **Client Secret**.
+2. Em `.env.local` (nunca com `NEXT_PUBLIC_`, nunca em commit, issue ou chat):
+   ```bash
+   LIVES_PROVIDERS=youtube,twitch,kick
+   KICK_CLIENT_ID=...
+   KICK_CLIENT_SECRET=...
+   ```
+   `KICK_CATEGORY_ID` já vem com o padrão `13155` (Grand Theft Auto VI (GTA)).
+3. Reinicie `npm run dev` e confira `GET /api/lives` (`sources` com `kick`) e o filtro "Plataforma".
+
+Sem `KICK_CLIENT_ID` e `KICK_CLIENT_SECRET`, a Kick fica de fora mesmo listada em `LIVES_PROVIDERS`. Os [Developer Terms da Kick](https://dev.kick.com/terms-of-service) permitem cache de até 24 h, proíbem redistribuir os dados da API e não permitem o player em sites voltados a menores de 16 anos (spec 020).
+
 ## Variáveis de ambiente
 
 | Variável | Obrigatória | Padrão | Uso |
 | --- | --- | --- | --- |
 | `YOUTUBE_API_KEY` | sim | — | Chave da YouTube Data API v3 (somente servidor). Na Vercel: **só Production**. |
-| `LIVES_PROVIDERS` | não | `youtube` | Plataformas ativas, separadas por vírgula, na ordem de intercalação: `youtube`, `twitch` (e `kick`, quando existir). Mudar na Vercel exige redeploy. |
+| `LIVES_PROVIDERS` | não | `youtube` | Plataformas ativas, separadas por vírgula, na ordem de intercalação: `youtube`, `twitch`, `kick`. Mudar na Vercel exige redeploy. |
 | `TWITCH_CLIENT_ID` / `TWITCH_CLIENT_SECRET` | para a Twitch | — | Credenciais do app da Twitch (somente servidor). Sem as duas, a Twitch fica de fora. |
 | `TWITCH_GAME_ID` | não | `1867279146` | Categoria "Grand Theft Auto VI" na Twitch. |
 | `TWITCH_MAX_PAGES` | não | `1` | Páginas de 100 lives buscadas na Twitch (1 a 3), das de maior público. |
 | `TWITCH_CACHE_TTL_SECONDS` | não | `180` | Validade do cache da Twitch (30 a 3600). |
 | `TWITCH_STALE_TTL_SECONDS` | não | `600` | Tempo extra para servir dados antigos se a Twitch falhar (0 a 3600). |
+| `KICK_CLIENT_ID` / `KICK_CLIENT_SECRET` | para a Kick | — | Credenciais do app da Kick (somente servidor). Sem as duas, a Kick fica de fora. |
+| `KICK_CATEGORY_ID` | não | `13155` | Categoria "Grand Theft Auto VI (GTA)" na Kick. |
+| `KICK_CACHE_TTL_SECONDS` | não | `180` | Validade do cache da Kick (30 a 3600). |
+| `KICK_STALE_TTL_SECONDS` | não | `600` | Tempo extra para servir dados antigos se a Kick falhar (0 a 3600). |
 | `NEXT_PUBLIC_SITE_URL` | produção | `siteConfig.url` | URL pública (Open Graph). |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | produção | — | Estado compartilhado. Também aceita `KV_REST_API_URL` / `KV_REST_API_TOKEN` (criadas pela integração da Vercel). |
 | `RATE_LIMIT_SECRET` | não | token do Upstash | Chave do HMAC que pseudonimiza o IP no rate limit. |
 | `LIVE_CACHE_TTL_SECONDS` | não | `900` | Validade do cache de resultados do YouTube. |
 | `LIVE_STALE_TTL_SECONDS` | não | `600` | Tempo extra para servir dados antigos se o YouTube falhar. |
-| `LIVE_RATE_LIMIT_SECONDS` | não | `30` | Intervalo mínimo entre buscas no YouTube e na Twitch (trava compartilhada, uma por plataforma). |
+| `LIVE_RATE_LIMIT_SECONDS` | não | `30` | Intervalo mínimo entre buscas em cada plataforma (trava compartilhada, uma por plataforma). |
 | `YOUTUBE_SEARCH_DAILY_BUDGET` | não | `90` | Limite diário de `search.list` (quota padrão: 100). |
 | `YOUTUBE_DETAILS_DAILY_BUDGET` | não | `2000` | Limite diário de revalidações (`videos.list`). |
 | `YOUTUBE_DEFAULT_REGION` / `YOUTUBE_DEFAULT_LANGUAGE` | não | `BR` / `pt` | Região e idioma de relevância da busca. |
@@ -118,8 +137,8 @@ Modelo completo em [.env.example](.env.example).
 | `npm run dev` | Servidor de desenvolvimento |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Gera tipos de rota e roda `tsc --noEmit` |
-| `npm test` | Testes unitários (Vitest, 266 testes em 27 arquivos), sem chamadas reais às APIs |
-| `npm run test:e2e` | Testes de interface (Playwright, 72 testes: 36 em desktop e 36 em 375 px), sem chave, sem quota e sem chamadas à Twitch. Antes, uma vez: `npx playwright install chromium`. Com `E2E_BASE_URL=<url>`, roda contra um deploy |
+| `npm test` | Testes unitários (Vitest, 327 testes em 32 arquivos), sem chamadas reais às APIs |
+| `npm run test:e2e` | Testes de interface (Playwright, 84 testes: 42 em desktop e 42 em 375 px), sem chave, sem quota e sem chamadas à Twitch ou à Kick. Antes, uma vez: `npx playwright install chromium`. Com `E2E_BASE_URL=<url>`, roda contra um deploy |
 | `npm run build` / `npm start` | Build e servidor de produção |
 
 ## API
@@ -129,11 +148,11 @@ Modelo completo em [.env.example](.env.example).
 - `q` ≤ 80 caracteres; `pageToken` `[A-Za-z0-9_-]{1,128}`; outros parâmetros → `400`.
 - `q`, `lang` e `sort` filtram resultados já buscados (sem gastar quota).
 - Resposta: `items`, `updatedAt`, `cached`, `stale`, `nextPageToken` e `sources`.
-  - Cada item tem `id` (`<plataforma>:<sourceId>`), `platform`, `sourceId` (id do vídeo no YouTube, login do canal na Twitch), `isMature` e `rank`. O antigo `videoId` saiu em 2026-11-27 ([spec 053](docs/specs/053-remove-deprecated-fields/)).
+  - Cada item tem `id` (`<plataforma>:<sourceId>`), `platform`, `sourceId` (id do vídeo no YouTube, login do canal na Twitch, slug do canal na Kick), `isMature` e `rank`. O antigo `videoId` saiu em 2026-11-27 ([spec 053](docs/specs/053-remove-deprecated-fields/)).
   - `sources`: um status por plataforma ativa (`platform`, `ok`, `cached`, `stale`, `updatedAt`, `errorCode`). Se uma falhar, as outras continuam e a página mostra o aviso de resultado parcial.
   - `stale` é `true` se alguma plataforma serviu dados antigos.
 
-`GET /api/status/{platform}/{id}` — revalida uma live ao abrir o player (`platform` = `youtube` ou `twitch`; na Twitch, `id` é o login do canal): `platform`, `sourceId`, `state` (`live|ended|upcoming|unavailable`), `embedAllowed`, `concurrentViewers`, `checkedAt`, `cached`. Cache de 60 s. Plataforma inativa ou id inválido → `400`.
+`GET /api/status/{platform}/{id}` — revalida uma live ao abrir o player (`platform` = `youtube`, `twitch` ou `kick`; na Twitch, `id` é o login do canal; na Kick, o slug, até 25 caracteres): `platform`, `sourceId`, `state` (`live|ended|upcoming|unavailable`), `embedAllowed`, `concurrentViewers`, `checkedAt`, `cached`. Cache de 60 s. Plataforma inativa ou id inválido → `400`.
 
 A antiga `GET /api/lives/{videoId}` foi removida (responde `404`); use `/api/status/youtube/{id}`.
 
@@ -145,20 +164,22 @@ Conforme a documentação oficial consultada em 21/11/2026: `search.list` tem **
 
 Em produção, o Upstash Redis guarda e compartilha entre todas as instâncias:
 
-- cache de resultados (YouTube 15 min; Twitch 3 min) e de revalidações (60 s);
+- cache de resultados (YouTube 15 min; Twitch e Kick 3 min) e de revalidações (60 s);
 - orçamento diário por método (reset à meia-noite do Pacífico);
 - trava que impede buscas simultâneas em cada plataforma;
 - rate limit por cliente (o IP é pseudonimizado com HMAC-SHA256; nunca é gravado em claro).
 
-Se o Upstash falhar, o app **não** chama o YouTube nem a Twitch (protege quota e limites) e serve dados salvos quando houver; o rate limit deixa a requisição passar.
+Se o Upstash falhar, o app **não** chama o YouTube, a Twitch nem a Kick (protege quota e limites) e serve dados salvos quando houver; o rate limit deixa a requisição passar.
 
 **Twitch:** token de app (client credentials) só em memória, renovado antes de expirar; busca de 1 página por padrão (até 100 lives) mais 1 chamada para os rótulos de conteúdo adulto; cache de 180 s + 600 s de dados antigos, bem abaixo das 24 h permitidas pelo Developer Agreement. Limite da Helix: 800 pontos/min.
+
+**Kick:** token de app (client credentials, 60 dias) só em memória; busca na API v2 seguindo o cursor (até 5 páginas de 1000; ~1800 lives em 2 páginas no spike), filtra pt/en/es, ordena por espectadores e fica com as 100 maiores; revalidação pelo slug em `/public/v1/channels` (o schema descarta a chave de transmissão do streamer); cache de 180 s + 600 s, abaixo das 24 h dos Developer Terms. A Kick não documenta limite numérico: `429` é tratado com `Retry-After`.
 
 **Ambientes:** Production usa as chaves de sempre no Redis; Preview e Development usam um prefixo próprio (`preview:`, `development:`), para que um Preview nunca grave no cache da produção ([spec 036](docs/specs/036-preview-store-isolation/)).
 
 ## Telemetria e analytics
 
-- **Logs do servidor** (`lib/telemetry.ts`): eventos JSON por linha — `youtube_call`, `youtube_error`, `budget_exhausted`, `stale_served`, `route_error`, `store_error`, `store_memory_in_production`, `provider_failed`, `provider_disabled`, `config_warning`, `twitch_token`, `twitch_error`, `twitch_call`. Sem IP, chave, token ou URLs do YouTube. Na Vercel, os logs de runtime ficam disponíveis por cerca de 1 hora.
+- **Logs do servidor** (`lib/telemetry.ts`): eventos JSON por linha — `youtube_call`, `youtube_error`, `budget_exhausted`, `stale_served`, `route_error`, `store_error`, `store_memory_in_production`, `provider_failed`, `provider_disabled`, `config_warning`, `twitch_token`, `twitch_error`, `twitch_call`, `kick_token`, `kick_error`, `kick_call`. Sem IP, chave, token ou URLs do YouTube. Na Vercel, os logs de runtime ficam disponíveis por cerca de 1 hora.
 - **Vercel Web Analytics**: page views sem cookies de terceiros; a URL é enviada sem query string nem fragmento.
 
 ## Deploy (Vercel + Upstash)
@@ -174,14 +195,14 @@ Para mudar os ambientes de uma variável, use o painel: na Vercel CLI 59.x, `ver
 
 ### Ligar, desligar e voltar uma plataforma
 
-- **Ligar (ex.: Twitch):** cadastre `TWITCH_CLIENT_ID` e `TWITCH_CLIENT_SECRET` pelo painel, primeiro em **Preview**; inclua a plataforma em `LIVES_PROVIDERS` (`youtube,twitch`) e faça o redeploy. Confira o Preview; depois repita em **Production**, no mesmo deploy que publica `/privacy` e `/terms` citando a plataforma.
-- **Desligar:** tire a plataforma de `LIVES_PROVIDERS` em Production e faça o redeploy (painel → "Redeploy", ou `vercel redeploy <último deploy> --target production`). Leva cerca de 1 minuto, sem mudar código; ensaiado em 2026-11-25.
+- **Ligar (ex.: Kick):** cadastre `KICK_CLIENT_ID` e `KICK_CLIENT_SECRET` pelo painel, primeiro em **Preview**; inclua a plataforma em `LIVES_PROVIDERS` (`youtube,twitch,kick`) e faça o redeploy. Confira o Preview; depois repita em **Production**, no mesmo deploy que publica `/privacy` e `/terms` citando a plataforma.
+- **Desligar:** tire a plataforma de `LIVES_PROVIDERS` em Production e faça o redeploy (painel → "Redeploy", ou `vercel redeploy <último deploy> --target production`). Leva cerca de 1 minuto, sem mudar código; ensaiado com a Twitch (2026-11-25) e com a Kick (2026-11-27).
 - **Conferir:** `GET /api/lives` → `sources` com as plataformas esperadas; `GET /api/status/<plataforma>/<id>` responde `400` para plataforma desligada.
 - No Preview não há `YOUTUBE_API_KEY`: lá o YouTube aparece como indisponível e só as outras plataformas mostram lives.
 
 ## Pendências
 
-- **Multiplataforma:** issues do épico [#28](https://github.com/darioreisjr/radar-de-lives/issues/28); plano, portões e registro de monitoramento em [`docs/plans/multiplataforma.md`](docs/plans/multiplataforma.md). A Kick (#48 a #55) depende do spike #31.
+- **Multiplataforma:** issues do épico [#28](https://github.com/darioreisjr/radar-de-lives/issues/28); plano, portões e registro de monitoramento em [`docs/plans/multiplataforma.md`](docs/plans/multiplataforma.md). A Kick está em monitoramento (#55).
 - **Sprint de finalização** ([`sprint.md`](sprint.md), S-01 a S-15): concluído em 2026-11-23.
 - Não apagar `public/googleae0552e8a704d280.html`: é a verificação do Google Search Console.
 - Registros de legítimo interesse e de transferência internacional guardados pelo responsável (fora do repositório; revisão anual). Se Vercel ou Upstash oferecerem as cláusulas-padrão da ANPD, atualizar a seção "Transferência internacional" de `/privacy`.
@@ -192,7 +213,7 @@ O projeto segue **Spec-Driven Development** ([skill](.claude/skills/sdd/SKILL.md
 
 **Trabalho pendente:** issues do épico #28 e [`sprint.md`](sprint.md). Cada tarefa usa a branch `sprint/<id>` e só altera os arquivos listados nela.
 
-**CI:** cada push e PR para `main` roda lint, typecheck, testes e build no GitHub Actions, e confere que o bundle do cliente não contém o endpoint de token nem o nome das credenciais da Twitch ou da Kick; se passarem, o job `e2e` roda os 72 testes de interface (Playwright) ([`ci.yml`](.github/workflows/ci.yml), [spec 009](docs/specs/009-ci/)).
+**CI:** cada push e PR para `main` roda lint, typecheck, testes e build no GitHub Actions, e confere que o bundle do cliente não contém o endpoint de token nem o nome das credenciais da Twitch ou da Kick; se passarem, o job `e2e` roda os 84 testes de interface (Playwright) ([`ci.yml`](.github/workflows/ci.yml), [spec 009](docs/specs/009-ci/)).
 
 | Fatia | Conteúdo | Status |
 | --- | --- | --- |
@@ -215,7 +236,7 @@ O projeto segue **Spec-Driven Development** ([skill](.claude/skills/sdd/SKILL.md
 | [017-csp](docs/specs/017-csp/) | Content Security Policy completa (S-12) | ✅ |
 | [018-player-status-badge](docs/specs/018-player-status-badge/) | Selo do player conforme o estado revalidado (bug da S-10) | ✅ |
 | [019-twitch-research](docs/specs/019-twitch-research/) | Spike: API Helix da Twitch para lives de GTA 6 | ✅ |
-| [020-kick-research](docs/specs/020-kick-research/) | Spike: API pública da Kick (aguarda dados do responsável, #31) | ⏳ |
+| [020-kick-research](docs/specs/020-kick-research/) | Spike: API pública da Kick (P1 a P4; recomendação: seguir) | ✅ |
 | [021-platform-model](docs/specs/021-platform-model/) | Modelo de live independente de plataforma (`id`, `platform`, `sourceId`) | ✅ |
 | [022-providers-aggregator](docs/specs/022-providers-aggregator/) | Contrato `LivesProvider` e agregador com isolamento de falhas | ✅ |
 | [023-provider-flags](docs/specs/023-provider-flags/) | Ligar e desligar plataformas com `LIVES_PROVIDERS` | ✅ |
@@ -236,7 +257,17 @@ O projeto segue **Spec-Driven Development** ([skill](.claude/skills/sdd/SKILL.md
 | [043-multiplatform-docs](docs/specs/043-multiplatform-docs/) | Documentação multiplataforma | ✅ |
 | [044-twitch-login-notice](docs/specs/044-twitch-login-notice/) | Aviso de login antes do player da Twitch | ✅ |
 | [045-player-focus-return](docs/specs/045-player-focus-return/) | Foco volta ao card ao fechar o player de live encerrada | ✅ |
+| [046-kick-client](docs/specs/046-kick-client/) | Credenciais e cliente HTTP da Kick com token de app | ✅ |
+| [047-kick-search](docs/specs/047-kick-search/) | Busca de lives de GTA 6 na Kick e normalização | ✅ |
+| [048-kick-service](docs/specs/048-kick-service/) | Serviço da Kick com cache e registro no agregador | ✅ |
+| [049-kick-status](docs/specs/049-kick-status/) | Revalidação de lives da Kick pelo slug | ✅ |
+| [050-kick-csp](docs/specs/050-kick-csp/) | CSP: miniaturas e player da Kick | ✅ |
+| [051-kick-player](docs/specs/051-kick-player/) | Player embutido da Kick, com link de fallback | ✅ |
+| [052-kick-legal](docs/specs/052-kick-legal/) | Kick na política de privacidade e nos termos (16 anos) | ✅ |
 | [053-remove-deprecated-fields](docs/specs/053-remove-deprecated-fields/) | Remoção de `videoId`, da rota `/api/lives/[videoId]` e de `source` | ✅ |
+| [054-multiplatform-qa-kick](docs/specs/054-multiplatform-qa-kick/) | QA manual com YouTube, Twitch e Kick | ✅ |
+| [055-player-focus-race](docs/specs/055-player-focus-race/) | Foco devolvido na hora ao fechar o player | ✅ |
+| [056-kick-docs](docs/specs/056-kick-docs/) | Documentação da Kick | ✅ |
 
 **Commits:** [Conventional Commits](https://www.conventionalcommits.org/pt-br/) em pt-BR, sem linha de coautor (ex.: `feat(store): ...`, `docs(specs): ...`).
 

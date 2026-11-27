@@ -100,11 +100,11 @@ Se o usuário pedir uma construção maior, complete a fatia atual antes de inic
 
 ## Regras específicas para Radar de Lives
 
-Valem para todas as plataformas (hoje YouTube e Twitch; Kick só se o spike #31 aprovar):
+Valem para todas as plataformas (hoje YouTube, Twitch e Kick):
 
 - Nunca prometer todas as lives. Usar “Lives encontradas”.
 - Usar só a API oficial de cada plataforma (YouTube Data API, Twitch Helix); não fazer scraping.
-- Confirmar na documentação e nos termos vigentes da plataforma os parâmetros, campos, limites de uso e o tempo máximo de cache permitido (ex.: Developer Agreement da Twitch, até 24 h).
+- Confirmar na documentação e nos termos vigentes da plataforma os parâmetros, campos, limites de uso e o tempo máximo de cache permitido (ex.: Developer Agreement da Twitch e Developer Terms da Kick, até 24 h).
 - Tratar concurrentViewers como opcional e ausente como null.
 - Deduplicar por `id` (`<plataforma>:<sourceId>`). `videoId` é obsoleto.
 - Manter chaves, client secrets e tokens exclusivamente no servidor, sem `NEXT_PUBLIC_` e sem logar.

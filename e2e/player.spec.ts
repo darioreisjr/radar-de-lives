@@ -241,3 +241,40 @@ for (const state of ["ended", "unavailable"] as const) {
     });
   }
 }
+
+/* Spec 055 (#102): o foco precisa estar no card IMEDIATAMENTE depois do Esc, sem esperar o evento
+ * "close" do <dialog> (que o navegador entrega ~100 ms depois quando a página está ocupada). */
+for (const state of ["live", "ended", "unavailable"] as const) {
+  test(`foco no card logo depois do Esc, sem estado intermediário: ${state} (spec 055)`, async ({ page, api }) => {
+    await page.setViewportSize({ width: 1280, height: 860 });
+    const kick = liveItem(6, {
+      id: "kick:canal-kick-6",
+      platform: "kick",
+      sourceId: "canal-kick-6",
+      title: "Live da Kick 6",
+      thumbnailUrl: null,
+      watchUrl: "https://kick.com/canal-kick-6",
+    });
+    await page.route((u) => u.hostname === "player.kick.com", (r) => r.fulfill({ contentType: "text/html", body: "<p>player</p>" }));
+    const sources = (["youtube", "twitch", "kick"] as const).map((platform) => ({ platform, ok: true, cached: false, stale: false, updatedAt: new Date().toISOString() }));
+    api.setLives(ok(livesPayload([liveItem(1), twitchLive(), kick, liveItem(2), liveItem(3), liveItem(4), liveItem(5), liveItem(7), liveItem(8)], { sources })));
+    api.status = (id, platform) => ok(statusPayload(id, state, { platform }));
+    await page.goto("/");
+    const card = page.getByRole("article").filter({ hasText: "Live da Kick 6" });
+    await card.getByRole("button", { name: "Assistir aqui" }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByText(state === "live" ? "Carregar player" : /Esta live terminou|Vídeo indisponível/)).toBeVisible();
+    // Esc e leitura do foco na mesma tarefa: nenhuma espera pelo evento "close".
+    const focused = await page.evaluate(() => {
+      const d = document.querySelector("dialog")!;
+      d.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      const ev = new Event("cancel", { cancelable: true });
+      if (d.dispatchEvent(ev)) d.close();
+      const el = document.activeElement as HTMLElement;
+      return { inDialog: !!el.closest("dialog"), text: (el.textContent ?? "").trim() };
+    });
+    expect(focused.inDialog, "foco não pode ficar no diálogo fechado").toBe(false);
+    expect(focused.text).toContain(state === "live" ? "Assistir aqui" : "Abrir na Kick");
+    await expect(dialog).toBeHidden();
+  });
+}

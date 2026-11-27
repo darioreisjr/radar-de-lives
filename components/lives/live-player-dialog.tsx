@@ -70,6 +70,19 @@ export function LivePlayerDialog({
     if (d && !d.open) d.showModal();
   }, []);
 
+  /**
+   * Fecha e avisa o pai na hora (spec 055). O evento "close" do <dialog> chega numa tarefa
+   * separada (~100 ms depois com a página ocupada); esperar por ele deixava o foco, nesse
+   * intervalo, num botão do diálogo já invisível. `closedRef` evita avisar duas vezes.
+   */
+  const closedRef = useRef(false);
+  function requestClose() {
+    if (closedRef.current) return;
+    closedRef.current = true;
+    ref.current?.close();
+    onClose();
+  }
+
   // Revalida a live ao abrir (spec 002 D5), pela rota de status da plataforma (spec 024/025). Falha não bloqueia (D6).
   useEffect(() => {
     if (demo) return;
@@ -115,7 +128,18 @@ export function LivePlayerDialog({
     <dialog
       ref={ref}
       aria-labelledby={titleId}
-      onClose={onClose}
+      // Esc: fecha na hora, sem esperar o "close" (spec 055).
+      onCancel={(e) => {
+        e.preventDefault();
+        requestClose();
+      }}
+      // Outros caminhos de fechamento (ex.: o navegador fechar o diálogo) continuam avisando o pai.
+      onClose={() => {
+        if (!closedRef.current) {
+          closedRef.current = true;
+          onClose();
+        }
+      }}
       className="m-auto w-[min(960px,calc(100vw-2rem))] max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl bg-surface p-0 text-text-primary ring-1 ring-border backdrop:bg-background/85 backdrop:backdrop-blur-sm open:animate-dialog-in"
     >
       <div className="flex items-start justify-between gap-4 p-4 sm:p-5">
@@ -129,7 +153,7 @@ export function LivePlayerDialog({
           </h2>
           <p className="mt-1 truncate text-sm text-text-secondary">{item.channelTitle}</p>
         </div>
-        <Button onClick={() => ref.current?.close()} aria-label="Fechar player" className="shrink-0 px-3">
+        <Button onClick={requestClose} aria-label="Fechar player" className="shrink-0 px-3">
           <svg viewBox="0 0 16 16" className="size-4" aria-hidden="true">
             <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
           </svg>

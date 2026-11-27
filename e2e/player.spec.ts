@@ -81,34 +81,69 @@ test("incorporação desativada na lista: sem botão Assistir aqui", async ({ pa
   await expect(card.getByRole("button", { name: "Assistir aqui" })).toHaveCount(0);
 });
 
-test("plataforma sem player embutido: modo só-link (spec 025 CA3)", async ({ page, api }) => {
-  // A Kick ainda não tem player embutido (#53); a Twitch ganhou o seu na spec 032.
-  const kick = liveItem(1, {
-    id: "kick:canal_teste",
+const kickLive = () =>
+  liveItem(1, {
+    id: "kick:canal-teste",
     platform: "kick",
-    sourceId: "canal_teste",
+    sourceId: "canal-teste",
     title: "Live simulada da Kick",
     thumbnailUrl: null,
-    watchUrl: "https://kick.com/canal_teste",
-    embedUrl: "",
+    watchUrl: "https://kick.com/canal-teste",
+    embedUrl: "https://player.kick.com/canal-teste?autoplay=false&muted=true",
   });
-  api.setLives(ok(livesPayload([kick, liveItem(2)])));
+
+/** Player da Kick respondido no próprio teste: nada sai para a Kick (spec 051 D5). */
+async function fakeKickPlayer(page: Page) {
+  await page.route(
+    (u) => u.hostname === "player.kick.com",
+    (r) => r.fulfill({ contentType: "text/html", body: "<!doctype html><title>Player simulado</title><p>player</p>" }),
+  );
+}
+
+test("Kick: consentimento e player oficial, com link de fallback (spec 051 CA1, CA2, CA4)", async ({ page, api }) => {
+  await fakeKickPlayer(page);
+  api.setLives(ok(livesPayload([kickLive(), liveItem(2)])));
   await page.goto("/");
   const card = page.getByRole("article").filter({ hasText: "Live simulada da Kick" });
-  await expect(card.getByRole("link", { name: /^Kick/ })).toHaveAttribute("href", "https://kick.com/canal_teste");
-
-  await card.getByRole("button", { name: "Assistir aqui" }).click();
+  await expect(card.getByRole("link", { name: /^Kick/ })).toHaveAttribute("href", "https://kick.com/canal-teste");
+  const trigger = card.getByRole("button", { name: "Assistir aqui" });
+  await trigger.click();
   const dialog = page.getByRole("dialog");
-  await expect(dialog.getByText("Assista na Kick")).toBeVisible();
+  expect(api.statusPaths).toEqual(["/api/status/kick/canal-teste"]);
+
+  // Consentimento com a política da Kick antes do iframe (D2); sem aviso de login (D3).
+  await expect(dialog.getByRole("link", { name: "Política de Privacidade da Kick" })).toHaveAttribute("href", "https://kick.com/privacy-policy");
+  await expect(dialog.locator("p", { hasText: "carregado da Kick, que pode coletar dados de uso conforme a Política de Privacidade da Kick" })).toBeVisible();
+  await expect(dialog.getByText(/entre na sua conta|pedir login/)).toHaveCount(0);
   await expect(dialog.locator("iframe")).toHaveCount(0);
-  await expect(dialog.getByRole("button", { name: "Carregar player" })).toHaveCount(0);
   const link = dialog.getByRole("link", { name: /Abrir na Kick/ });
-  await expect(link).toHaveAttribute("href", "https://kick.com/canal_teste");
-  await link.focus();
-  await expect(link).toBeFocused();
-  expect(api.statusPaths).toEqual(["/api/status/kick/canal_teste"]);
+  await expect(link).toHaveAttribute("href", "https://kick.com/canal-teste");
+
+  await dialog.getByRole("button", { name: "Carregar player" }).click();
+  const iframe = dialog.locator("iframe");
+  await expect(iframe).toHaveAttribute("src", "https://player.kick.com/canal-teste?autoplay=false&muted=true");
+  await expect(iframe).toHaveAttribute("title", "Player da Kick: Live simulada da Kick");
+  await expect(dialog.getByText("Se o player não carregar ou mostrar erro, abra na Kick.")).toBeVisible();
+  await expect(link).toBeVisible();
+
+  // Acessibilidade (CA4): Esc fecha e o foco volta ao card.
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+});
+
+test("Kick: live encerrada na revalidação não carrega o player e mantém o link (spec 051 CA3)", async ({ page, api }) => {
+  await fakeKickPlayer(page);
+  api.setLives(ok(livesPayload([kickLive(), liveItem(2)])));
+  api.status = (id, platform) => ok(statusPayload(id, "ended", { platform }));
+  await page.goto("/");
+  await page.getByRole("article").filter({ hasText: "Live simulada da Kick" }).getByRole("button", { name: "Assistir aqui" }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByText("Esta live terminou")).toBeVisible();
+  await expect(dialog.getByText("A Kick pode ter a gravação.", { exact: false })).toBeVisible();
+  await expect(dialog.getByText("Encerrada", { exact: true })).toBeVisible();
+  await expect(dialog.locator("iframe")).toHaveCount(0);
+  await expect(dialog.getByRole("link", { name: /Abrir na Kick/ })).toBeVisible();
 });
 
 const twitchLive = () =>

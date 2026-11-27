@@ -48,8 +48,14 @@ describe("embedSrc (CA2)", () => {
       );
     }
   });
-  it("plataforma sem embed não tem URL de iframe (spec 025)", () => {
-    expect(embedSrc({ platform: "kick", sourceId: "canal" }, { hostname: "x" })).toBeNull();
+  it("Kick: player oficial pelo slug, sem autoplay e sem som, sem depender do domínio (spec 051 CA1)", () => {
+    for (const hostname of ["radardelives.darioreis.dev", "localhost"]) {
+      expect(embedSrc({ platform: "kick", sourceId: "canal-x" }, { hostname })).toBe(
+        "https://player.kick.com/canal-x?autoplay=false&muted=true",
+      );
+    }
+    // Slug é codificado (defesa extra; a validação já recusa formatos estranhos).
+    expect(embedSrc({ platform: "kick", sourceId: "a b" }, { hostname: "x" })).toBe("https://player.kick.com/a%20b?autoplay=false&muted=true");
   });
   it("Twitch: player oficial com channel, parent do domínio, sem autoplay e sem som (spec 032 CA1)", () => {
     expect(embedSrc({ platform: "twitch", sourceId: "canal_x" }, { hostname: "radardelives.darioreis.dev" })).toBe(

@@ -91,8 +91,24 @@ export const PLATFORMS: Record<Platform, PlatformMeta> = {
       withPlayer: "Se a Twitch pedir login ou o player não carregar, abra na Twitch.",
     },
   },
-  // Player embutido da Kick entra na #53; até lá, só link.
-  kick: { label: "Kick", inLabel: "na Kick", ofLabel: "da Kick", subjectLabel: "A Kick", apiLabel: "da API da Kick", embed: false },
+  kick: {
+    label: "Kick",
+    inLabel: "na Kick",
+    ofLabel: "da Kick",
+    subjectLabel: "A Kick",
+    apiLabel: "da API da Kick",
+    embed: true,
+    // Player oficial (spec 051 D1): sem parent; sem autoplay e sem som até a pessoa agir.
+    // No spike (spec 020, P3) tocou sem pedir login: sem loginNotice; sem tamanho mínimo documentado.
+    embedSrc: (slug) => `https://player.kick.com/${encodeURIComponent(slug)}?autoplay=false&muted=true`,
+    consent: {
+      from: "da Kick",
+      privacyArticle: "a",
+      privacyName: "Política de Privacidade da Kick",
+      // Conferida em 2026-11-27 (200).
+      privacyUrl: "https://kick.com/privacy-policy",
+    },
+  },
 };
 
 export const platformMeta = (p: Platform): PlatformMeta => PLATFORMS[p];

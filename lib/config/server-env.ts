@@ -42,6 +42,11 @@ export function getServerEnv() {
     twitchStaleTtlSeconds: int("TWITCH_STALE_TTL_SECONDS", 600, 0, 3_600),
     /** Páginas de 100 lives buscadas na Twitch (spec 035): padrão 1, de 1 a 3. */
     twitchMaxPages: int("TWITCH_MAX_PAGES", 1, 1, 3),
+    /** Kick (spec 046): segredo só no servidor. Sem as duas, a Kick fica "não configurada". */
+    kickClientId: process.env.KICK_CLIENT_ID?.trim() || null,
+    kickClientSecret: process.env.KICK_CLIENT_SECRET?.trim() || null,
+    /** Categoria "Grand Theft Auto VI (GTA)" na Kick (spec 020, consultada em 2026-11-27). */
+    kickCategoryId: code("KICK_CATEGORY_ID", "13155", /^\d{1,20}$/),
     cacheTtlSeconds: int("LIVE_CACHE_TTL_SECONDS", 900, 30, 86_400),
     staleTtlSeconds: int("LIVE_STALE_TTL_SECONDS", 600, 0, 86_400),
     rateLimitSeconds: int("LIVE_RATE_LIMIT_SECONDS", 30, 5, 3_600),

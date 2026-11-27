@@ -109,6 +109,50 @@ test("miniatura da Twitch carrega sem violar a CSP (spec 031)", async ({ page, a
   expect(twitchRequests).toEqual([thumb]);
 });
 
+// PNG 1×1 transparente, para responder as miniaturas da Kick localmente.
+const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
+
+function kickItem(n: number, thumbnailUrl: string | null): LiveItem {
+  const slug = `canal-kick-${n}`;
+  return liveItem(n, {
+    id: `kick:${slug}`,
+    platform: "kick",
+    sourceId: slug,
+    title: `Live da Kick ${n}`,
+    thumbnailUrl,
+    watchUrl: `https://kick.com/${slug}`,
+    embedUrl: `https://player.kick.com/${slug}?autoplay=false&muted=true`,
+  });
+}
+
+test("miniaturas da Kick (images.kick.com e web.kick.com) carregam sem violar a CSP (spec 050)", async ({ page, api }) => {
+  const thumbs = [
+    "https://images.kick.com/video_thumbnails/AAAA/BBBB/720.webp",
+    "https://web.kick.com/video_thumbnails/CCCC/DDDD/720.webp",
+  ];
+  // Respondidas no próprio teste: nada sai para a Kick (spec 050 D4).
+  await page.route(
+    (u) => u.hostname === "images.kick.com" || u.hostname === "web.kick.com",
+    (r) => r.fulfill({ contentType: "image/png", body: PNG }),
+  );
+  api.setLives(
+    ok(livesPayload([liveItem(1), kickItem(2, thumbs[0]), kickItem(3, thumbs[1])], { sources: [source("youtube"), source("kick")] })),
+  );
+  const kickRequests: string[] = [];
+  page.on("request", (r) => {
+    if (/(^|\.)kick\.com$/.test(new URL(r.url()).hostname)) kickRequests.push(r.url());
+  });
+  await page.goto("/");
+  for (const [i, thumb] of thumbs.entries()) {
+    const img = page.getByRole("article").filter({ hasText: `Live da Kick ${i + 2}` }).locator("img");
+    await expect(img).toHaveAttribute("src", thumb);
+    await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
+  }
+  // Só as miniaturas; nenhuma chamada do navegador à API ou ao player da Kick (spec 050 D3).
+  expect(kickRequests.sort()).toEqual([...thumbs].sort());
+  // A violação de CSP, se houvesse, falharia o fixture (support.ts).
+});
+
 test.describe("aceite antes da Twitch (spec 033)", () => {
   test.use({ acceptPolicy: false });
 

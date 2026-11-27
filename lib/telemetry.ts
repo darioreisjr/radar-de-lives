@@ -25,7 +25,9 @@ export type TelemetryEvent =
   /** Token de app da Kick emitido ou descartado (spec 046). Nunca o valor do token. */
   | "kick_token"
   /** Falha na Kick: só stage, status HTTP e code (spec 046 D5). */
-  | "kick_error";
+  | "kick_error"
+  /** Busca feita na Kick (spec 048): só a quantidade de itens. */
+  | "kick_call";
 
 export type TelemetryFields = Record<string, string | number | boolean | null>;
 

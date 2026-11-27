@@ -193,6 +193,14 @@ Só começa se o #31 recomendar seguir. Sequência igual à da onda 2: #48 → #
 
 A Fase 1 já preparou tudo, então a Kick **não mexe** em modelo, agregador, filtro ou textos do site.
 
+**Estado do #31 (2026-11-27):** P1 a P4 concluídos; P3 sem bloqueio a partir da Vercel (`iad1`) e player sem pedir login. Recomendação final: **seguir com ressalvas**. Condições levadas para as issues (detalhes na spec 020):
+- **#49:** categoria `13155`; ~1800 lives em 2 páginas, da mais antiga para a mais nova → seguir o cursor, filtrar pt/en/es pelo prefixo e ficar com as 100 maiores por espectadores.
+- **#50:** cache curto (≤ 24 h pelos termos; sugestão 180 s); token de 60 dias em memória.
+- **#52:** `img-src https://images.kick.com https://web.kick.com`; `frame-src https://player.kick.com`.
+- **#53:** player `player.kick.com/<slug>` carregou sem pedir login no P3; não precisa do aviso da spec 044.
+- **#54:** atribuição sem logo; `/api/lives` como uso interno (proibição de re-distribuição); site não voltado a menores de 16.
+- **Selo adulto:** não mostrar na Kick (decisão D-K1: 98% da categoria vem marcada).
+
 ---
 
 ## 5. Estratégia de testes

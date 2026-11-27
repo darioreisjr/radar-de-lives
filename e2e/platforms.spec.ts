@@ -176,3 +176,29 @@ test.describe("aceite antes da Twitch (spec 033)", () => {
     await expect.poll(() => twitch).toEqual([thumb]);
   });
 });
+
+test.describe("aceite antes da Kick (spec 052)", () => {
+  test.use({ acceptPolicy: false });
+
+  test("nenhuma requisição à Kick antes do aceite; miniatura só depois (CA3)", async ({ page, api }) => {
+    const thumb = "https://images.kick.com/video_thumbnails/AAAA/BBBB/720.webp";
+    await page.route(
+      (u) => u.hostname === "images.kick.com" || u.hostname === "web.kick.com",
+      (r) => r.fulfill({ contentType: "image/png", body: PNG }),
+    );
+    api.setLives(ok(livesPayload([liveItem(1), kickItem(2, thumb)], { sources: [source("youtube"), source("kick")] })));
+    const kick: string[] = [];
+    page.on("request", (r) => {
+      if (/(^|\.)kick\.com$/.test(new URL(r.url()).hostname)) kick.push(r.url());
+    });
+
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "Antes de ver as lives" })).toBeVisible();
+    expect(api.livesCalls).toHaveLength(0);
+    expect(kick).toEqual([]);
+
+    await page.getByRole("button", { name: "Li e concordo. Continuar" }).click();
+    await expect(summary(page)).toHaveText("2 lives encontradas");
+    await expect.poll(() => kick).toEqual([thumb]);
+  });
+});

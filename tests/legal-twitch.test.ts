@@ -24,14 +24,15 @@ describe("textos legais com a Twitch (spec 033)", () => {
     expect(privacy).toContain("não envia dados de quem visita o site");
   });
 
-  it("idade mínima de 13 anos (Developer Agreement da Twitch)", () => {
-    expect(terms).toContain("não é direcionado a crianças menores de 13 anos");
-    expect(privacy).toContain("não é direcionado a crianças menores de 13 anos");
+  it("idade mínima: 16 anos desde a spec 052 (cobre os 13 anos do Developer Agreement da Twitch)", () => {
+    expect(terms).toContain("não é direcionado a menores de 16 anos");
+    expect(privacy).toContain("não é direcionado a menores de 16 anos");
+    expect(terms + privacy).not.toContain("menores de 13 anos");
   });
 
   it("aviso de marca e ausência de afiliação incluem a Twitch", () => {
-    expect(siteConfig.disclaimer).toContain("YouTube ou Twitch");
-    expect(terms).toContain("YouTube ou pela Twitch");
+    expect(siteConfig.disclaimer).toContain("YouTube, Twitch ou Kick");
+    expect(terms).toContain("YouTube, pela Twitch ou pela Kick");
   });
 
   it("tempos de cache do texto batem com os padrões do código", () => {
@@ -45,12 +46,12 @@ describe("textos legais com a Twitch (spec 033)", () => {
     // YouTube: 15 min + 10 min; Twitch: 3 min + 10 min.
     expect([min(env.cacheTtlSeconds), min(env.staleTtlSeconds)]).toEqual([15, 10]);
     expect([min(env.twitchCacheTtlSeconds), min(env.twitchStaleTtlSeconds)]).toEqual([3, 10]);
-    expect(privacy).toContain("os da Twitch por 3 minutos e, como dado antigo, por até cerca de 13 minutos no total");
-    expect(privacy).toContain("Twitch, 3 minutos, mais até cerca de 10 minutos como dado antigo");
-    expect(terms).toContain("ou 13 minutos (Twitch)");
+    expect(privacy).toContain("os da Twitch e os da Kick por 3 minutos e, como dado antigo, por até cerca de 13 minutos no total");
+    expect(privacy).toContain("Twitch e Kick, 3 minutos cada, mais até cerca de 10 minutos como dado antigo");
+    expect(terms).toContain("ou 13 minutos (Twitch e Kick)");
   });
 
-  it("a data de atualização mudou, o que pede novo aceite (spec 016)", () => {
-    expect(siteConfig.legal.updatedAt).toBe("2026-11-25");
+  it("a data de atualização mudou, o que pede novo aceite (spec 016; atualizada de novo na spec 052)", () => {
+    expect(siteConfig.legal.updatedAt).toBe("2026-11-27");
   });
 });

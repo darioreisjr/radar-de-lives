@@ -14,6 +14,7 @@ import { createStores, type Stores } from "@/lib/store";
 import { createKickClientFromEnv } from "@/lib/kick/client";
 import { searchKickLives } from "@/lib/kick/search";
 import { createKickLivesService, type KickPage } from "@/lib/kick/service";
+import { createKickStatusService, type KickStatusData } from "@/lib/kick/status";
 import { createTwitchClientFromEnv } from "@/lib/twitch/client";
 import { searchTwitchLives } from "@/lib/twitch/search";
 import { createTwitchLivesService, type TwitchPage } from "@/lib/twitch/service";
@@ -140,11 +141,19 @@ function build(): Runtime {
         },
       })
     : null;
+  // Revalidação ao abrir o player (spec 049): cache de 60 s, como no YouTube e na Twitch.
+  const kickStatus = kickClient
+    ? createKickStatusService({
+        client: kickClient,
+        cache: stores.cache<KickStatusData>("status:kick", 500),
+        ttlMs: 60_000,
+      })
+    : null;
 
   const providers = activeProviders(env.livesProviders, {
     youtube: createYoutubeProvider(lives, client !== null, status),
     twitch: createTwitchProvider(twitch, twitchStatus),
-    kick: createKickProvider(kick),
+    kick: createKickProvider(kick, kickStatus),
   });
 
   g.__radarRuntime = {

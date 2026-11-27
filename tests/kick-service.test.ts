@@ -184,11 +184,11 @@ describe("Kick no agregador (spec 048)", () => {
     expect(r.sources[1]).toMatchObject({ platform: "kick", ok: false, errorCode: "upstream_config" });
   });
 
-  it("D5: timeout de 12 s no agregador e ainda sem revalidação de status (#51)", () => {
+  it("D5: timeout de 12 s no agregador; sem serviço de status, sem revalidação", () => {
     const p = createKickProvider(null);
     expect(p.timeoutMs).toBe(KICK_TIMEOUT_MS);
     expect(KICK_TIMEOUT_MS).toBe(12_000);
-    expect(p.status).toBeUndefined();
+    expect(p.status).toBeUndefined(); // revalidação: spec 049
   });
 });
 

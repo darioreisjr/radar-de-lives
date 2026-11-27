@@ -114,10 +114,10 @@ Ordem obrigatória: #33 → #34 → #35. Depois, #36 → #37 e #38 podem correr 
 | [#38](https://github.com/darioreisjr/radar-de-lives/issues/38) selo, filtro, aviso parcial e selo adulto | M | Tudo escondido enquanto só houver uma plataforma ativa. |
 
 **Portão G1** (cada PR pode ir para produção assim que fizer merge):
-- [ ] O teste de caracterização passa sem mudança no snapshot.
-- [ ] A suíte e2e passa nos dois perfis (`desktop` e `mobile-375`).
-- [ ] Depois do deploy em produção, a home fica igual e `GET /api/lives` traz `sources` com só o YouTube.
-- [ ] Nas 24 h seguintes, o consumo de `search.list` fica dentro da média dos dias anteriores.
+- [x] O teste de caracterização passa sem mudança no snapshot.
+- [x] A suíte e2e passa nos dois perfis (`desktop` e `mobile-375`).
+- [x] Depois do deploy em produção, a home fica igual e `GET /api/lives` traz `sources` com só o YouTube.
+- [x] Nas 24 h seguintes, o consumo de `search.list` fica dentro da média dos dias anteriores. Conferido em 2026-11-27: contador diário em **2 de 90** buscas às 06:28 UTC (~200 de 10.000 unidades), sem `budget_exhausted`.
 
 ### Onda 2 — Twitch no código, desligada
 
@@ -148,8 +148,8 @@ O código vai para `main` e para produção, mas fica **inativo** até a onda 3,
 5. **Ensaio de rollback** (seção 6), uma vez, logo após a ativação.
 
 **Portão G3:**
-- [ ] Os 7 critérios da seção 1 estão confirmados em produção.
-- [ ] O ensaio de rollback foi feito e a Twitch foi reativada.
+- [x] Os 7 critérios da seção 1 estão confirmados em produção (ativação em 2026-11-25, registrada na #47; o critério 7 está na onda 5).
+- [x] O ensaio de rollback foi feito e a Twitch foi reativada (2026-11-25: desligar em 34 s, religar em 39 s; #47).
 
 ### Onda 4 — Encerramento da Twitch
 
@@ -168,6 +168,24 @@ Durante 48 h, acompanhe:
 - o Web Analytics.
 
 Se encontrar um bug, abra uma issue ligada ao #28.
+
+#### Registro (Twitch, de 2026-11-25 a 2026-11-27)
+
+**Limite:** os logs de runtime da Vercel duram ~1 h. O acompanhamento foi feito por **checagens pontuais** (decisão de 2026-11-25), sem Log Drain. Cada checagem cobre só a última hora.
+
+| Data (UTC) | Janela | Resultado |
+|---|---|---|
+| 2026-11-25 | 20:07–20:55 | 0 erros; 6 `twitch_call` com 97 a 100 itens |
+| 2026-11-25 | após o deploy da #82 | Preview e produção com chaves separadas no Redis (CA4 da spec 036) |
+| 2026-11-27 | 05:34–06:34 | 0 `twitch_error`, `provider_failed`, `stale_served`, `store_error`, `config_warning`, `budget_exhausted`, `route_error`; 0 respostas 429/5xx; 0 logs de erro ou aviso; `twitch_call` com 96 itens |
+
+**Ajustes feitos no período:**
+- [#78](https://github.com/darioreisjr/radar-de-lives/issues/78) (spec 035): busca da Twitch limitada a 1 página por padrão (`TWITCH_MAX_PAGES`); a lista caiu de ~350 para ~150 lives.
+- [#81](https://github.com/darioreisjr/radar-de-lives/issues/81) (spec 036): Preview e Development com prefixo próprio no Redis, depois que um Preview antigo gravou 293 lives no cache da produção. Os 55 Previews antigos foram apagados.
+
+**Não conferido pelo agente:** alertas de uso e de quota (S-13) e Web Analytics, que ficam no painel.
+
+**Conclusão:** critério 7 da seção 1 atendido nas janelas observadas. Monitoramento de 48 h da Twitch encerrado.
 
 ### Onda 6 — Kick (segunda leva)
 

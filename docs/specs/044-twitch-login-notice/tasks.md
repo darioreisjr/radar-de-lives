@@ -12,4 +12,4 @@
   - `npm run build`: ok (dentro do e2e);
   - `npm run test:e2e`: 64 testes;
   - captura do diálogo em 1280 px: aviso em destaque acima de "Carregar player"; rodapé "Se a Twitch pedir login ou o player não carregar, abra na Twitch." com o player carregado.
-- [ ] Depois do deploy: conferir o aviso em produção numa live real da Twitch.
+- [x] Depois do deploy (2026-11-27): em produção, numa live real da Twitch, o aviso aparece antes de "Carregar player" e o rodapé cita o login com o player aberto; o YouTube segue sem aviso. Registrado na [#86](https://github.com/darioreisjr/radar-de-lives/issues/86#issuecomment-7212188271).

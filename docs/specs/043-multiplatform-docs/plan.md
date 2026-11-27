@@ -12,5 +12,5 @@
 
 ## Arquivos
 
-- **Alterados:** `README.md`, `CLAUDE.md`, `.claude/skills/sdd/SKILL.md`, `sprint.md`
+- **Alterados:** `README.md`, `CLAUDE.md`, `.claude/skills/sdd/SKILL.md`, `sprint.md`, `.env.example`, `docs/specs/044-twitch-login-notice/tasks.md` (ampliação autorizada)
 - **Novos:** `docs/specs/043-multiplatform-docs/*`

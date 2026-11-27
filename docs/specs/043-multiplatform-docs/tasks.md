@@ -33,9 +33,9 @@
 
 - [x] lint e typecheck: ok; `npm test`: 26 arquivos, 259 testes; `npm run build`: ok. Sem mudança de código (e2e não obrigatório).
 
-## Pendências levadas ao responsável
+## Decisões do responsável (2026-11-27)
 
-- [ ] Remover `videoId`, a rota `/api/lives/[videoId]` e `source`? Se sim, issue própria.
-- [ ] Renumerar as specs reservadas nas issues da Kick (#48 a #54 citam 035–041; 035 e 036 já foram usadas).
-- [ ] `.env.example` sem `TWITCH_CACHE_TTL_SECONDS` e `TWITCH_STALE_TTL_SECONDS` (fora dos arquivos permitidos).
-- [ ] Spec 044: marcar a conferência em produção (feita e registrada na #86).
+- [x] Itens obsoletos: issue [#90](https://github.com/darioreisjr/radar-de-lives/issues/90) aberta (spec 053 reservada). (D1)
+- [x] Issues da Kick renumeradas: #48 → 046-kick-client, #49 → 047-kick-search, #50 → 048-kick-service, #51 → 049-kick-status, #52 → 050-kick-csp, #53 → 051-kick-player, #54 → 052-kick-legal (pasta e branch). #31 e #55 não citavam números. (D2)
+- [x] `.env.example` com `TWITCH_CACHE_TTL_SECONDS` e `TWITCH_STALE_TTL_SECONDS`. (D3)
+- [x] Spec 044: conferência em produção marcada. (D3)

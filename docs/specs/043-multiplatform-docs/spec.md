@@ -20,7 +20,12 @@ A documentação para pessoas e para agentes reflete o projeto multiplataforma, 
 
 **Não inclui**
 - Mudança de código.
-- `.env.example`: não documenta `TWITCH_CACHE_TTL_SECONDS` e `TWITCH_STALE_TTL_SECONDS` (fora dos arquivos permitidos; o README documenta as duas).
+- Remoção dos itens obsoletos (vai para a #90).
+
+**Ampliação autorizada pelo responsável (2026-11-27):**
+- `.env.example`: documentar `TWITCH_CACHE_TTL_SECONDS` e `TWITCH_STALE_TTL_SECONDS`.
+- `docs/specs/044-twitch-login-notice/tasks.md`: marcar a conferência em produção.
+- Corpo das issues da Kick (#48 a #54): specs renumeradas de 035–041 para 046–052.
 
 ## Fatos conferidos no código (2026-11-27)
 
@@ -36,9 +41,13 @@ A documentação para pessoas e para agentes reflete o projeto multiplataforma, 
 | CI: o bundle do cliente não pode conter o endpoint de token nem os nomes das credenciais da Twitch e da Kick. | `.github/workflows/ci.yml` |
 | Testes: 26 arquivos, 259 unitários; 72 e2e (36 por perfil). | `npm test`, `npm run test:e2e` |
 
-## Decisão pendente com o responsável
+## Decisões do responsável (2026-11-27)
 
-Quando remover o campo `videoId`, a rota `/api/lives/[videoId]` e o campo `source`. Se a decisão for remover, abrir uma issue própria (fora desta).
+| ID | Decisão |
+|---|---|
+| D1 | Remover `videoId`, a rota `/api/lives/[videoId]` e `source` numa issue própria: [#90](https://github.com/darioreisjr/radar-de-lives/issues/90) (spec 053 reservada). |
+| D2 | Renumerar as specs da Kick para 046–052 (035 e 036 já foram usadas por correções da Twitch). |
+| D3 | Incluir neste PR os dois ajustes fora dos arquivos da issue (`.env.example` e spec 044). |
 
 ## Critérios de aceite
 

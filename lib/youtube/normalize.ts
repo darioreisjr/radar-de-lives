@@ -22,18 +22,6 @@ export function parseViewers(v: unknown): number | null {
   return Number.isFinite(n) && n >= 0 ? Math.floor(n) : null;
 }
 
-/** Remove duplicatas por videoId mantendo a primeira ocorrência (melhor posição). */
-export function dedupeByVideoId<T extends { videoId: string }>(items: readonly T[]): T[] {
-  const seen = new Set<string>();
-  const out: T[] = [];
-  for (const item of items) {
-    if (seen.has(item.videoId)) continue;
-    seen.add(item.videoId);
-    out.push(item);
-  }
-  return out;
-}
-
 /** Extrai videoIds válidos e únicos da busca, preservando ordem. */
 export function searchVideoIds(items: readonly YtSearchItem[] | undefined): string[] {
   const ids: string[] = [];
@@ -85,7 +73,6 @@ export function normalizeLives(
       id: liveId("youtube", videoId),
       platform: "youtube",
       sourceId: videoId,
-      videoId,
       title: decodeEntities(title) || "Sem título",
       description: decodeEntities(d?.snippet?.description ?? s.description ?? ""),
       channelId: d?.snippet?.channelId ?? s.channelId ?? "",

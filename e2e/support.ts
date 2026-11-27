@@ -15,7 +15,6 @@ export function liveItem(n: number, over: Partial<LiveItem> = {}): LiveItem {
     id: `youtube:${id}`,
     platform: "youtube",
     sourceId: id,
-    videoId: id,
     title: `Live simulada ${n} de teste`,
     description: "Item simulado para testes de interface.",
     channelId: `canal-${n}`,
@@ -45,7 +44,6 @@ export function livesPayload(items: LiveItem[], over: Partial<LivesPayload> = {}
     cached: false,
     stale: false,
     nextPageToken: null,
-    source: "youtube",
     ...over,
   };
 }
@@ -54,7 +52,6 @@ export function statusPayload(id: string, state: LiveState, over: Partial<LiveSt
   return {
     platform: "youtube",
     sourceId: id,
-    videoId: id,
     state,
     embedAllowed: true,
     concurrentViewers: state === "live" ? 4321 : null,
@@ -76,8 +73,8 @@ export const apiError = (code: string, status: number, message: string): Reply =
 export const networkFailure: Reply = { abort: true };
 
 /**
- * Controla as respostas de /api/lives e da revalidação (/api/status/<platform>/<id>, spec 025;
- * e /api/lives/<id>, obsoleta). Qualquer outra rota de /api/ é bloqueada e registrada.
+ * Controla as respostas de /api/lives e da revalidação (/api/status/<platform>/<id>, spec 025).
+ * Qualquer outra rota de /api/ (inclusive a antiga /api/lives/<id>, removida na spec 053) é bloqueada e registrada.
  */
 export class ApiMock {
   private livesReplies: Reply[] = [ok(livesPayload(sixLives()))];
@@ -100,9 +97,7 @@ export class ApiMock {
       this.livesCalls.push(url.search);
       reply = this.livesReplies.length > 1 ? this.livesReplies.shift()! : this.livesReplies[0];
     } else {
-      const m =
-        url.pathname.match(/^\/api\/status\/(youtube|twitch|kick)\/([^/]+)$/) ??
-        url.pathname.match(/^\/api\/lives\/()([^/]+)$/);
+      const m = url.pathname.match(/^\/api\/status\/(youtube|twitch|kick)\/([^/]+)$/);
       if (!m) {
         this.unmocked.push(url.pathname);
         return route.abort();
@@ -110,7 +105,7 @@ export class ApiMock {
       const id = decodeURIComponent(m[2]);
       this.statusCalls.push(id);
       this.statusPaths.push(url.pathname);
-      reply = this.status(id, (m[1] || "youtube") as Platform);
+      reply = this.status(id, m[1] as Platform);
     }
     if (reply.abort) return route.abort("internetdisconnected");
     return route.fulfill({

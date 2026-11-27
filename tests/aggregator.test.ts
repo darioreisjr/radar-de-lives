@@ -55,7 +55,7 @@ function youtube(opts: { fetchImpl?: typeof fetch; cache?: MemoryCache<PageData>
 }
 
 const item = (platform: Platform, sourceId: string, rank: number): LiveItem => ({
-  id: liveId(platform, sourceId), platform, sourceId, videoId: sourceId,
+  id: liveId(platform, sourceId), platform, sourceId,
   title: sourceId, description: "", channelId: "c", channelTitle: "c", thumbnailUrl: null,
   publishedAt: null, liveStartedAt: null, concurrentViewers: null, language: "unknown",
   watchUrl: "", embedUrl: "", isLive: true, embedAllowed: true, isMature: false, rank,

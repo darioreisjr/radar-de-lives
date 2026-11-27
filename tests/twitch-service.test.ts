@@ -15,7 +15,7 @@ import { LivesError } from "@/lib/youtube/errors";
 const T0 = Date.parse("2026-11-25T12:00:00Z");
 
 const item = (platform: Platform, id: string, rank: number): LiveItem => ({
-  id: liveId(platform, id), platform, sourceId: id, videoId: id,
+  id: liveId(platform, id), platform, sourceId: id,
   title: id, description: "", channelId: "c", channelTitle: "c", thumbnailUrl: null,
   publishedAt: null, liveStartedAt: null, concurrentViewers: 10, language: "pt",
   watchUrl: "", embedUrl: "", isLive: true, embedAllowed: true, isMature: false, rank,

@@ -40,11 +40,11 @@ describe("contrato com a resposta real da Twitch (spec 028)", () => {
 
   it("CA1: a fixture gera LiveItems válidos com platform twitch e id twitch:<login>", () => {
     const items = fixture.data.map((raw, i) => normalizeStream(TwitchStreamSchema.parse(raw), i, false));
+    expect(items[0]).not.toHaveProperty("videoId"); // spec 053
     expect(items[0]).toMatchObject({
       id: "twitch:canal_teste_de",
       platform: "twitch",
       sourceId: "canal_teste_de",
-      videoId: "canal_teste_de",
       title: "[DROPS] GTA6 Story & Easter Eggs | Drops aktiv",
       channelId: "10000001",
       channelTitle: "Canal_Teste_DE",

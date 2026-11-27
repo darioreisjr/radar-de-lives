@@ -16,11 +16,6 @@ export interface LiveItem {
   platform: Platform;
   /** Id na plataforma de origem (videoId no YouTube, login do canal na Twitch, slug na Kick). */
   sourceId: string;
-  /**
-   * @deprecated Igual a `sourceId`. Mantido para não mudar o payload na Fase 1 (spec 021 D1);
-   * a remoção fica para a consolidação (#57). Código novo deve usar `id` ou `sourceId`.
-   */
-  videoId: string;
   title: string;
   description: string;
   channelId: string;
@@ -59,19 +54,18 @@ export interface LivesPayload {
   cached: boolean;
   stale: boolean;
   nextPageToken: string | null;
-  source: "youtube" | "fixture";
+  /** Só nos dados simulados de desenvolvimento, montados no cliente; o servidor nunca envia (spec 053 D4). */
+  demo?: true;
   /** Enviado sempre pelo servidor; ausente = só YouTube (spec 022 D9). */
   sources?: SourceStatus[];
 }
 
 export type LiveState = "live" | "ended" | "upcoming" | "unavailable";
 
-/** Resposta de GET /api/status/[platform]/[id] e de /api/lives/[videoId] (spec 024 D3). */
+/** Resposta de GET /api/status/[platform]/[id] (spec 024). */
 export interface LiveStatusPayload {
   platform: Platform;
   sourceId: string;
-  /** @deprecated Igual a `sourceId`; mantido porque a rota antiga já o devolvia (spec 024 D3). */
-  videoId: string;
   state: LiveState;
   embedAllowed: boolean | "unknown";
   concurrentViewers: number | null;

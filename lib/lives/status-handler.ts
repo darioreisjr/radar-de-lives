@@ -13,7 +13,7 @@ export interface StatusHandlerDeps {
 }
 
 /**
- * Handler compartilhado por /api/status/[platform]/[id] e /api/lives/[videoId] (spec 024).
+ * Handler de /api/status/[platform]/[id] (spec 024; a rota antiga /api/lives/[videoId] saiu na spec 053).
  * Ordem igual à da rota original: rate limit, validação, provedor (D2).
  */
 export function createStatusHandler(deps: StatusHandlerDeps) {
@@ -23,7 +23,7 @@ export function createStatusHandler(deps: StatusHandlerDeps) {
     request: Request,
     platform: string,
     id: string,
-    opts: { idLabel?: string; route: string },
+    opts: { route: string },
   ): Promise<Response> {
     const limited = await deps.rateLimit().check(clientKey(request));
     if (!limited.ok) return errorResponse("rate_limited", undefined, limited.retryAfterSeconds);
@@ -32,7 +32,7 @@ export function createStatusHandler(deps: StatusHandlerDeps) {
     const status = deps.providers().find((p) => p.platform === platform)?.status;
     if (!status) return errorResponse("invalid_params", "Parâmetros inválidos: plataforma inválida");
     if (!status.isValidId(id)) {
-      return errorResponse("invalid_params", `Parâmetros inválidos: ${opts.idLabel ?? "id"} inválido`);
+      return errorResponse("invalid_params", "Parâmetros inválidos: id inválido");
     }
 
     try {

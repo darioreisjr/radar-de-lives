@@ -10,6 +10,7 @@ import { RefreshStatus } from "@/components/lives/refresh-status";
 import { EmptyState, ErrorState, QuotaState, SetupState } from "@/components/lives/states";
 import { Button } from "@/components/ui/button";
 import { applyLiveFilters } from "@/lib/lives/filter";
+import { liveDomId } from "@/lib/lives/identity";
 import { coverageNote } from "@/lib/lives/copy";
 import { activePlatforms, hasPartialFailure } from "@/lib/lives/sources";
 
@@ -41,9 +42,17 @@ export function LiveExplorer() {
   }
 
   function closePlayer() {
+    const item = selected;
     setSelectedId(null);
-    // Devolve o foco ao botão que abriu o diálogo.
-    triggerRef.current?.focus();
+    // Devolve o foco ao botão que abriu o diálogo (spec 045 D1).
+    const trigger = triggerRef.current;
+    if (trigger?.isConnected) return trigger.focus();
+    // Live encerrada ou indisponível: o "Assistir aqui" saiu do card; vai para o link da plataforma (D2).
+    const card = item ? document.getElementById(`${liveDomId(item)}-title`)?.closest("article") : null;
+    const link = card?.querySelector<HTMLElement>("a[href]");
+    if (link) return link.focus();
+    // Sem o card: título da seção, nunca o <body> (D3).
+    document.getElementById("lives-title")?.focus();
   }
   const filtered = filters.q.trim() !== "" || filters.lang !== "all" || platformFilter !== "all";
   const partial = hasPartialFailure(state.meta?.sources);
@@ -52,7 +61,7 @@ export function LiveExplorer() {
   return (
     <section id="lives" aria-labelledby="lives-title" className="scroll-mt-20">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
-        <h2 id="lives-title" className="sr-only">
+        <h2 id="lives-title" tabIndex={-1} className="sr-only">
           Lives encontradas
         </h2>
 

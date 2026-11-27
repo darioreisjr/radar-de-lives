@@ -169,7 +169,7 @@ Branch descartável `spike/kick-network` (rota `/api/spike-kick` e página `/spi
 | Maiores em pt/en/es | 9729 (en), 6957 (en), 6891 (es) |
 | Player embutido | `player.kick.com/<slug>?autoplay=false&muted=true` carregou no iframe com a CSP liberando `player.kick.com`, mostrando o canal, a categoria e "LIVE · 9.7K watching", **sem tela de idade ou login** (ao contrário da Twitch) |
 
-**I3 confirmada:** o `slug` abre o player. A branch, os Previews dela e as variáveis foram removidos depois do teste.
+**I3 confirmada:** o `slug` abre o player. A branch e os Previews dela foram removidos depois do teste; as variáveis `KICK_*` do Preview ficam para o responsável remover pelo painel.
 
 ### Decisão do responsável (2026-11-27)
 
